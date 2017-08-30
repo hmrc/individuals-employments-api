@@ -1,0 +1,11 @@
+{
+  "_links": {
+    "paye": {
+      "href": "/individuals/employments/paye/match/8f9e634e-85f1-4e39-8735-609d149513d7{?fromDate,toDate}",
+      "title": "View individual's employments"
+    },
+    "self": {
+      "href": "/individuals/employments/match/8f9e634e-85f1-4e39-8735-609d149513d7"
+    }
+  }
+}
