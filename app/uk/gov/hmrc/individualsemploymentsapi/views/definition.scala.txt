@@ -1,0 +1,40 @@
+@import play.api.libs.json.Json
+@(standardWhitelistedApplicationIds: Seq[String], privilegedWhitelistedApplicationIds: Seq[String])
+{
+  "scopes":[
+    {
+      "key":"read:individuals-employments",
+      "name":"access all individuals employment information",
+      "description":"Access employments history for all individuals"
+    },
+    {
+      "key":"read:individual-employments",
+      "name":"access employment information",
+      "description":"Access employment history",
+      "confidenceLevel":200
+    }
+  ],
+  "api":{
+    "name":"Individuals Employments",
+    "description":"Individuals Employments API",
+    "context":"individuals/employments",
+    "versions":[
+      {
+        "version":"P1",
+        "status":"PUBLISHED",
+        "access":{
+          "type":"PRIVATE",
+          "whitelistedApplicationIds": @Json.toJson(privilegedWhitelistedApplicationIds)
+        }
+      },
+      {
+        "version":"1",
+        "status":"PROTOTYPED",
+        "access":{
+          "type":"PRIVATE",
+          "whitelistedApplicationIds": @Json.toJson(standardWhitelistedApplicationIds)
+        }
+      }
+    ]
+  }
+}
