@@ -18,6 +18,7 @@ package uk.gov.hmrc.individualsemploymentsapi
 
 import com.typesafe.config.Config
 import play.api.{Application, Configuration, Play}
+import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils._
 import uk.gov.hmrc.play.audit.filters.AuditFilter
 import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig}
@@ -31,7 +32,7 @@ import play.api.Play.current
 import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
 import uk.gov.hmrc.api.connector.ServiceLocatorConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
-
+import play.api.mvc.RequestHeader
 
 object ControllerConfiguration extends ControllerConfig {
   lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
@@ -72,4 +73,16 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal with ServiceLocatorR
   override val slConnector = ServiceLocatorConnector(WSHttp)
 
   override lazy val registrationEnabled = Play.current.configuration.getBoolean("microservice.services.service-locator.enabled").getOrElse(false)
+
+  private lazy val unversionedContexts = Play.current.configuration.getStringSeq("versioning.unversionedContexts").getOrElse(Seq.empty[String])
+
+  override def onRequestReceived(originalRequest: RequestHeader) = {
+    val requestContext = extractUriContext(originalRequest)
+    if (unversionedContexts.contains(requestContext)) {
+      super.onRequestReceived(originalRequest)
+    } else {
+      super.onRequestReceived(getVersionedRequest(originalRequest))
+    }
+  }
+
 }
