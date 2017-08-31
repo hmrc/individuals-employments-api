@@ -31,9 +31,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.{failed, successful}
 
-class EmploymentsController extends Controller with Recovery {
+abstract class EmploymentsController extends Controller with Recovery {
 
-  def hateoas(matchId: UUID) = Action.async {
+  def root(matchId: UUID) = Action.async {
     resolve(matchId) map { _ =>
       val payeLink = HalLink("paye", s"/individuals/employments/paye/match/$matchId{?fromDate,toDate}", title = Option("View individual's employments"))
       val selfLink = HalLink("self", s"/individuals/employments/match/$matchId")
@@ -41,7 +41,7 @@ class EmploymentsController extends Controller with Recovery {
     } recover recovery
   }
 
-  protected def resolve(matchId: UUID): Future[Nino] = ???
+  protected def resolve(matchId: UUID): Future[Nino]
 
 }
 

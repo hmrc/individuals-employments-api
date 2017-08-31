@@ -22,7 +22,7 @@ import uk.gov.hmrc.domain.Nino
 
 object SandboxData {
 
-  val sandboxMatchId = UUID.fromString("8f9e634e-85f1-4e39-8735-609d149513d7")
-  val sandboxNino = Nino("AB123456C")
+  val sandboxMatchId = UUID.fromString("57072660-1df9-4aeb-b4ea-cd2d7f96e430")
+  val sandboxNino = Nino("NA000799C")
 
 }

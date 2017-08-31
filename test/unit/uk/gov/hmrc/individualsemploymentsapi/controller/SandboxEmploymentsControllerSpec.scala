@@ -34,7 +34,7 @@ class SandboxEmploymentsControllerSpec extends PlaySpec with Results {
     val sandboxEmploymentsController = new SandboxEmploymentsController
 
     "return a 404 (not found) when a match id does not match sandbox data" in {
-      val eventualResult = sandboxEmploymentsController.hateoas(UUID.fromString("322049c9-ffcf-4483-992b-48bf48010a71")).apply(FakeRequest())
+      val eventualResult = sandboxEmploymentsController.root(UUID.fromString("322049c9-ffcf-4483-992b-48bf48010a71")).apply(FakeRequest())
       status(eventualResult) mustBe NOT_FOUND
       contentAsJson(eventualResult) mustBe parse(
         """
@@ -46,7 +46,7 @@ class SandboxEmploymentsControllerSpec extends PlaySpec with Results {
     }
 
     "return a 200 (ok) when a match id matches sandbox data" in {
-      val eventualResult = sandboxEmploymentsController.hateoas(sandboxMatchId).apply(FakeRequest())
+      val eventualResult = sandboxEmploymentsController.root(sandboxMatchId).apply(FakeRequest())
       status(eventualResult) mustBe OK
       contentAsJson(eventualResult) mustBe parse(
         s"""

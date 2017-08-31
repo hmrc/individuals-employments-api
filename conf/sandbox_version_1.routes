@@ -1,0 +1,3 @@
+# sandbox routes
+
+GET      /match/:matchId                                      @uk.gov.hmrc.individualsemploymentsapi.controller.SandboxEmploymentsController.root(matchId: java.util.UUID)
