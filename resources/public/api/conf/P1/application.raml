@@ -24,7 +24,7 @@ uses:
   annotations: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/annotations.raml
   types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
 
-/individuals/employment:
+/individuals/employments:
   /match/{matchId}:
     uriParameters:
       matchId:
@@ -45,13 +45,3 @@ uses:
             application/json:
               example: !include examples/root.json
               type: !include schemas/root.json
-
-/hello-world:
-  get:
-    displayName: Hello world endpoint
-    description: This is a hello world enpoint
-    responses:
-      200:
-        body:
-          text/plain:
-            example: Hello world
