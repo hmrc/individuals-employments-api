@@ -14,37 +14,36 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.error
+package uk.gov.hmrc.individualsemploymentsapi.controller
 
 import java.util.UUID
 
 import org.joda.time.DateTime
-import play.api.mvc.{Controller, Request, Result}
+import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorNotFound, MatchNotFoundException}
-import uk.gov.hmrc.individualsemploymentsapi.util.Dates.toFormattedLocalDate
+import uk.gov.hmrc.individualsemploymentsapi.util.Dates._
+import uk.gov.hmrc.play.microservice.controller.BaseController
 
 import scala.concurrent.Future
-import scala.concurrent.Future.successful
 import scala.util.{Success, Try}
 
-trait Recovery {
-  this: Controller =>
+trait CommonController extends BaseController {
 
   protected def withUuid(uuidString: String)(f: UUID => Future[Result]): Future[Result] = {
     Try(UUID.fromString(uuidString)) match {
       case Success(uuid) => f(uuid)
-      case _ => successful(ErrorNotFound.toHttpResponse)
+      case _ => Future.successful(ErrorNotFound.toHttpResponse)
     }
   }
 
   private def getQueryParam[T](name: String)(implicit request: Request[T]) = request.queryString.get(name).flatMap(_.headOption)
 
-  protected def urlWithInterval[T](url: String, fromDate: DateTime)(implicit request: Request[T]) = {
+  private[controller] def urlWithInterval[T](url: String, fromDate: DateTime)(implicit request: Request[T]) = {
     val urlWithFromDate = s"$url?fromDate=${toFormattedLocalDate(fromDate)}"
     getQueryParam("toDate") map (toDate => s"$urlWithFromDate&toDate=$toDate") getOrElse urlWithFromDate
   }
 
-  protected def recovery: PartialFunction[Throwable, Result] = {
+  private[controller] def recovery: PartialFunction[Throwable, Result] = {
     case _: MatchNotFoundException => ErrorNotFound.toHttpResponse
     case e: IllegalArgumentException => ErrorInvalidRequest(e.getMessage).toHttpResponse
   }
