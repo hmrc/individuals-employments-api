@@ -17,21 +17,25 @@
 package uk.gov.hmrc.individualsemploymentsapi.controller
 
 import java.util.UUID
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
 
+import org.joda.time.Interval
 import play.api.hal.Hal._
 import play.api.hal.HalLink
 import play.api.mvc.hal._
+import play.api.libs.json.Json.{obj, toJson}
 import play.api.mvc.{Action, Controller}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.error.Recovery
+import uk.gov.hmrc.individualsemploymentsapi.service.{EmploymentsService, SandboxEmploymentsService}
+import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.{failed, successful}
 
-abstract class EmploymentsController extends Controller with Recovery {
+abstract class EmploymentsController(employmentsService: EmploymentsService) extends Controller with Recovery {
 
   def root(matchId: UUID) = Action.async {
     resolve(matchId) map { _ =>
@@ -41,12 +45,26 @@ abstract class EmploymentsController extends Controller with Recovery {
     } recover recovery
   }
 
+  def paye(matchId: String, interval: Interval) = Action.async { implicit request =>
+    withUuid(matchId) { matchUuid =>
+      resolve(matchUuid) flatMap { _ =>
+        employmentsService.paye(matchUuid, interval) map { employments =>
+          val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye/match/$matchId", interval.getStart))
+          val employmentsJsObject = obj("employments" -> toJson(employments))
+          val embeddedJsObject = obj("_embedded" -> employmentsJsObject)
+          Ok(state(embeddedJsObject) ++ selfLink)
+        }
+      }
+    } recover recovery
+  }
+
   protected def resolve(matchId: UUID): Future[Nino]
 
 }
 
 @Singleton
-class SandboxEmploymentsController extends EmploymentsController {
+class SandboxEmploymentsController @Inject()(sandboxEmploymentsService: SandboxEmploymentsService)
+  extends EmploymentsController(sandboxEmploymentsService) {
 
   import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData._
 

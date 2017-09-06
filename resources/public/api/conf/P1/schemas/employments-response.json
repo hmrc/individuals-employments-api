@@ -1,0 +1,98 @@
+{
+  "_links":{
+    "self":{
+      "href":"/individuals/employments/paye/match/57072660-1df9-4aeb-b4ea-cd2d7f96e430?fromDate=2016-02-28"
+    }
+  },
+  "_embedded": {
+    "type": "object",
+    "properties": {
+      "employments": {
+        "type": "array",
+        "description": "List of employments for the requested period",
+        "items": {
+          "type": "object",
+          "properties": {
+            "payFrequency": {
+              "type": "string",
+              "description": "A value representing the frequency of payment for an employment",
+              "enum": [
+                "WEEKLY",
+                "FORTNIGHTLY",
+                "FOUR_WEEKLY",
+                "CALENDAR_MONTHLY",
+                "QUARTERLY",
+                "BI_ANNUALLY",
+                "ANNUALLY",
+                "ONE_OFF",
+                "IRREGULAR"
+              ]
+            },
+            "startDate": {
+              "type": "string",
+              "description": "The start date for an employment. Date in the format: YYYY-MM-DD.",
+              "example": "2016-06-30"
+            },
+            "endDate": {
+              "type": "string",
+              "description": "The end date for an employment. Date in the format: YYYY-MM-DD.",
+              "example": "2017-06-30"
+            },
+            "employer": {
+              "type": "object",
+              "description": "Employer's details",
+              "properties": {
+                "payeReference": {
+                  "type": "string",
+                  "description": "Employer PAYE Reference",
+                  "example": "123/AI45678"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Employer's name"
+                },
+                "address": {
+                  "type": "object",
+                  "description": "Employer's address",
+                  "properties": {
+                    "line1": {
+                      "type": "string",
+                      "description": "Address line 1"
+                    },
+                    "line2": {
+                      "type": "string",
+                      "description": "Address line 2"
+                    },
+                    "line3": {
+                      "type": "string",
+                      "description": "Address line 3"
+                    },
+                    "line4": {
+                      "type": "string",
+                      "description": "Address line 4"
+                    },
+                    "line5": {
+                      "type": "string",
+                      "description": "Address line 5"
+                    },
+                    "postcode": {
+                      "type": "string",
+                      "description": "Postcode"
+                    }
+                  },
+                  "required": [
+                    "line1",
+                    "postcode"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "required": [
+      "employments"
+    ]
+  }
+}

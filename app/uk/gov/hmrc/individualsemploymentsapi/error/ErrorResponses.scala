@@ -16,26 +16,23 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.error
 
-import play.api.http.Status.NOT_FOUND
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.http.Status.{NOT_FOUND, _}
 import play.api.libs.json.Json.toJson
 import play.api.mvc.Results.Status
-
-import play.api.http.Status._
-import play.api.libs.json.Json
-import play.api.mvc.Results
+import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 object ErrorResponses {
 
   sealed abstract class ErrorResponse(val httpStatusCode: Int, val errorCode: String, val message: String) {
+
     def toHttpResponse = Status(httpStatusCode)(toJson(this))
   }
 
-  implicit val errorResponseWrites = new Writes[ErrorResponse] {
-    def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
-  }
-
   case object ErrorNotFound extends ErrorResponse(NOT_FOUND, "NOT_FOUND", "The resource can not be found")
+
+  case class ErrorInvalidRequest(errorMessage: String) extends ErrorResponse(BAD_REQUEST, "INVALID_REQUEST", errorMessage)
+
+  class ValidationException(message: String) extends RuntimeException(message)
 
   class MatchNotFoundException extends RuntimeException
 

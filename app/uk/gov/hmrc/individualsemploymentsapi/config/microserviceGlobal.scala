@@ -17,22 +17,27 @@
 package uk.gov.hmrc.individualsemploymentsapi
 
 import com.typesafe.config.Config
+import net.ceedubs.ficus.Ficus._
+import play.api.libs.json.Json
+import play.api.mvc.{RequestHeader, Result}
 import play.api.{Application, Configuration, Play}
+import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
+import uk.gov.hmrc.api.connector.ServiceLocatorConnector
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ErrorInvalidRequest
+import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.errorInvalidRequestFormat
 import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils._
 import uk.gov.hmrc.play.audit.filters.AuditFilter
 import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
+import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig}
+import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
+import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
-import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
-import net.ceedubs.ficus.Ficus._
-import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
-import play.api.i18n.Messages.Implicits._
-import play.api.Play.current
-import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
-import uk.gov.hmrc.api.connector.ServiceLocatorConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
-import play.api.mvc.RequestHeader
+
+import scala.concurrent.Future
+import scala.concurrent.Future.successful
+import scala.util.Try
 
 object ControllerConfiguration extends ControllerConfig {
   lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
@@ -44,6 +49,7 @@ object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
 
 object MicroserviceAuditFilter extends AuditFilter with AppName with MicroserviceFilterSupport {
   override val auditConnector = MicroserviceAuditConnector
+
   override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
 }
 
@@ -54,6 +60,7 @@ object MicroserviceLoggingFilter extends LoggingFilter with MicroserviceFilterSu
 object MicroserviceAuthFilter extends AuthorisationFilter with MicroserviceFilterSupport {
   override lazy val authParamsConfig = AuthParamsControllerConfiguration
   override lazy val authConnector = MicroserviceAuthConnector
+
   override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
 }
 
@@ -82,6 +89,13 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal with ServiceLocatorR
       super.onRequestReceived(originalRequest)
     } else {
       super.onRequestReceived(getVersionedRequest(originalRequest))
+    }
+  }
+
+  override def onBadRequest(request: RequestHeader, error: String): Future[Result] = {
+    Try(Json.parse(error).as[ErrorInvalidRequest]).toOption match {
+      case Some(errorResponse) => successful(errorResponse.toHttpResponse)
+      case _ => successful(ErrorInvalidRequest("Invalid Request").toHttpResponse)
     }
   }
 
