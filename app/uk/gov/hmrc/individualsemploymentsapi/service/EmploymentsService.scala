@@ -20,6 +20,7 @@ import java.util.UUID
 import javax.inject.Singleton
 
 import org.joda.time.{Interval, LocalDate}
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 
@@ -30,6 +31,8 @@ trait EmploymentsService {
 
   implicit val localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ isBefore _)
 
+  def resolve(matchId: UUID): Future[Nino]
+
   def paye(matchId: UUID, interval: Interval): Future[Seq[Employment]]
 
 }
@@ -38,6 +41,9 @@ trait EmploymentsService {
 class SandboxEmploymentsService extends EmploymentsService {
 
   import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.Individuals.find
+  import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData._
+
+  override def resolve(matchId: UUID) = if (matchId.equals(sandboxMatchId)) successful(sandboxNino) else failed(new MatchNotFoundException)
 
   override def paye(matchId: UUID, interval: Interval) = paye(find(matchId), interval)
 

@@ -27,6 +27,7 @@ import play.api.libs.json.Json.parse
 import play.api.mvc._
 import play.api.test.Helpers._
 import play.api.test._
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.individualsemploymentsapi.controller.SandboxEmploymentsController
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
@@ -42,7 +43,9 @@ class SandboxEmploymentsControllerSpec extends PlaySpec with Results with Mockit
   "Sandbox employments controller root function" should {
 
     "return a 404 (not found) when a match id does not match sandbox data" in {
-      val eventualResult = sandboxEmploymentsController.root(UUID.fromString("322049c9-ffcf-4483-992b-48bf48010a71")).apply(FakeRequest())
+      val invalidMatchId = UUID.randomUUID()
+      when(sandboxEmploymentsService.resolve(invalidMatchId)).thenReturn(failed(new MatchNotFoundException))
+      val eventualResult = sandboxEmploymentsController.root(invalidMatchId).apply(FakeRequest())
       status(eventualResult) mustBe NOT_FOUND
       contentAsJson(eventualResult) mustBe parse(
         """
@@ -54,6 +57,7 @@ class SandboxEmploymentsControllerSpec extends PlaySpec with Results with Mockit
     }
 
     "return a 200 (ok) when a match id matches sandbox data" in {
+      when(sandboxEmploymentsService.resolve(sandboxMatchId)).thenReturn(successful(Nino("AB123456C")))
       val eventualResult = sandboxEmploymentsController.root(sandboxMatchId).apply(FakeRequest())
       status(eventualResult) mustBe OK
       contentAsJson(eventualResult) mustBe parse(
