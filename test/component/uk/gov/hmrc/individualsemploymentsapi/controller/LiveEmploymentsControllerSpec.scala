@@ -39,6 +39,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("invalid token") {
       Given("an invalid token")
+      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken)
 
       When("the root entry point to the API is invoked")
       val response = invokeRootEndpoint

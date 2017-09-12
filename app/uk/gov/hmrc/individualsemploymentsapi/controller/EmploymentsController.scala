@@ -25,38 +25,48 @@ import play.api.hal.HalLink
 import play.api.libs.json.Json.{obj, toJson}
 import play.api.mvc.hal._
 import play.api.mvc.Action
+import uk.gov.hmrc.individualsemploymentsapi.config.ServiceAuthConnector
+import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.service.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService}
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-abstract class EmploymentsController(employmentsService: EmploymentsService) extends CommonController {
+abstract class EmploymentsController(employmentsService: EmploymentsService) extends CommonController with PrivilegedAuthentication {
 
   def root(matchId: UUID) = Action.async { implicit request =>
-    employmentsService.resolve(matchId) map { _ =>
-      val payeLink = HalLink("paye", s"/individuals/employments/paye/match?matchId=$matchId{&fromDate,toDate}", title = Option("View individual's employments"))
-      val selfLink = HalLink("self", s"/individuals/employments/match?matchId=$matchId")
-      Ok(links(payeLink, selfLink))
-    } recover recovery
+    requiresPrivilegedAuthentication {
+      employmentsService.resolve(matchId) map { _ =>
+        val payeLink = HalLink("paye", s"/individuals/employments/paye/match?matchId=$matchId{&fromDate,toDate}", title = Option("View individual's employments"))
+        val selfLink = HalLink("self", s"/individuals/employments/match?matchId=$matchId")
+        Ok(links(payeLink, selfLink))
+      } recover recovery
+    }
   }
 
   def paye(matchId: String, interval: Interval) = Action.async { implicit request =>
-    withUuid(matchId) { matchUuid =>
-      employmentsService.paye(matchUuid, interval) map { employments =>
-        val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye/match?matchId=$matchId", interval.getStart))
-        val employmentsJsObject = obj("employments" -> toJson(employments))
-        val embeddedJsObject = obj("_embedded" -> employmentsJsObject)
-        Ok(state(embeddedJsObject) ++ selfLink)
-      }
-    } recover recovery
+    requiresPrivilegedAuthentication {
+      withUuid(matchId) { matchUuid =>
+        employmentsService.paye(matchUuid, interval) map { employments =>
+          val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye/match?matchId=$matchId", interval.getStart))
+          val employmentsJsObject = obj("employments" -> toJson(employments))
+          val embeddedJsObject = obj("_embedded" -> employmentsJsObject)
+          Ok(state(embeddedJsObject) ++ selfLink)
+        }
+      } recover recovery
+    }
   }
 
 }
 
 @Singleton
-class SandboxEmploymentsController @Inject()(sandboxEmploymentsService: SandboxEmploymentsService)
-  extends EmploymentsController(sandboxEmploymentsService)
+class SandboxEmploymentsController @Inject()(sandboxEmploymentsService: SandboxEmploymentsService, val authConnector: ServiceAuthConnector)
+  extends EmploymentsController(sandboxEmploymentsService) {
+  override val environment = SANDBOX
+}
 
 @Singleton
-class LiveEmploymentsController @Inject()(liveEmploymentsService: LiveEmploymentsService)
-  extends EmploymentsController(liveEmploymentsService)
+class LiveEmploymentsController @Inject()(liveEmploymentsService: LiveEmploymentsService, val authConnector: ServiceAuthConnector)
+  extends EmploymentsController(liveEmploymentsService) {
+  override val environment = PRODUCTION
+}
