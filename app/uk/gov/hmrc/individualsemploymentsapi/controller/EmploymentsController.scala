@@ -34,8 +34,8 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
 
   def root(matchId: UUID) = Action.async { implicit request =>
     employmentsService.resolve(matchId) map { _ =>
-      val payeLink = HalLink("paye", s"/individuals/employments/paye/match/$matchId{?fromDate,toDate}", title = Option("View individual's employments"))
-      val selfLink = HalLink("self", s"/individuals/employments/match/$matchId")
+      val payeLink = HalLink("paye", s"/individuals/employments/paye/match?matchId=$matchId{&fromDate,toDate}", title = Option("View individual's employments"))
+      val selfLink = HalLink("self", s"/individuals/employments/match?matchId=$matchId")
       Ok(links(payeLink, selfLink))
     } recover recovery
   }
@@ -43,7 +43,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
   def paye(matchId: String, interval: Interval) = Action.async { implicit request =>
     withUuid(matchId) { matchUuid =>
       employmentsService.paye(matchUuid, interval) map { employments =>
-        val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye/match/$matchId", interval.getStart))
+        val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye/match?matchId=$matchId", interval.getStart))
         val employmentsJsObject = obj("employments" -> toJson(employments))
         val embeddedJsObject = obj("_embedded" -> employmentsJsObject)
         Ok(state(embeddedJsObject) ++ selfLink)

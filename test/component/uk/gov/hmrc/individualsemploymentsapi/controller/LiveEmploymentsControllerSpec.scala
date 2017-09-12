@@ -92,11 +92,11 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
           {
             "_links":{
               "paye":{
-                "href":"/individuals/employments/paye/match/$matchId{?fromDate,toDate}",
+                "href":"/individuals/employments/paye/match?matchId=$matchId{&fromDate,toDate}",
                 "title":"View individual's employments"
               },
               "self":{
-                "href":"/individuals/employments/match/$matchId"
+                "href":"/individuals/employments/match?matchId=$matchId"
               }
             }
           }

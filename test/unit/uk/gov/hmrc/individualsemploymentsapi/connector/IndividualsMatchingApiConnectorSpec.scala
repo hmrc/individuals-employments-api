@@ -58,7 +58,7 @@ class IndividualsMatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEa
       stubFor(get(urlPathMatching(s"/match-record/$matchId"))
         .willReturn(aResponse().withStatus(responseStatus).withBody(body)))
 
-    "fail when upsteram service fails" in new Fixture {
+    "fail when upstream service fails" in new Fixture {
       stubWithResponseStatus(INTERNAL_SERVER_ERROR)
       a[Upstream5xxResponse] should be thrownBy {
         await(individualsMatchingApiConnector.resolve(matchId))

@@ -30,12 +30,12 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken)
 
       When("I request the root entry point to the API")
-      val response = Http(s"$serviceUrl/sandbox/match/57072660-1df9-4aeb-b4ea-cd2d7f96e430").headers(requestHeaders()).asString
+      val response = Http(s"$serviceUrl/sandbox/match?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430").headers(requestHeaders()).asString
 
       Then("The response status should be 200 (OK)")
       response.code shouldBe OK
       response.body shouldBe
-        """{"_links":{"paye":{"href":"/individuals/employments/paye/match/57072660-1df9-4aeb-b4ea-cd2d7f96e430{?fromDate,toDate}","title":"View individual's employments"},"self":{"href":"/individuals/employments/match/57072660-1df9-4aeb-b4ea-cd2d7f96e430"}}}"""
+        """{"_links":{"paye":{"href":"/individuals/employments/paye/match?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&fromDate,toDate}","title":"View individual's employments"},"self":{"href":"/individuals/employments/match?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"}}}"""
     }
   }
 
