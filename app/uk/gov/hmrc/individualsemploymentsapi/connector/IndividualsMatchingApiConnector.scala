@@ -30,9 +30,9 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class MatchingApiConnector extends ServicesConfig {
+class IndividualsMatchingApiConnector extends ServicesConfig {
 
-  private[connector] val serviceUrl = baseUrl("matching-api")
+  private[connector] val serviceUrl = baseUrl("individuals-matching-api")
   private[connector] val http: HttpGet = WSHttp
 
   def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =

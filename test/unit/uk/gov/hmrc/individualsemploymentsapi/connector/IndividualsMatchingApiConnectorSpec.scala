@@ -25,13 +25,13 @@ import org.mockito.{Matchers => MM}
 import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.individualsemploymentsapi.connector.MatchingApiConnector
+import uk.gov.hmrc.individualsemploymentsapi.connector.IndividualsMatchingApiConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.play.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-class MatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApplication {
+class IndividualsMatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApplication {
 
   val stubPort = sys.env.getOrElse("WIREMOCK", "11121").toInt
   val stubHost = "localhost"
@@ -40,7 +40,7 @@ class MatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEach with Wit
   trait Fixture {
     implicit val hc = HeaderCarrier()
 
-    val matchingApiConnector = new MatchingApiConnector {
+    val individualsMatchingApiConnector = new IndividualsMatchingApiConnector {
       override val serviceUrl = "http://localhost:11121"
     }
   }
@@ -61,14 +61,14 @@ class MatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEach with Wit
     "fail when upsteram service fails" in new Fixture {
       stubWithResponseStatus(INTERNAL_SERVER_ERROR)
       a[Upstream5xxResponse] should be thrownBy {
-        await(matchingApiConnector.resolve(matchId))
+        await(individualsMatchingApiConnector.resolve(matchId))
       }
     }
 
     "rethrow a not found exception as a match not found exception" in new Fixture {
       stubWithResponseStatus(NOT_FOUND)
       a[MatchNotFoundException] should be thrownBy {
-        await(matchingApiConnector.resolve(matchId))
+        await(individualsMatchingApiConnector.resolve(matchId))
       }
     }
 
@@ -80,7 +80,7 @@ class MatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEach with Wit
             "nino":"AB123456C"
           }
         """)
-      await(matchingApiConnector.resolve(matchId)) shouldBe NinoMatch(matchId, Nino("AB123456C"))
+      await(individualsMatchingApiConnector.resolve(matchId)) shouldBe NinoMatch(matchId, Nino("AB123456C"))
     }
 
   }

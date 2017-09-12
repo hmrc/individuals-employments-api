@@ -20,7 +20,7 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
 import org.joda.time.{Interval, LocalDate}
-import uk.gov.hmrc.individualsemploymentsapi.connector.MatchingApiConnector
+import uk.gov.hmrc.individualsemploymentsapi.connector.IndividualsMatchingApiConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -65,9 +65,9 @@ class SandboxEmploymentsService extends EmploymentsService {
 }
 
 @Singleton
-class LiveEmploymentsService @Inject()(matchingApiConnector: MatchingApiConnector) extends EmploymentsService {
+class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: IndividualsMatchingApiConnector) extends EmploymentsService {
 
-  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier) = matchingApiConnector.resolve(matchId)
+  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier) = individualsMatchingApiConnector.resolve(matchId)
 
   override def paye(matchId: UUID, interval: Interval) = throw new UnsupportedOperationException
 

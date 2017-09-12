@@ -35,7 +35,7 @@ trait BaseSpec extends FeatureSpec with BeforeAndAfterAll with BeforeAndAfterEac
     "auditing.enabled" -> false,
     "auditing.traceRequests" -> false,
     "microservice.services.auth.port" -> AuthStub.port,
-    "microservice.services.matching-api.port" -> MatchingApiStub.port,
+    "microservice.services.individuals-matching-api.port" -> MatchingApiStub.port,
     "run.mode" -> "It"
   ).build()
 
