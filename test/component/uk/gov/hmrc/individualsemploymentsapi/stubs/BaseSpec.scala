@@ -35,13 +35,13 @@ trait BaseSpec extends FeatureSpec with BeforeAndAfterAll with BeforeAndAfterEac
     "auditing.enabled" -> false,
     "auditing.traceRequests" -> false,
     "microservice.services.auth.port" -> AuthStub.port,
-    "microservice.services.individuals-matching-api.port" -> MatchingApiStub.port,
+    "microservice.services.individuals-matching-api.port" -> IndividualsMatchingApiStub.port,
     "run.mode" -> "It"
   ).build()
 
   val timeout = Duration(5, TimeUnit.SECONDS)
   val serviceUrl = s"http://localhost:$port"
-  val mocks = Seq(AuthStub, MatchingApiStub)
+  val mocks = Seq(AuthStub, IndividualsMatchingApiStub)
   val authToken = "Bearer AUTH_TOKEN"
   val acceptHeaderV1 = ACCEPT -> "application/vnd.hmrc.1+json"
   val acceptHeaderVP1 = ACCEPT -> "application/vnd.hmrc.P1+json"

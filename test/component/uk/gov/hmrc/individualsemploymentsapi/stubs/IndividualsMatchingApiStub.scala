@@ -19,7 +19,7 @@ package component.uk.gov.hmrc.individualsemploymentsapi.stubs
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, urlEqualTo}
 import component.uk.gov.hmrc.individualsemploymentsapi.controller.MockHost
 
-object MatchingApiStub extends MockHost(21000) {
+object IndividualsMatchingApiStub extends MockHost(21000) {
 
   def willRespondWith(matchId: String, responseCode: Int, responseBody: String = "") =
     mock.register(get(urlEqualTo(s"/match-record/$matchId"))

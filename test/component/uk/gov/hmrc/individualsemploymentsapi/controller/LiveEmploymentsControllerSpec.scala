@@ -18,7 +18,7 @@ package component.uk.gov.hmrc.individualsemploymentsapi.controller
 
 import java.util.UUID
 
-import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec, MatchingApiStub}
+import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec, IndividualsMatchingApiStub}
 import play.api.libs.json.Json.parse
 import play.api.test.Helpers._
 
@@ -75,7 +75,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken)
 
       And("a valid record in the matching API")
-      MatchingApiStub.willRespondWith(matchId, OK,
+      IndividualsMatchingApiStub.willRespondWith(matchId, OK,
         """
           {
             "matchId" : "951dcf9f-8dd1-44e0-91d5-cb772c8e8e5e",
