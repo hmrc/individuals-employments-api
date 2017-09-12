@@ -19,13 +19,14 @@ package uk.gov.hmrc.individualsemploymentsapi.util
 import java.util.UUID
 
 import play.api.libs.json._
-import uk.gov.hmrc.individualsemploymentsapi.domain.{Address, Employer, Employment, PayFrequency}
+import uk.gov.hmrc.individualsemploymentsapi.domain._
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorResponse}
 
 import scala.util.{Failure, Try}
 
 object JsonFormatters {
 
+  implicit val ninoMatchJsonFormat = Json.format[NinoMatch]
   implicit val addressJsonFormat = Json.format[Address]
   implicit val employerJsonFormat = Json.format[Employer]
   implicit val payFrequencyJsonFormat = EnumJson.enumFormat(PayFrequency)

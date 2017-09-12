@@ -22,18 +22,17 @@ import javax.inject.{Inject, Singleton}
 import org.joda.time.Interval
 import play.api.hal.Hal._
 import play.api.hal.HalLink
-import play.api.mvc.hal._
 import play.api.libs.json.Json.{obj, toJson}
-import play.api.mvc.{Action, Controller}
-import uk.gov.hmrc.individualsemploymentsapi.error.Recovery
-import uk.gov.hmrc.individualsemploymentsapi.service.{EmploymentsService, SandboxEmploymentsService}
+import play.api.mvc.hal._
+import play.api.mvc.Action
+import uk.gov.hmrc.individualsemploymentsapi.service.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService}
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-abstract class EmploymentsController(employmentsService: EmploymentsService) extends Controller with Recovery {
+abstract class EmploymentsController(employmentsService: EmploymentsService) extends CommonController {
 
-  def root(matchId: UUID) = Action.async {
+  def root(matchId: UUID) = Action.async { implicit request =>
     employmentsService.resolve(matchId) map { _ =>
       val payeLink = HalLink("paye", s"/individuals/employments/paye/match/$matchId{?fromDate,toDate}", title = Option("View individual's employments"))
       val selfLink = HalLink("self", s"/individuals/employments/match/$matchId")
@@ -58,3 +57,6 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
 class SandboxEmploymentsController @Inject()(sandboxEmploymentsService: SandboxEmploymentsService)
   extends EmploymentsController(sandboxEmploymentsService)
 
+@Singleton
+class LiveEmploymentsController @Inject()(liveEmploymentsService: LiveEmploymentsService)
+  extends EmploymentsController(liveEmploymentsService)

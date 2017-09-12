@@ -27,7 +27,7 @@ import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.Employers._
 object SandboxData {
 
   val sandboxMatchIdString = "57072660-1df9-4aeb-b4ea-cd2d7f96e430"
-  val sandboxMatchId = UUID.fromString("57072660-1df9-4aeb-b4ea-cd2d7f96e430")
+  val sandboxMatchId = UUID.fromString(sandboxMatchIdString)
 
   val sandboxNinoString = "NA000799C"
   val sandboxNino = Nino(sandboxNinoString)

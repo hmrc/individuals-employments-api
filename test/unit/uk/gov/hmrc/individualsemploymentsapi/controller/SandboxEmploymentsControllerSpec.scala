@@ -19,6 +19,7 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.controller
 import java.util.UUID
 
 import org.joda.time.{Interval, LocalDate}
+import org.mockito.Matchers.{any, refEq}
 import org.mockito.Mockito.when
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play._
@@ -29,9 +30,11 @@ import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.individualsemploymentsapi.controller.SandboxEmploymentsController
+import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
 import uk.gov.hmrc.individualsemploymentsapi.service.SandboxEmploymentsService
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future.{failed, successful}
 
@@ -39,12 +42,13 @@ class SandboxEmploymentsControllerSpec extends PlaySpec with Results with Mockit
 
   private val sandboxEmploymentsService = mock[SandboxEmploymentsService]
   private val sandboxEmploymentsController = new SandboxEmploymentsController(sandboxEmploymentsService)
+  implicit val hc = HeaderCarrier()
 
   "Sandbox employments controller root function" should {
 
     "return a 404 (not found) when a match id does not match sandbox data" in {
       val invalidMatchId = UUID.randomUUID()
-      when(sandboxEmploymentsService.resolve(invalidMatchId)).thenReturn(failed(new MatchNotFoundException))
+      when(sandboxEmploymentsService.resolve(refEq(invalidMatchId))(any[HeaderCarrier])).thenReturn(failed(new MatchNotFoundException))
       val eventualResult = sandboxEmploymentsController.root(invalidMatchId).apply(FakeRequest())
       status(eventualResult) mustBe NOT_FOUND
       contentAsJson(eventualResult) mustBe parse(
@@ -57,7 +61,7 @@ class SandboxEmploymentsControllerSpec extends PlaySpec with Results with Mockit
     }
 
     "return a 200 (ok) when a match id matches sandbox data" in {
-      when(sandboxEmploymentsService.resolve(sandboxMatchId)).thenReturn(successful(Nino("AB123456C")))
+      when(sandboxEmploymentsService.resolve(refEq(sandboxMatchId))(any[HeaderCarrier])).thenReturn(successful(NinoMatch(sandboxMatchId, Nino("AB123456C"))))
       val eventualResult = sandboxEmploymentsController.root(sandboxMatchId).apply(FakeRequest())
       status(eventualResult) mustBe OK
       contentAsJson(eventualResult) mustBe parse(
@@ -137,7 +141,7 @@ class SandboxEmploymentsControllerSpec extends PlaySpec with Results with Mockit
       val eventualResult = sandboxEmploymentsController.paye(sandboxMatchId.toString, interval).apply(FakeRequest())
       status(eventualResult) mustBe OK
       contentAsJson(eventualResult) mustBe parse(
-        s"""
+        """
           {
             "_links":{
               "self":{
