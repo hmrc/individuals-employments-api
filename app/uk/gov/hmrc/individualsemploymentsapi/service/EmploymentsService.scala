@@ -17,11 +17,13 @@
 package uk.gov.hmrc.individualsemploymentsapi.service
 
 import java.util.UUID
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
 
 import org.joda.time.{Interval, LocalDate}
-import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual}
+import uk.gov.hmrc.individualsemploymentsapi.connector.IndividualsMatchingApiConnector
+import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 import scala.concurrent.Future.{failed, successful}
@@ -29,6 +31,8 @@ import scala.concurrent.Future.{failed, successful}
 trait EmploymentsService {
 
   implicit val localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ isBefore _)
+
+  def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch]
 
   def paye(matchId: UUID, interval: Interval): Future[Seq[Employment]]
 
@@ -38,6 +42,9 @@ trait EmploymentsService {
 class SandboxEmploymentsService extends EmploymentsService {
 
   import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.Individuals.find
+  import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData._
+
+  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier) = if (matchId.equals(sandboxMatchId)) successful(NinoMatch(sandboxMatchId, sandboxNino)) else failed(new MatchNotFoundException)
 
   override def paye(matchId: UUID, interval: Interval) = paye(find(matchId), interval)
 
@@ -54,5 +61,14 @@ class SandboxEmploymentsService extends EmploymentsService {
       case None => failed(new MatchNotFoundException)
     }
   }
+
+}
+
+@Singleton
+class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: IndividualsMatchingApiConnector) extends EmploymentsService {
+
+  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier) = individualsMatchingApiConnector.resolve(matchId)
+
+  override def paye(matchId: UUID, interval: Interval) = throw new UnsupportedOperationException
 
 }

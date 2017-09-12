@@ -39,7 +39,7 @@ trait CommonController extends BaseController {
   private def getQueryParam[T](name: String)(implicit request: Request[T]) = request.queryString.get(name).flatMap(_.headOption)
 
   private[controller] def urlWithInterval[T](url: String, fromDate: DateTime)(implicit request: Request[T]) = {
-    val urlWithFromDate = s"$url?fromDate=${toFormattedLocalDate(fromDate)}"
+    val urlWithFromDate = s"$url&fromDate=${toFormattedLocalDate(fromDate)}"
     getQueryParam("toDate") map (toDate => s"$urlWithFromDate&toDate=$toDate") getOrElse urlWithFromDate
   }
 

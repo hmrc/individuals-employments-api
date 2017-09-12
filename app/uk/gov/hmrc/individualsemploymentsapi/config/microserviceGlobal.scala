@@ -18,12 +18,13 @@ package uk.gov.hmrc.individualsemploymentsapi
 
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
+import play.api.http.Status.UNAUTHORIZED
 import play.api.libs.json.Json
 import play.api.mvc.{RequestHeader, Result}
 import play.api.{Application, Configuration, Play}
 import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
 import uk.gov.hmrc.api.connector.ServiceLocatorConnector
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ErrorInvalidRequest
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorUnauthorized}
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.errorInvalidRequestFormat
 import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils._
 import uk.gov.hmrc.play.audit.filters.AuditFilter
@@ -35,6 +36,7 @@ import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
 import scala.util.Try
@@ -62,6 +64,16 @@ object MicroserviceAuthFilter extends AuthorisationFilter with MicroserviceFilte
   override lazy val authConnector = MicroserviceAuthConnector
 
   override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
+
+  override def apply(next: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
+    super.apply(next)(rh) map { res =>
+      res.header.status match {
+        case UNAUTHORIZED => ErrorUnauthorized.toHttpResponse
+        case _ => res
+      }
+    }
+  }
+
 }
 
 object MicroserviceGlobal extends DefaultMicroserviceGlobal with ServiceLocatorRegistration with ServiceLocatorConfig with MicroserviceFilterSupport {

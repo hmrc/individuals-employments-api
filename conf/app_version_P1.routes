@@ -1,3 +1,4 @@
 # microservice specific routes
 
 GET        /hello-world             uk.gov.hmrc.individualsemploymentsapi.controllers.MicroserviceHelloWorld.hello
+GET        /                        @uk.gov.hmrc.individualsemploymentsapi.controller.LiveEmploymentsController.root(matchId: java.util.UUID)

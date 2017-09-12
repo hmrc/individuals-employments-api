@@ -33,7 +33,7 @@ class EmploymentsSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken)
 
       When("I request individual employments for the sandbox matchId")
-      val response = Http(s"$serviceUrl/sandbox/paye/match/$sandboxMatchId?fromDate=2016-04-01&toDate=2017-01-01")
+      val response = Http(s"$serviceUrl/sandbox/paye/match?matchId=$sandboxMatchId&fromDate=2016-04-01&toDate=2017-01-01")
         .headers(requestHeaders(acceptHeaderVP1)).asString
 
       Then("The response status should be 200 (OK)")
@@ -43,7 +43,7 @@ class EmploymentsSpec extends BaseSpec {
           {
             "_links":{
               "self":{
-                "href":"/individuals/employments/paye/match/$sandboxMatchId?fromDate=2016-04-01&toDate=2017-01-01"
+                "href":"/individuals/employments/paye/match?matchId=$sandboxMatchId&fromDate=2016-04-01&toDate=2017-01-01"
               }
             },
             "_embedded":{
