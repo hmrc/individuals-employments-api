@@ -69,6 +69,6 @@ class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: Individu
 
   override def resolve(matchId: UUID)(implicit hc: HeaderCarrier) = individualsMatchingApiConnector.resolve(matchId)
 
-  override def paye(matchId: UUID, interval: Interval) = throw new UnsupportedOperationException
+  override def paye(matchId: UUID, interval: Interval): Future[Seq[Employment]] = throw new UnsupportedOperationException
 
 }

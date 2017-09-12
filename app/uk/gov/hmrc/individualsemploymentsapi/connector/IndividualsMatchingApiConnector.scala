@@ -19,7 +19,7 @@ package uk.gov.hmrc.individualsemploymentsapi.connector
 import java.util.UUID
 import javax.inject.Singleton
 
-import uk.gov.hmrc.individualsemploymentsapi.WSHttp
+import uk.gov.hmrc.individualsemploymentsapi.config.WSHttp
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.ninoMatchJsonFormat

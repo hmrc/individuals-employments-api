@@ -14,39 +14,32 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi
+package uk.gov.hmrc.individualsemploymentsapi.config
 
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
-import play.api.http.Status.UNAUTHORIZED
 import play.api.libs.json.Json
 import play.api.mvc.{RequestHeader, Result}
-import play.api.{Application, Configuration, Play}
+import play.api.{Application, Configuration, Logger, Play}
 import uk.gov.hmrc.api.config.{ServiceLocatorConfig, ServiceLocatorRegistration}
 import uk.gov.hmrc.api.connector.ServiceLocatorConnector
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorUnauthorized}
+import uk.gov.hmrc.auth.core.AuthorisationException
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInternalServer, ErrorInvalidRequest, ErrorUnauthorized}
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.errorInvalidRequestFormat
 import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils._
 import uk.gov.hmrc.play.audit.filters.AuditFilter
-import uk.gov.hmrc.play.auth.controllers.AuthParamsControllerConfig
-import uk.gov.hmrc.play.auth.microservice.filters.AuthorisationFilter
 import uk.gov.hmrc.play.config.{AppName, ControllerConfig}
 import uk.gov.hmrc.play.filters.MicroserviceFilterSupport
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.http.logging.filters.LoggingFilter
 import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
 import scala.util.Try
 
 object ControllerConfiguration extends ControllerConfig {
   lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
-}
-
-object AuthParamsControllerConfiguration extends AuthParamsControllerConfig {
-  lazy val controllerConfigs = ControllerConfiguration.controllerConfigs
 }
 
 object MicroserviceAuditFilter extends AuditFilter with AppName with MicroserviceFilterSupport {
@@ -59,22 +52,6 @@ object MicroserviceLoggingFilter extends LoggingFilter with MicroserviceFilterSu
   override def controllerNeedsLogging(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsLogging
 }
 
-object MicroserviceAuthFilter extends AuthorisationFilter with MicroserviceFilterSupport {
-  override lazy val authParamsConfig = AuthParamsControllerConfiguration
-  override lazy val authConnector = MicroserviceAuthConnector
-
-  override def controllerNeedsAuth(controllerName: String): Boolean = ControllerConfiguration.paramsForController(controllerName).needsAuth
-
-  override def apply(next: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
-    super.apply(next)(rh) map { res =>
-      res.header.status match {
-        case UNAUTHORIZED => ErrorUnauthorized.toHttpResponse
-        case _ => res
-      }
-    }
-  }
-
-}
 
 object MicroserviceGlobal extends DefaultMicroserviceGlobal with ServiceLocatorRegistration with ServiceLocatorConfig with MicroserviceFilterSupport {
   override val auditConnector = MicroserviceAuditConnector
@@ -85,7 +62,7 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal with ServiceLocatorR
 
   override val microserviceAuditFilter = MicroserviceAuditFilter
 
-  override val authFilter = Some(MicroserviceAuthFilter)
+  override val authFilter = None
 
   override implicit val hc = HeaderCarrier()
 
@@ -111,4 +88,12 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal with ServiceLocatorR
     }
   }
 
+  override def onError(request: RequestHeader, ex: Throwable): Future[Result] = {
+    ex match {
+      case _: AuthorisationException => successful(ErrorUnauthorized.toHttpResponse)
+      case _ =>
+        Logger.error("An unexpected error occured", ex)
+        successful(ErrorInternalServer.toHttpResponse)
+    }
+  }
 }
