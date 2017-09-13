@@ -25,7 +25,7 @@ import scalaj.http.{Http, HttpResponse}
 
 class VersioningSpec extends BaseSpec {
 
-  private val sandboxMatchEndpointWithSandboxMatchId = "/sandbox/match?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+  private val sandboxMatchEndpointWithSandboxMatchId = "/sandbox?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
 
   feature("Versioning") {
 
@@ -67,11 +67,11 @@ class VersioningSpec extends BaseSpec {
           {
             "_links":{
               "paye":{
-                "href":"/individuals/employments/paye/match?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&fromDate,toDate}",
+                "href":"/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&fromDate,toDate}",
                 "title":"View individual's employments"
               },
               "self":{
-                "href":"/individuals/employments/match?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+                "href":"/individuals/employments/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
               }
             }
           }
