@@ -37,8 +37,8 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
   def root(matchId: UUID) = Action.async { implicit request =>
     requiresPrivilegedAuthentication {
       employmentsService.resolve(matchId) map { _ =>
-        val payeLink = HalLink("paye", s"/individuals/employments/paye/match?matchId=$matchId{&fromDate,toDate}", title = Option("View individual's employments"))
-        val selfLink = HalLink("self", s"/individuals/employments/match?matchId=$matchId")
+        val payeLink = HalLink("paye", s"/individuals/employments/paye?matchId=$matchId{&fromDate,toDate}", title = Option("View individual's employments"))
+        val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
         Ok(links(payeLink, selfLink))
       } recover recovery
     }
@@ -48,7 +48,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
     requiresPrivilegedAuthentication {
       withUuid(matchId) { matchUuid =>
         employmentsService.paye(matchUuid, interval) map { employments =>
-          val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye/match?matchId=$matchId", interval.getStart))
+          val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
           val employmentsJsObject = obj("employments" -> toJson(employments))
           val embeddedJsObject = obj("_embedded" -> employmentsJsObject)
           Ok(state(embeddedJsObject) ++ selfLink)
