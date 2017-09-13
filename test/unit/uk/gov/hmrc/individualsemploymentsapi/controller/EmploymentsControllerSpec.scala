@@ -98,11 +98,10 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
     }
 
     "fail with AuthorizedException when the bearer token does not have enrolment read:individuals-employments" in new Setup {
-      when(mockLiveEmploymentsService.resolve(refEq(randomMatchId))(any[HeaderCarrier])).thenReturn(successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
-
       given(mockAuthConnector.authorise(refEq(Enrolment("read:individuals-employments")), refEq(EmptyRetrieval))(any())).willReturn(failed(new InsufficientEnrolments()))
 
       intercept[InsufficientEnrolments]{await(liveEmploymentsController.root(randomMatchId).apply(FakeRequest()))}
+      verifyZeroInteractions(mockLiveEmploymentsService)
     }
 
     "not require bearer token authentication for sandbox" in new Setup {
@@ -204,11 +203,11 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
     }
 
     "fail with AuthorizedException when the bearer token does not have enrolment read:individuals-employments" in new Setup {
-      when(mockLiveEmploymentsService.paye(sandboxMatchId, interval)).thenReturn(successful(Seq(Employments.acme, Employments.disney)))
 
       given(mockAuthConnector.authorise(refEq(Enrolment("read:individuals-employments")), refEq(EmptyRetrieval))(any())).willReturn(failed(new InsufficientEnrolments()))
 
       intercept[InsufficientEnrolments]{await(liveEmploymentsController.paye(sandboxMatchId.toString, interval).apply(FakeRequest()))}
+      verifyZeroInteractions(mockLiveEmploymentsService)
     }
 
     "not require bearer token authentication" in new Setup {
