@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi
+package uk.gov.hmrc.individualsemploymentsapi.util
 
-import uk.gov.hmrc.individualsemploymentsapi.util.{IntervalQueryStringBinder, MatchUuidQueryStringBinder}
+import play.api.libs.json.Json.toJson
+import play.api.mvc.QueryStringBindable
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ErrorInvalidRequest
+import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.errorInvalidRequestFormat
 
-package object Binders {
-  implicit val matchUuidQueryStringBinder = new MatchUuidQueryStringBinder
-  implicit val intervalQueryStringBinder = new IntervalQueryStringBinder
+abstract class AbstractQueryStringBinder[T] extends QueryStringBindable[T] {
+
+  protected def errorResponse(message: String) = toJson(ErrorInvalidRequest(message)).toString
+
 }
