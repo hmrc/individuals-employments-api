@@ -68,11 +68,11 @@ class LiveEmploymentsControllerSpec extends PlaySpec with Results with MockitoSu
           {
             "_links":{
               "paye":{
-                "href":"/individuals/employments/paye/match?matchId=$randomMatchId{&fromDate,toDate}",
+                "href":"/individuals/employments/paye?matchId=$randomMatchId{&fromDate,toDate}",
                 "title":"View individual's employments"
               },
               "self":{
-                "href":"/individuals/employments/match?matchId=$randomMatchId"
+                "href":"/individuals/employments?matchId=$randomMatchId"
               }
             }
           }

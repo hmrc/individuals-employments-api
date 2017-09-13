@@ -69,11 +69,11 @@ class SandboxEmploymentsControllerSpec extends PlaySpec with Results with Mockit
           {
             "_links":{
               "paye":{
-                "href":"/individuals/employments/paye/match?matchId=$sandboxMatchId{&fromDate,toDate}",
+                "href":"/individuals/employments/paye?matchId=$sandboxMatchId{&fromDate,toDate}",
                 "title":"View individual's employments"
               },
               "self":{
-                "href":"/individuals/employments/match?matchId=$sandboxMatchId"
+                "href":"/individuals/employments?matchId=$sandboxMatchId"
               }
             }
           }
@@ -125,7 +125,7 @@ class SandboxEmploymentsControllerSpec extends PlaySpec with Results with Mockit
           {
             "_links":{
               "self":{
-                "href":"/individuals/employments/paye/match?matchId=$sandboxMatchId&fromDate=2017-03-02"
+                "href":"/individuals/employments/paye?matchId=$sandboxMatchId&fromDate=2017-03-02"
               }
             },
             "_embedded":{
@@ -145,7 +145,7 @@ class SandboxEmploymentsControllerSpec extends PlaySpec with Results with Mockit
           {
             "_links":{
               "self":{
-                "href":"/individuals/employments/paye/match?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-03-02"
+                "href":"/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-03-02"
               }
             },
             "_embedded":{
