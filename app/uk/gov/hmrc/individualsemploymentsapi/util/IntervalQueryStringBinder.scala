@@ -18,14 +18,11 @@ package uk.gov.hmrc.individualsemploymentsapi.util
 
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.{Interval, LocalDate}
-import play.api.libs.json.Json.toJson
-import play.api.mvc.QueryStringBindable
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ValidationException}
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ValidationException
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates.toInterval
-import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.errorInvalidRequestFormat
 import uk.gov.hmrc.play.config.ServicesConfig
 
-class IntervalQueryStringBinder extends QueryStringBindable[Interval] with ServicesConfig {
+class IntervalQueryStringBinder extends AbstractQueryStringBinder[Interval] with ServicesConfig {
 
   private val dateTimeFormatter = DateTimeFormat.forPattern(Dates.localDatePattern)
 
@@ -58,8 +55,5 @@ class IntervalQueryStringBinder extends QueryStringBindable[Interval] with Servi
   override def unbind(key: String, dateRange: Interval): String = {
     s"fromDate=${dateTimeFormatter.print(dateRange.getStart.toLocalDate)}&toDate=${dateTimeFormatter.print(dateRange.getEnd.toLocalDate)}"
   }
-
-  private def errorResponse(message: String) = toJson(ErrorInvalidRequest(message)).toString
-
 
 }
