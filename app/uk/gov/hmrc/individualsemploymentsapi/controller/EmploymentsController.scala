@@ -44,17 +44,15 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
     }
   }
 
-  def paye(matchId: String, interval: Interval) = Action.async { implicit request =>
+  def paye(matchId: UUID, interval: Interval) = Action.async { implicit request =>
     requiresPrivilegedAuthentication {
-      withUuid(matchId) { matchUuid =>
-        employmentsService.paye(matchUuid, interval) map { employments =>
-          val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
-          val employmentsJsObject = obj("employments" -> toJson(employments))
-          val embeddedJsObject = obj("_embedded" -> employmentsJsObject)
-          Ok(state(embeddedJsObject) ++ selfLink)
-        }
-      } recover recovery
-    }
+      employmentsService.paye(matchId, interval) map { employments =>
+        val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
+        val employmentsJsObject = obj("employments" -> toJson(employments))
+        val embeddedJsObject = obj("_embedded" -> employmentsJsObject)
+        Ok(state(embeddedJsObject) ++ selfLink)
+      }
+    } recover recovery
   }
 
 }
