@@ -120,23 +120,11 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
     val toDate = new LocalDate("2017-05-31").toDateTimeAtStartOfDay
     val interval = new Interval(fromDate, toDate)
 
-    "return 404 (not found) when a match id is malformed" in new Setup {
-      val eventualResult = liveEmploymentsController.paye("malformedMatchId", interval).apply(FakeRequest())
-      status(eventualResult) mustBe NOT_FOUND
-      contentAsJson(eventualResult) mustBe parse(
-        """
-          {
-            "code":"NOT_FOUND",
-            "message":"The resource can not be found"
-          }
-        """)
-    }
-
     "return 404 (not found) for an invalid matchId" in new Setup {
       val invalidMatchId = UUID.randomUUID()
       when(mockLiveEmploymentsService.paye(invalidMatchId, interval)).thenReturn(failed(new MatchNotFoundException))
 
-      val eventualResult = liveEmploymentsController.paye(invalidMatchId.toString, interval).apply(FakeRequest())
+      val eventualResult = liveEmploymentsController.paye(invalidMatchId, interval).apply(FakeRequest())
       status(eventualResult) mustBe NOT_FOUND
       contentAsJson(eventualResult) mustBe parse(
         """
@@ -150,7 +138,7 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
     "return 200 (ok) when matching succeeds and service returns employments" in new Setup {
       when(mockLiveEmploymentsService.paye(sandboxMatchId, interval)).thenReturn(successful(Seq(Employments.acme, Employments.disney)))
 
-      val eventualResult = liveEmploymentsController.paye(sandboxMatchId.toString, interval).apply(FakeRequest())
+      val eventualResult = liveEmploymentsController.paye(sandboxMatchId, interval).apply(FakeRequest())
       status(eventualResult) mustBe OK
       contentAsJson(eventualResult) mustBe parse(
         """
@@ -206,14 +194,14 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
 
       given(mockAuthConnector.authorise(refEq(Enrolment("read:individuals-employments")), refEq(EmptyRetrieval))(any())).willReturn(failed(new InsufficientEnrolments()))
 
-      intercept[InsufficientEnrolments]{await(liveEmploymentsController.paye(sandboxMatchId.toString, interval).apply(FakeRequest()))}
+      intercept[InsufficientEnrolments]{await(liveEmploymentsController.paye(sandboxMatchId, interval).apply(FakeRequest()))}
       verifyZeroInteractions(mockLiveEmploymentsService)
     }
 
     "not require bearer token authentication" in new Setup {
       when(mockSandboxEmploymentsService.paye(sandboxMatchId, interval)).thenReturn(successful(Seq(Employments.acme, Employments.disney)))
 
-      val eventualResult = sandboxEmploymentsController.paye(sandboxMatchId.toString, interval).apply(FakeRequest())
+      val eventualResult = sandboxEmploymentsController.paye(sandboxMatchId, interval).apply(FakeRequest())
 
       status(eventualResult) mustBe OK
       verifyZeroInteractions(mockAuthConnector)

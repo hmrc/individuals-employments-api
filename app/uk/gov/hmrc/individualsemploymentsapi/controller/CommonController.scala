@@ -33,13 +33,6 @@ import scala.util.{Success, Try}
 
 trait CommonController extends BaseController {
 
-  protected def withUuid(uuidString: String)(f: UUID => Future[Result]): Future[Result] = {
-    Try(UUID.fromString(uuidString)) match {
-      case Success(uuid) => f(uuid)
-      case _ => Future.successful(ErrorNotFound.toHttpResponse)
-    }
-  }
-
   private def getQueryParam[T](name: String)(implicit request: Request[T]) = request.queryString.get(name).flatMap(_.headOption)
 
   private[controller] def urlWithInterval[T](url: String, fromDate: DateTime)(implicit request: Request[T]) = {
