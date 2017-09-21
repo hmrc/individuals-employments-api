@@ -20,6 +20,7 @@ import java.util.UUID
 
 import play.api.libs.json._
 import uk.gov.hmrc.individualsemploymentsapi.domain._
+import uk.gov.hmrc.individualsemploymentsapi.domain.des._
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorResponse}
 
 import scala.util.{Failure, Try}
@@ -50,6 +51,12 @@ object JsonFormatters {
 
     override def reads(json: JsValue) = JsSuccess(UUID.fromString(json.asInstanceOf[JsString].value))
   }
+
+  implicit val desAddressJsonFormat = Json.format[DesAddress]
+  implicit val desPaymentJsonFormat = Json.format[DesPayment]
+  implicit val desEmploymentPayFrequencyJsonFormat = EnumJson.enumFormat(DesPayFrequency)
+  implicit val desEmploymentJsonFormat = Json.format[DesEmployment]
+  implicit val desEmploymentsJsonFormat = Json.format[DesEmployments]
 
   object EnumJson {
 

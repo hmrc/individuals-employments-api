@@ -122,7 +122,7 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
 
     "return 404 (not found) for an invalid matchId" in new Setup {
       val invalidMatchId = UUID.randomUUID()
-      when(mockLiveEmploymentsService.paye(invalidMatchId, interval)).thenReturn(failed(new MatchNotFoundException))
+      when(mockLiveEmploymentsService.paye(refEq(invalidMatchId), refEq(interval))(any())).thenReturn(failed(new MatchNotFoundException))
 
       val eventualResult = liveEmploymentsController.paye(invalidMatchId, interval).apply(FakeRequest())
       status(eventualResult) mustBe NOT_FOUND
@@ -136,7 +136,7 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
     }
 
     "return 200 (ok) when matching succeeds and service returns employments" in new Setup {
-      when(mockLiveEmploymentsService.paye(sandboxMatchId, interval)).thenReturn(successful(Seq(Employments.acme, Employments.disney)))
+      when(mockLiveEmploymentsService.paye(refEq(sandboxMatchId), refEq((interval)))(any())).thenReturn(successful(Seq(Employments.acme, Employments.disney)))
 
       val eventualResult = liveEmploymentsController.paye(sandboxMatchId, interval).apply(FakeRequest())
       status(eventualResult) mustBe OK
@@ -199,7 +199,7 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
     }
 
     "not require bearer token authentication" in new Setup {
-      when(mockSandboxEmploymentsService.paye(sandboxMatchId, interval)).thenReturn(successful(Seq(Employments.acme, Employments.disney)))
+      when(mockSandboxEmploymentsService.paye(refEq(sandboxMatchId), refEq((interval)))(any())).thenReturn(successful(Seq(Employments.acme, Employments.disney)))
 
       val eventualResult = sandboxEmploymentsController.paye(sandboxMatchId, interval).apply(FakeRequest())
 

@@ -58,13 +58,13 @@ object SandboxData {
     val amanda = Individual(sandboxMatchId, sandboxNinoString,
       Seq(Employments.acme, Employments.disney),
       Seq(
-        Payment(parse("2016-01-28"), Option(Acme.empRef)),
-        Payment(parse("2016-02-28"), Option(Acme.empRef)),
-        Payment(parse("2016-03-28"), Option(Acme.empRef)),
-        Payment(parse("2016-04-28"), Option(Acme.empRef)),
-        Payment(parse("2016-05-28"), Option(Acme.empRef)),
-        Payment(parse("2017-02-09"), Option(Disney.empRef)),
-        Payment(parse("2017-02-16"), Option(Disney.empRef))
+        Payment(0, parse("2016-01-28"), Option(Acme.empRef)),
+        Payment(0, parse("2016-02-28"), Option(Acme.empRef)),
+        Payment(0, parse("2016-03-28"), Option(Acme.empRef)),
+        Payment(0, parse("2016-04-28"), Option(Acme.empRef)),
+        Payment(0, parse("2016-05-28"), Option(Acme.empRef)),
+        Payment(0, parse("2017-02-09"), Option(Disney.empRef)),
+        Payment(0, parse("2017-02-16"), Option(Disney.empRef))
       )
     )
 

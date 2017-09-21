@@ -2,3 +2,4 @@
 
 GET        /hello-world             uk.gov.hmrc.individualsemploymentsapi.controllers.MicroserviceHelloWorld.hello
 GET        /                        @uk.gov.hmrc.individualsemploymentsapi.controller.LiveEmploymentsController.root(matchId: java.util.UUID)
+GET        /paye                    @uk.gov.hmrc.individualsemploymentsapi.controller.LiveEmploymentsController.paye(matchId: java.util.UUID, interval: org.joda.time.Interval)
