@@ -16,7 +16,23 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain
 
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesPayFrequency._
+
 object PayFrequency extends Enumeration {
   type PayFrequency = Value
   val WEEKLY, FORTNIGHTLY, FOUR_WEEKLY, ONE_OFF, IRREGULAR, CALENDAR_MONTHLY, QUARTERLY, BI_ANNUALLY, ANNUALLY = Value
+
+  private val conversionMap = Map(
+    W1 -> WEEKLY,
+    W2 -> FORTNIGHTLY,
+    W4 -> FOUR_WEEKLY,
+    IO -> ONE_OFF,
+    IR -> IRREGULAR,
+    M1 -> CALENDAR_MONTHLY,
+    M3 -> QUARTERLY,
+    M6 -> BI_ANNUALLY,
+    MA -> ANNUALLY)
+
+  def from(desValue: DesPayFrequency) = conversionMap.get(desValue)
+
 }

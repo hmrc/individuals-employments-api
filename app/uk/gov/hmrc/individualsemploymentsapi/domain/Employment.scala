@@ -18,5 +18,29 @@ package uk.gov.hmrc.individualsemploymentsapi.domain
 
 import org.joda.time.LocalDate
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequency.PayFrequency
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment}
 
 case class Employment(startDate: Option[LocalDate], endDate: Option[LocalDate], employer: Option[Employer], payFrequency: Option[PayFrequency])
+
+object Employment {
+
+  def from(desEmployment: DesEmployment): Option[Employment] = {
+
+    def address(desAddress: Option[DesAddress]) = {
+      desAddress map { address =>
+        Address(address.line1, address.line2, address.line3, address.line4, address.line5, address.postalCode)
+      }
+    }
+
+    val startDate = desEmployment.employmentStartDate
+    val endDate = desEmployment.employmentLeavingDate
+    val employer = Employer.create(desEmployment.employerPayeReference, desEmployment.employerName, address(desEmployment.employerAddress))
+    val payFrequency = desEmployment.employmentPayFrequency.flatMap(PayFrequency.from)
+
+    (startDate, endDate, employer, payFrequency) match {
+      case (None, None, None, None) => None
+      case _ => Some(Employment(startDate, endDate, employer, payFrequency))
+    }
+  }
+
+}

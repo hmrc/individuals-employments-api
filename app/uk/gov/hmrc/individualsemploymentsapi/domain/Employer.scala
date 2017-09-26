@@ -19,3 +19,13 @@ package uk.gov.hmrc.individualsemploymentsapi.domain
 import uk.gov.hmrc.domain.EmpRef
 
 case class Employer(payeReference: Option[EmpRef], name: Option[String], address: Option[Address])
+
+object Employer {
+  def create(payeReference: Option[EmpRef], name: Option[String], address: Option[Address]): Option[Employer] = {
+    (payeReference, name, address) match {
+      case (None, None, None) => None
+      case _ => Some(Employer(payeReference, name, address))
+    }
+  }
+}
+

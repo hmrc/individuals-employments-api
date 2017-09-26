@@ -20,11 +20,13 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
 import org.joda.time.{Interval, LocalDate}
-import uk.gov.hmrc.individualsemploymentsapi.connector.IndividualsMatchingApiConnector
+import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.play.http.HeaderCarrier
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.{failed, successful}
 
@@ -34,7 +36,7 @@ trait EmploymentsService {
 
   def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch]
 
-  def paye(matchId: UUID, interval: Interval): Future[Seq[Employment]]
+  def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]]
 
 }
 
@@ -46,9 +48,9 @@ class SandboxEmploymentsService extends EmploymentsService {
 
   override def resolve(matchId: UUID)(implicit hc: HeaderCarrier) = if (matchId.equals(sandboxMatchId)) successful(NinoMatch(sandboxMatchId, sandboxNino)) else failed(new MatchNotFoundException)
 
-  override def paye(matchId: UUID, interval: Interval) = paye(find(matchId), interval)
+  override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier) = paye(find(matchId), interval)
 
-  private def paye(maybeIndividual: Option[Individual], interval: Interval): Future[Seq[Employment]] = {
+  private def paye(maybeIndividual: Option[Individual], interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] = {
 
     def lastEmploymentPaymentDate(individual: Individual, employment: Employment): LocalDate =
       individual.income.filter(p => p.employerPayeReference == employment.employer.flatMap(_.payeReference)).map(_.paymentDate).max
@@ -65,10 +67,17 @@ class SandboxEmploymentsService extends EmploymentsService {
 }
 
 @Singleton
-class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: IndividualsMatchingApiConnector) extends EmploymentsService {
+class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: IndividualsMatchingApiConnector, desConnector: DesConnector) extends EmploymentsService {
+
+  private val sortByLeavingDateOrLastPaymentDate = { e: DesEmployment => e.employmentLeavingDate.getOrElse(e.payments.map(_.paymentDate).max) }
 
   override def resolve(matchId: UUID)(implicit hc: HeaderCarrier) = individualsMatchingApiConnector.resolve(matchId)
 
-  override def paye(matchId: UUID, interval: Interval): Future[Seq[Employment]] = throw new UnsupportedOperationException
+  override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =
+    resolve(matchId) flatMap { ninoMatch =>
+      desConnector.fetchEmployments(ninoMatch.nino, interval) map { employments =>
+        employments.sortBy(sortByLeavingDateOrLastPaymentDate).reverse flatMap Employment.from
+      }
+    }
 
 }
