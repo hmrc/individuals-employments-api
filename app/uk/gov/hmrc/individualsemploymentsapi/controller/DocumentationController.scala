@@ -27,8 +27,8 @@ import uk.gov.hmrc.individualsemploymentsapi.views._
 @Singleton
 class DocumentationController @Inject()(httpErrorHandler: HttpErrorHandler, configuration: Configuration) extends uk.gov.hmrc.api.controllers.DocumentationController(httpErrorHandler) {
 
-  private lazy val standardWhitelistedApplicationIds = configuration.getStringSeq("api.access.version-1.whitelistedApplicationIds").getOrElse(Seq.empty)
-  private lazy val privilegedWhitelistedApplicationIds = configuration.getStringSeq("api.access.version-P1.whitelistedApplicationIds").getOrElse(Seq.empty)
+  private lazy val standardWhitelistedApplicationIds = configuration.getStringSeq("api.access.version-1.0.whitelistedApplicationIds").getOrElse(Seq.empty)
+  private lazy val privilegedWhitelistedApplicationIds = configuration.getStringSeq("api.access.version-P1.0.whitelistedApplicationIds").getOrElse(Seq.empty)
 
   override def definition(): Action[AnyContent] = Action { request =>
     Ok(txt.definition(standardWhitelistedApplicationIds, privilegedWhitelistedApplicationIds)).withHeaders(CONTENT_TYPE -> JSON)
