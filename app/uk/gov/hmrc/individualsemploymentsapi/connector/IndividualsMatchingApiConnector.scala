@@ -24,10 +24,10 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.ninoMatchJsonFormat
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.http.{HeaderCarrier, HttpGet, NotFoundException}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, NotFoundException }
 
 @Singleton
 class IndividualsMatchingApiConnector extends ServicesConfig {

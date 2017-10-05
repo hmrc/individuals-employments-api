@@ -22,7 +22,7 @@ import component.uk.gov.hmrc.individualsemploymentsapi.controller.MockHost
 import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.{JsArray, Json}
-import uk.gov.hmrc.auth.core.authorise.Enrolment
+import uk.gov.hmrc.auth.core.Enrolment
 
 object AuthStub extends MockHost(22000) {
 

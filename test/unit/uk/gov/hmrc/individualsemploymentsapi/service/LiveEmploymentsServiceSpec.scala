@@ -31,12 +31,13 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesPayFrequency.{DesPayF
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.service.LiveEmploymentsService
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.Intervals
 
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
+import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class LiveEmploymentsServiceSpec extends UnitSpec with Intervals with MockitoSugar with BeforeAndAfterEach {
 

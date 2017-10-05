@@ -21,9 +21,9 @@ import java.util.UUID
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
 import uk.gov.hmrc.individualsemploymentsapi.service.SandboxEmploymentsService
-import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.Intervals
+import uk.gov.hmrc.http.HeaderCarrier
 
 class SandboxEmploymentsServiceSpec extends UnitSpec with Intervals {
 
