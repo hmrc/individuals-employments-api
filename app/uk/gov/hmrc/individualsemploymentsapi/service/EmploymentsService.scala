@@ -24,11 +24,11 @@ import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, Individual
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.{failed, successful}
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait EmploymentsService {
 

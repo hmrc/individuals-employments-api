@@ -29,17 +29,17 @@ import play.api.libs.json.Json.parse
 import play.api.mvc._
 import play.api.test.Helpers._
 import play.api.test._
-import uk.gov.hmrc.auth.core.InsufficientEnrolments
-import uk.gov.hmrc.auth.core.authorise.Enrolment
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
+import uk.gov.hmrc.auth.core.{Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.config.ServiceAuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.{LiveEmploymentsController, SandboxEmploymentsController}
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
 import uk.gov.hmrc.individualsemploymentsapi.service.{LiveEmploymentsService, SandboxEmploymentsService}
-import uk.gov.hmrc.play.http.HeaderCarrier
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future.{failed, successful}
 
@@ -56,7 +56,7 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
 
     implicit val hc = HeaderCarrier()
 
-    given(mockAuthConnector.authorise(any(), refEq(EmptyRetrieval))(any())).willReturn(successful(()))
+    given(mockAuthConnector.authorise(any(), refEq(EmptyRetrieval))(any(), any())).willReturn(successful(()))
   }
 
   "Root" should {
@@ -98,7 +98,7 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
     }
 
     "fail with AuthorizedException when the bearer token does not have enrolment read:individuals-employments" in new Setup {
-      given(mockAuthConnector.authorise(refEq(Enrolment("read:individuals-employments")), refEq(EmptyRetrieval))(any())).willReturn(failed(new InsufficientEnrolments()))
+      given(mockAuthConnector.authorise(refEq(Enrolment("read:individuals-employments")), refEq(EmptyRetrieval))(any(), any())).willReturn(failed(new InsufficientEnrolments()))
 
       intercept[InsufficientEnrolments]{await(liveEmploymentsController.root(randomMatchId).apply(FakeRequest()))}
       verifyZeroInteractions(mockLiveEmploymentsService)
@@ -192,7 +192,7 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
 
     "fail with AuthorizedException when the bearer token does not have enrolment read:individuals-employments" in new Setup {
 
-      given(mockAuthConnector.authorise(refEq(Enrolment("read:individuals-employments")), refEq(EmptyRetrieval))(any())).willReturn(failed(new InsufficientEnrolments()))
+      given(mockAuthConnector.authorise(refEq(Enrolment("read:individuals-employments")), refEq(EmptyRetrieval))(any(), any())).willReturn(failed(new InsufficientEnrolments()))
 
       intercept[InsufficientEnrolments]{await(liveEmploymentsController.paye(sandboxMatchId, interval).apply(FakeRequest()))}
       verifyZeroInteractions(mockLiveEmploymentsService)
