@@ -190,9 +190,9 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
         """)
     }
 
-    "fail with AuthorizedException when the bearer token does not have enrolment read:individuals-employments" in new Setup {
+    "fail with AuthorizedException when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
 
-      given(mockAuthConnector.authorise(refEq(Enrolment("read:individuals-employments")), refEq(EmptyRetrieval))(any(), any())).willReturn(failed(new InsufficientEnrolments()))
+      given(mockAuthConnector.authorise(refEq(Enrolment("read:individuals-employments-paye")), refEq(EmptyRetrieval))(any(), any())).willReturn(failed(new InsufficientEnrolments()))
 
       intercept[InsufficientEnrolments]{await(liveEmploymentsController.paye(sandboxMatchId, interval).apply(FakeRequest()))}
       verifyZeroInteractions(mockLiveEmploymentsService)

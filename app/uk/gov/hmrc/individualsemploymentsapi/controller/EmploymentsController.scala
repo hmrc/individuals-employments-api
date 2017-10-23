@@ -35,7 +35,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 abstract class EmploymentsController(employmentsService: EmploymentsService) extends CommonController with PrivilegedAuthentication {
 
   def root(matchId: UUID) = Action.async { implicit request =>
-    requiresPrivilegedAuthentication {
+    requiresPrivilegedAuthentication("read:individuals-employments") {
       employmentsService.resolve(matchId) map { _ =>
         val payeLink = HalLink("paye", s"/individuals/employments/paye?matchId=$matchId{&fromDate,toDate}", title = Option("View individual's employments"))
         val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
@@ -45,7 +45,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
   }
 
   def paye(matchId: UUID, interval: Interval) = Action.async { implicit request =>
-    requiresPrivilegedAuthentication {
+    requiresPrivilegedAuthentication("read:individuals-employments-paye") {
       employmentsService.paye(matchId, interval) map { employments =>
         val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
         val employmentsJsObject = obj("employments" -> toJson(employments))

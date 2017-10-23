@@ -58,11 +58,11 @@ uses:
       description: !include docs/employments-endpoint-description.md
       is: [headers.acceptHeader]
       (annotations.sandboxData): !include sandbox/employments-request.md
-      (annotations.scope): "read:individuals-employments"
-      securedBy: [ sec.oauth_2_0: { scopes: [ "read:individuals-employments" ] } ]
+      (annotations.scope): "read:individuals-employments-paye"
+      securedBy: [ sec.oauth_2_0: { scopes: [ "read:individuals-employments-paye" ] } ]
       headers:
         Authorization:
-          description: OAuth 2.0 Bearer Token with the read:individuals-employments scope.
+          description: OAuth 2.0 Bearer Token with the read:individuals-employments-paye scope.
           type: string
           required: true
           example: Bearer <BEARER_TOKEN>

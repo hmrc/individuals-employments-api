@@ -26,26 +26,26 @@ import uk.gov.hmrc.auth.core.Enrolment
 
 object AuthStub extends MockHost(22000) {
 
-  def willAuthorizePrivilegedAuthToken(authBearerToken: String): StubMapping = {
+  def willAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping = {
     mock.register(post(urlEqualTo("/auth/authorise"))
-      .withRequestBody(equalToJson(privilegedAuthority.toString()))
+      .withRequestBody(equalToJson(privilegedAuthority(scope).toString()))
       .withHeader(AUTHORIZATION, equalTo(authBearerToken))
       .willReturn(aResponse()
         .withStatus(Status.OK)
         .withBody("""{"internalId": "some-id"}""")))
   }
 
-  def willNotAuthorizePrivilegedAuthToken(authBearerToken: String): StubMapping = {
+  def willNotAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping = {
     mock.register(post(urlEqualTo("/auth/authorise"))
-      .withRequestBody(equalToJson(privilegedAuthority.toString()))
+      .withRequestBody(equalToJson(privilegedAuthority(scope).toString()))
       .withHeader(AUTHORIZATION, equalTo(authBearerToken))
       .willReturn(aResponse()
         .withStatus(Status.UNAUTHORIZED)
         .withHeader(HeaderNames.WWW_AUTHENTICATE, """MDTP detail="InsufficientConfidenceLevel"""")))
   }
 
-  val privilegedAuthority = Json.obj(
-    "authorise" -> Json.arr(Json.toJson(Enrolment("read:individuals-employments"))),
+  def privilegedAuthority(scope: String) = Json.obj(
+    "authorise" -> Json.arr(Json.toJson(Enrolment(scope))),
     "retrieve" -> JsArray()
   )
 

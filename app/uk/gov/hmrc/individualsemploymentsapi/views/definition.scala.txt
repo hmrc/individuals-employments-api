@@ -4,8 +4,13 @@
   "scopes":[
     {
       "key":"read:individuals-employments",
-      "name":"access all individuals employment information",
-      "description":"Access employments history for all individuals"
+      "name":"access individuals employment information",
+      "description":"Access employments information for all individuals"
+    },
+    {
+      "key":"read:individuals-employments-paye",
+      "name":"access all paye individuals employment information",
+      "description":"Access paye employments history for all individuals"
     },
     {
       "key":"read:individual-employments",

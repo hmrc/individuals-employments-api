@@ -23,6 +23,7 @@ import play.api.test.Helpers._
 import scalaj.http.{Http, HttpResponse}
 
 class SandboxEmploymentsControllerSpec extends BaseSpec {
+  private val employmentsScope = "read:individuals-employments"
 
   feature("View individuals root (hateoas) entry point is accessible") {
 
@@ -55,8 +56,6 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
     }
 
     scenario("invalid match id") {
-      Given("a valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken)
 
       When("the root entry point to the API is invoked with an invalid match id")
       val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366")
