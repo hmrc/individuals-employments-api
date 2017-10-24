@@ -24,13 +24,11 @@ import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.sandboxMatchId
 import scalaj.http.Http
 
 class EmploymentsSpec extends BaseSpec {
+  private val payeEmploymentsScope = "read:individuals-employments-paye"
 
   feature("individual employments is open and accessible") {
 
     scenario("Valid request to the sandbox implementation") {
-
-      Given("A valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken)
 
       When("I request individual employments for the sandbox matchId")
       val response = Http(s"$serviceUrl/sandbox/paye?matchId=$sandboxMatchId&fromDate=2016-04-01&toDate=2017-01-01")

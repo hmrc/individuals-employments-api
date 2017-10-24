@@ -30,8 +30,6 @@ class VersioningSpec extends BaseSpec {
   feature("Versioning") {
 
     scenario("Requests without an accept header default to version 1") {
-      Given("A valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken)
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made without an accept header")
       val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken)
@@ -41,8 +39,6 @@ class VersioningSpec extends BaseSpec {
     }
 
     scenario("Requests with an accept header version 1") {
-      Given("A valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken)
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version 1")
       val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken, acceptHeaderV1)
@@ -52,8 +48,6 @@ class VersioningSpec extends BaseSpec {
     }
 
     scenario("Requests with an accept header version P1") {
-      Given("A valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken)
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version P1")
       val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken, acceptHeaderVP1)
