@@ -49,8 +49,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
       employmentsService.paye(matchId, interval) map { employments =>
         val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
         val employmentsJsObject = obj("employments" -> toJson(employments))
-        val embeddedJsObject = obj("_embedded" -> employmentsJsObject)
-        Ok(state(embeddedJsObject) ++ selfLink)
+        Ok(state(employmentsJsObject) ++ selfLink)
       }
     } recover recovery
   }
