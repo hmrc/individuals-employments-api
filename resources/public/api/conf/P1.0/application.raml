@@ -40,7 +40,7 @@ uses:
         example: Bearer <BEARER_TOKEN>
     queryParameters:
       matchId:
-        description: A short-lived UUID, typically valid for several hours
+        description: A short-lived UUID, typically valid for several hours. Generated through the Individuals Matching API.
         type: string
         required: true
         example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
@@ -51,7 +51,24 @@ uses:
           application/json:
             example: !include examples/root.json
             type: !include schemas/root.json
-
+      400:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              BadRequest:
+                description: Invalid request
+                value:
+                  code: INVALID_REQUEST
+      404:
+        body:
+          application/json:
+            type: types.errorResponse
+            examples:
+              NotFound:
+                description: Not found
+                value:
+                  code: NOT_FOUND
   /paye:
     get:
       displayName: Retrieve Employments history
@@ -68,7 +85,7 @@ uses:
           example: Bearer <BEARER_TOKEN>
       queryParameters:
         matchId:
-          description: A short-lived UUID, typically valid for several hours
+          description: A short-lived UUID, typically valid for several hours. Generated through the Individuals Matching API
           type: string
           required: true
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430

@@ -238,15 +238,13 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
                  "href":"/individuals/employments/paye?matchId=$matchId&fromDate=2017-01-01&toDate=2017-09-25"
                }
              },
-             "_embedded":{
-               "employments":[
-                 {
-                   "employer":{
-                     "name":"employer name"
-                   }
+             "employments":[
+               {
+                 "employer":{
+                   "name":"employer name"
                  }
-               ]
-             }
+               }
+             ]
            }
         """)
     }

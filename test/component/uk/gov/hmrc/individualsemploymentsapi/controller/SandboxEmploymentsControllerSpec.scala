@@ -150,27 +150,25 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
                 "href":"/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01"
               }
             },
-            "_embedded":{
-              "employments":[
-                {
-                  "startDate":"2017-01-02",
-                  "endDate":"2017-03-01",
-                  "employer":{
-                    "payeReference":"123/DI45678",
-                    "name":"Disney",
-                    "address":{
-                      "line1":"Friars House",
-                      "line2":"Campus Way",
-                      "line3":"New Street",
-                      "line4":"Sometown",
-                      "line5":"Old County",
-                      "postcode":"TF22 3BC"
-                    }
-                  },
-                  "payFrequency":"FORTNIGHTLY"
-                }
-              ]
-            }
+            "employments":[
+              {
+                "startDate":"2017-01-02",
+                "endDate":"2017-03-01",
+                "employer":{
+                  "payeReference":"123/DI45678",
+                  "name":"Disney",
+                  "address":{
+                    "line1":"Friars House",
+                    "line2":"Campus Way",
+                    "line3":"New Street",
+                    "line4":"Sometown",
+                    "line5":"Old County",
+                    "postcode":"TF22 3BC"
+                  }
+                },
+                "payFrequency":"FORTNIGHTLY"
+              }
+            ]
           }
         """)
     }

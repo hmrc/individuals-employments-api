@@ -44,27 +44,25 @@ class EmploymentsSpec extends BaseSpec {
                 "href":"/individuals/employments/paye?matchId=$sandboxMatchId&fromDate=2016-04-01&toDate=2017-01-01"
               }
             },
-            "_embedded":{
-              "employments":[
-                {
-                  "startDate":"2016-01-01",
-                  "endDate":"2016-06-30",
-                  "employer":{
-                    "payeReference":"123/AI45678",
-                    "name":"Acme",
-                    "address":{
-                      "line1":"Acme Inc Building",
-                      "line2":"Acme Inc Campus",
-                      "line3":"Acme Street",
-                      "line4":"AcmeVille",
-                      "line5":"Acme State",
-                      "postcode":"AI22 9LL"
-                    }
-                  },
-                  "payFrequency":"FOUR_WEEKLY"
-                }
-              ]
-            }
+            "employments":[
+              {
+                "startDate":"2016-01-01",
+                "endDate":"2016-06-30",
+                "employer":{
+                  "payeReference":"123/AI45678",
+                  "name":"Acme",
+                  "address":{
+                    "line1":"Acme Inc Building",
+                    "line2":"Acme Inc Campus",
+                    "line3":"Acme Street",
+                    "line4":"AcmeVille",
+                    "line5":"Acme State",
+                    "postcode":"AI22 9LL"
+                  }
+                },
+                "payFrequency":"FOUR_WEEKLY"
+              }
+            ]
           }
         """)
     }
