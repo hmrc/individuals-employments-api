@@ -16,8 +16,8 @@
 
 package component.uk.gov.hmrc.individualsemploymentsapi
 
-import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, _}
-import play.api.http.HeaderNames.AUTHORIZATION
+import component.uk.gov.hmrc.individualsemploymentsapi.stubs._
+import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION}
 import play.api.libs.json.Json.parse
 import play.api.test.Helpers._
 
@@ -29,7 +29,7 @@ class VersioningSpec extends BaseSpec {
 
   feature("Versioning") {
 
-    scenario("Requests without an accept header default to version 1") {
+    scenario("Requests without an accept header default to version 1.0") {
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made without an accept header")
       val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken)
@@ -38,16 +38,16 @@ class VersioningSpec extends BaseSpec {
       response.code shouldBe NOT_FOUND
     }
 
-    scenario("Requests with an accept header version 1") {
+    scenario("Requests with an accept header with an invalid version") {
 
-      When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version 1")
-      val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken, acceptHeaderV1)
+      When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version 10.0")
+      val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken,  ACCEPT -> "application/vnd.hmrc.10.0+json")
 
       Then("The response status should be 404")
       response.code shouldBe NOT_FOUND
     }
 
-    scenario("Requests with an accept header version P1") {
+    scenario("Requests with an accept header version P1.0") {
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version P1")
       val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken, acceptHeaderVP1)
@@ -55,7 +55,7 @@ class VersioningSpec extends BaseSpec {
       Then("The response status should be 200")
       response.code shouldBe OK
 
-      Then("And the response body should be for api version P1")
+      Then("And the response body should be for api version P1.0")
       parse(response.body) shouldBe parse(
         """
           {

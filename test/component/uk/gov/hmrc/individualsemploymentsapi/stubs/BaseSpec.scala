@@ -44,7 +44,6 @@ trait BaseSpec extends FeatureSpec with BeforeAndAfterAll with BeforeAndAfterEac
   val serviceUrl = s"http://localhost:$port"
   val mocks = Seq(AuthStub, IndividualsMatchingApiStub, DesStub)
   val authToken = "Bearer AUTH_TOKEN"
-  val acceptHeaderV1 = ACCEPT -> "application/vnd.hmrc.1.0+json"
   val acceptHeaderVP1 = ACCEPT -> "application/vnd.hmrc.P1.0+json"
 
   protected def requestHeaders(acceptHeader: (String, String) = acceptHeaderVP1) = {
