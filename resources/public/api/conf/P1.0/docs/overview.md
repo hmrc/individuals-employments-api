@@ -1,4 +1,4 @@
-<p>This API provides individual's employment information (PAYE only) from HM Revenue and Customs (HMRC). Employment data is only available for tax years commencing 2013-2014.</p>
+<p>This API provides individual's employment information from HM Revenue and Customs (HMRC).</p>
 
 <p>The responses exclude fields when they do not have a value.</p>
 
