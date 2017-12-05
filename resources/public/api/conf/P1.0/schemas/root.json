@@ -8,7 +8,7 @@
       "properties": {
         "paye": {
           "type": "object",
-          "description": "Refers to the next logical resource",
+          "description": "The URI for the resource to get the individual's employment data",
           "properties": {
             "href": {
               "type": "string",

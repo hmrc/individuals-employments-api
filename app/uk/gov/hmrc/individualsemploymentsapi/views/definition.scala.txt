@@ -21,7 +21,7 @@
   ],
   "api":{
     "name":"Individuals Employments",
-    "description":"Individuals Employments API",
+    "description":"Retrieves employment information for an individual",
     "context":"individuals/employments",
     "versions":[
       {
