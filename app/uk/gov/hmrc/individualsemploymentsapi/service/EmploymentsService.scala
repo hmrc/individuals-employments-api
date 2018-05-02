@@ -69,14 +69,16 @@ class SandboxEmploymentsService extends EmploymentsService {
 @Singleton
 class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: IndividualsMatchingApiConnector, desConnector: DesConnector) extends EmploymentsService {
 
-  private val sortByLeavingDateOrLastPaymentDate = { e: DesEmployment => e.employmentLeavingDate.getOrElse(e.payments.map(_.paymentDate).max) }
+  private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { e: DesEmployment =>
+    e.employmentLeavingDate.getOrElse(interval.getEnd.toLocalDate)
+  }
 
-  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier) = individualsMatchingApiConnector.resolve(matchId)
+  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] = individualsMatchingApiConnector.resolve(matchId)
 
   override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =
     resolve(matchId) flatMap { ninoMatch =>
       desConnector.fetchEmployments(ninoMatch.nino, interval) map { employments =>
-        employments.sortBy(sortByLeavingDateOrLastPaymentDate).reverse flatMap Employment.from
+        employments.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse flatMap Employment.from
       }
     }
 
