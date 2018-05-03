@@ -85,6 +85,19 @@ class LiveEmploymentsServiceSpec extends UnitSpec with Intervals with MockitoSug
         Employment.from(employmentEndingJanuary).get)
     }
 
+    "return the employments sorted by last payment date when an employment exists with no payments" in {
+      val anEmployment = aDesEmployment(leavingDate = Some(LocalDate.parse("2017-01-01")))
+      val employmentWithNoPayments = aDesEmployment(leavingDate = None, payments = Nil)
+
+      mockIndividualsMatchingApiConnectorToReturn(Future.successful(ninoMatch))
+      mockDesConnectorToReturn(Future.successful(Seq(anEmployment, employmentWithNoPayments)))
+
+      await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq(
+        Employment.from(employmentWithNoPayments).get,
+        Employment.from(anEmployment).get
+      )
+    }
+
   }
 
   private def mockIndividualsMatchingApiConnectorToThrow(throwable: Throwable) =
