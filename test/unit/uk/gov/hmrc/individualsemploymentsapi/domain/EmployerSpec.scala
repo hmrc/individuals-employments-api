@@ -25,7 +25,7 @@ class EmployerSpec extends FlatSpec with Matchers {
   "Employer" should "derive itself from some parameters" in {
     val someEmpRef = Some(EmpRef("123", "AB45678"))
     val someName = Some("name")
-    val someAddress = Some(Address("line1", None, None, None, None, "AB1 2CD"))
+    val someAddress = Some(Address("line1", None, None, None, None, Some("AB1 2CD")))
     val employer = Employer(someEmpRef, someName, someAddress)
     Employer.create(someEmpRef, someName, someAddress) shouldBe Some(employer)
   }

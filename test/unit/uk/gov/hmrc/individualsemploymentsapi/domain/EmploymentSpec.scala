@@ -25,8 +25,8 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.{Address, Employer, Employme
 class EmploymentSpec extends FlatSpec with Matchers {
 
   "Employment" should "derive itself from an instance of des employment" in {
-    val desEmployment = DesEmployment(Seq.empty, Some("Acme Inc"), Some(DesAddress("line 1", "AB1 2CD")), Some("123"), Some("AB12345"), Some(parse("2016-01-01")), Some(parse("2016-12-31")), Some(DesPayFrequency.M1))
-    val employment = Employment(Some(parse("2016-01-01")), Some(parse("2016-12-31")), Some(Employer(Some(EmpRef("123", "AB12345")), Some("Acme Inc"), Some(Address("line 1", None, None, None, None, "AB1 2CD")))), Some(PayFrequency.withName("CALENDAR_MONTHLY")))
+    val desEmployment = DesEmployment(Seq.empty, Some("Acme Inc"), Some(DesAddress("line 1", Some("AB1 2CD"))), Some("123"), Some("AB12345"), Some(parse("2016-01-01")), Some(parse("2016-12-31")), Some(DesPayFrequency.M1))
+    val employment = Employment(Some(parse("2016-01-01")), Some(parse("2016-12-31")), Some(Employer(Some(EmpRef("123", "AB12345")), Some("Acme Inc"), Some(Address("line 1", None, None, None, None, Some("AB1 2CD"))))), Some(PayFrequency.withName("CALENDAR_MONTHLY")))
     Employment.from(desEmployment) shouldBe Some(employment)
   }
 

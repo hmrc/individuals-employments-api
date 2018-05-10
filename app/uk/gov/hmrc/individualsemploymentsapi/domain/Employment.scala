@@ -26,7 +26,7 @@ object Employment {
 
   def from(desEmployment: DesEmployment): Option[Employment] = {
 
-    def address(desAddress: Option[DesAddress]) = {
+    def address(desAddress: Option[DesAddress]): Option[Address] = {
       desAddress map { address =>
         Address(address.line1, address.line2, address.line3, address.line4, address.line5, address.postalCode)
       }

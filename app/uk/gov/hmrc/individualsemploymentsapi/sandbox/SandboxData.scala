@@ -36,13 +36,13 @@ object SandboxData {
 
     object Acme {
       val empRef = EmpRef.fromIdentifiers("123/AI45678")
-      val address = Address("Acme Inc Building", Some("Acme Inc Campus"), Some("Acme Street"), Some("AcmeVille"), Some("Acme State"), "AI22 9LL")
+      val address = Address("Acme Inc Building", Some("Acme Inc Campus"), Some("Acme Street"), Some("AcmeVille"), Some("Acme State"), Some("AI22 9LL"))
       val employer = Employer(Option(empRef), Option("Acme"), Option(address))
     }
 
     object Disney {
       val empRef = EmpRef.fromIdentifiers("123/DI45678")
-      val address = Address("Friars House", Some("Campus Way"), Some("New Street"), Some("Sometown"), Some("Old County"), "TF22 3BC")
+      val address = Address("Friars House", Some("Campus Way"), Some("New Street"), Some("Sometown"), Some("Old County"), Some("TF22 3BC"))
       val employer = Employer(Option(empRef), Option("Disney"), Option(address))
     }
 

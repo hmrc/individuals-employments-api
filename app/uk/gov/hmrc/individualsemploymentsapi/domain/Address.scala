@@ -16,4 +16,4 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain
 
-case class Address(line1: String, line2: Option[String], line3: Option[String], line4: Option[String], line5: Option[String], postcode: String)
+case class Address(line1: String, line2: Option[String], line3: Option[String], line4: Option[String], line5: Option[String], postcode: Option[String])
