@@ -21,7 +21,8 @@ import java.util.UUID
 import org.joda.time.LocalDate
 import org.joda.time.LocalDate.parse
 import org.mockito.Mockito
-import org.mockito.Mockito.when
+import org.mockito.Mockito._
+import org.mockito.Matchers._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 import uk.gov.hmrc.domain.{EmpRef, Nino}
@@ -36,14 +37,15 @@ import unit.uk.gov.hmrc.individualsemploymentsapi.util.Intervals
 
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class LiveEmploymentsServiceSpec extends UnitSpec with Intervals with MockitoSugar with BeforeAndAfterEach {
 
   private val individualsMatchingApiConnector = mock[IndividualsMatchingApiConnector]
   private val desConnector = mock[DesConnector]
-  private val liveEmploymentsService = new LiveEmploymentsService(individualsMatchingApiConnector, desConnector)
+  private val liveEmploymentsService = new LiveEmploymentsService(individualsMatchingApiConnector, desConnector, 0)
 
   private val matchId = UUID.randomUUID()
   private val nino = Nino("AB123456C")
@@ -96,6 +98,19 @@ class LiveEmploymentsServiceSpec extends UnitSpec with Intervals with MockitoSug
         Employment.from(employmentWithNoPayments).get,
         Employment.from(anEmployment).get
       )
+    }
+
+    "retry once if the employments lookup returns a 503" in {
+      val someEmployment = aDesEmployment()
+
+      mockIndividualsMatchingApiConnectorToReturn(Future.successful(ninoMatch))
+
+      when(desConnector.fetchEmployments(nino, interval))
+        .thenReturn(Future.failed(Upstream5xxResponse("""¯\_(ツ)_/¯""", 503, 503)))
+        .thenReturn(Future.successful(Seq(someEmployment)))
+
+      await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq(Employment.from(someEmployment).get)
+      verify(desConnector, times(2)).fetchEmployments(any(), any())(any(), any())
     }
 
   }

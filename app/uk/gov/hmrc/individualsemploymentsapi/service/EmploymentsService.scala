@@ -17,9 +17,10 @@
 package uk.gov.hmrc.individualsemploymentsapi.service
 
 import java.util.UUID
-import javax.inject.{Inject, Singleton}
 
+import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.{Interval, LocalDate}
+import play.api.{Logger, Play}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual, NinoMatch}
@@ -28,7 +29,7 @@ import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundE
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.{failed, successful}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 
 trait EmploymentsService {
 
@@ -67,7 +68,9 @@ class SandboxEmploymentsService extends EmploymentsService {
 }
 
 @Singleton
-class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: IndividualsMatchingApiConnector, desConnector: DesConnector) extends EmploymentsService {
+class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: IndividualsMatchingApiConnector,
+                                       desConnector: DesConnector,
+                                       @Named("retryDelay") retryDelay: Int) extends EmploymentsService {
 
   private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { e: DesEmployment =>
     e.employmentLeavingDate.getOrElse(interval.getEnd.toLocalDate)
@@ -77,9 +80,14 @@ class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: Individu
 
   override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =
     resolve(matchId) flatMap { ninoMatch =>
-      desConnector.fetchEmployments(ninoMatch.nino, interval) map { employments =>
-        employments.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse flatMap Employment.from
+      withRetry {
+        desConnector.fetchEmployments(ninoMatch.nino, interval) map { employments =>
+          employments.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse flatMap Employment.from
+        }
       }
     }
 
+  private def withRetry[T](body: => Future[T]): Future[T] = body recoverWith {
+    case Upstream5xxResponse(_, 503, _) => Thread.sleep(retryDelay); body
+  }
 }
