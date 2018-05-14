@@ -60,13 +60,6 @@ class LiveEmploymentsServiceSpec extends UnitSpec with Intervals with MockitoSug
 
   "Live Employments Service paye function based on match id" should {
 
-    "throw match not found exception when no individual exists for the given matchId" in {
-      mockIndividualsMatchingApiConnectorToThrow(new MatchNotFoundException)
-      a[MatchNotFoundException] should be thrownBy {
-        await(liveEmploymentsService.paye(matchId, interval))
-      }
-    }
-
     "return empty list of employments when no employments exists for the given matchId" in {
       mockIndividualsMatchingApiConnectorToReturn(successful(ninoMatch))
       mockDesConnectorToReturn(successful(Seq.empty))

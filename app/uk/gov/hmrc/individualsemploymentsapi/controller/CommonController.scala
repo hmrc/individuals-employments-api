@@ -38,7 +38,7 @@ trait CommonController extends BaseController {
   }
 
   private[controller] def recovery: PartialFunction[Throwable, Result] = {
-    case _: MatchNotFoundException => ErrorNotFound.toHttpResponse
+    case MatchNotFoundException => ErrorNotFound.toHttpResponse
     case e: IllegalArgumentException => ErrorInvalidRequest(e.getMessage).toHttpResponse
   }
 

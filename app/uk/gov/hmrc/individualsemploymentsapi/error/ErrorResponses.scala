@@ -38,6 +38,6 @@ object ErrorResponses {
 
   class ValidationException(message: String) extends RuntimeException(message)
 
-  class MatchNotFoundException extends RuntimeException
+  case object MatchNotFoundException extends RuntimeException
 
 }

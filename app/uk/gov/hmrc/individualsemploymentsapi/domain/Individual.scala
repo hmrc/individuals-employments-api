@@ -18,4 +18,6 @@ package uk.gov.hmrc.individualsemploymentsapi.domain
 
 import java.util.UUID
 
-case class Individual(matchId: UUID, nino: String, employments: Seq[Employment], income: Seq[Payment])
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
+
+case class Individual(matchId: UUID, nino: String, employments: Seq[DesEmployment])

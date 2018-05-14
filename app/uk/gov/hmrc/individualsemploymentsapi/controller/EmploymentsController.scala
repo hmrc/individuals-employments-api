@@ -17,14 +17,15 @@
 package uk.gov.hmrc.individualsemploymentsapi.controller
 
 import java.util.UUID
-import javax.inject.{Inject, Singleton}
 
+import javax.inject.{Inject, Singleton}
 import org.joda.time.Interval
 import play.api.hal.Hal._
 import play.api.hal.HalLink
+import play.api.libs.json.Json
 import play.api.libs.json.Json.{obj, toJson}
 import play.api.mvc.hal._
-import play.api.mvc.Action
+import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.individualsemploymentsapi.config.ServiceAuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.service.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService}
@@ -52,6 +53,16 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
         Ok(state(employmentsJsObject) ++ selfLink)
       }
     } recover recovery
+  }
+
+  def payroll(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
+    requiresPrivilegedAuthentication("read:individuals-employments-payroll") {
+      employmentsService.payroll(matchId, interval) map { payrolls =>
+        val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye/payroll?matchId=$matchId", interval.getStart))
+        val payrollJsObject = Json.obj("payroll" -> Json.toJson(payrolls))
+        Ok(state(payrollJsObject) ++ selfLink)
+      }
+    }
   }
 
 }

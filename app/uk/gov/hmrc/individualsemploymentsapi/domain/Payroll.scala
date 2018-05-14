@@ -16,12 +16,22 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain
 
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesAddress
+import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
+import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.addressJsonFormat
 
-case class Address(line1: String, line2: Option[String], line3: Option[String], line4: Option[String], line5: Option[String], postcode: Option[String])
+case class Payroll(employeeAddress: Option[Address], payrollId: Option[String])
 
-object Address {
-  def from(address: DesAddress): Address = {
-    Address(address.line1, address.line2, address.line3, address.line4, address.line5, address.postalCode)
+object Payroll {
+  implicit val format: Format[Payroll] = Json.format[Payroll]
+
+  def from(employment: DesEmployment): Option[Payroll] = {
+    val address = employment.employeeAddress.map(Address.from)
+    val payrollId = employment.payrollId
+
+    (address, payrollId) match {
+      case (None, None) => None
+      case _ => Some(Payroll(address, payrollId))
+    }
   }
 }
