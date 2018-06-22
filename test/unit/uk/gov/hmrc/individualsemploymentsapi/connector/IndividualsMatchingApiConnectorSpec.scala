@@ -65,13 +65,6 @@ class IndividualsMatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEa
       }
     }
 
-    "rethrow a not found exception as a match not found exception" in new Fixture {
-      stubWithResponseStatus(NOT_FOUND)
-      a[MatchNotFoundException] should be thrownBy {
-        await(individualsMatchingApiConnector.resolve(matchId))
-      }
-    }
-
     "return a nino match when upstream service call succeeds" in new Fixture {
       stubWithResponseStatus(OK,
         s"""

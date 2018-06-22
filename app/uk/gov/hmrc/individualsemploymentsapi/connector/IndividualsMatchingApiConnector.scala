@@ -37,7 +37,7 @@ class IndividualsMatchingApiConnector extends ServicesConfig {
 
   def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
     http.GET[NinoMatch](s"$serviceUrl/match-record/$matchId") recover {
-      case _: NotFoundException => throw new MatchNotFoundException
+      case _: NotFoundException => throw MatchNotFoundException
     }
 
 }

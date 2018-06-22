@@ -18,11 +18,11 @@ package uk.gov.hmrc.individualsemploymentsapi.sandbox
 
 import java.util.UUID
 
+import org.joda.time.LocalDate
 import org.joda.time.LocalDate.parse
-import uk.gov.hmrc.domain.{EmpRef, Nino}
-import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequency._
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.individualsemploymentsapi.domain._
-import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.Employers._
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayFrequency, DesPayment}
 
 object SandboxData {
 
@@ -32,40 +32,48 @@ object SandboxData {
   val sandboxNinoString = "NA000799C"
   val sandboxNino = Nino(sandboxNinoString)
 
-  object Employers {
-
-    object Acme {
-      val empRef = EmpRef.fromIdentifiers("123/AI45678")
-      val address = Address("Acme Inc Building", Some("Acme Inc Campus"), Some("Acme Street"), Some("AcmeVille"), Some("Acme State"), Some("AI22 9LL"))
-      val employer = Employer(Option(empRef), Option("Acme"), Option(address))
-    }
-
-    object Disney {
-      val empRef = EmpRef.fromIdentifiers("123/DI45678")
-      val address = Address("Friars House", Some("Campus Way"), Some("New Street"), Some("Sometown"), Some("Old County"), Some("TF22 3BC"))
-      val employer = Employer(Option(empRef), Option("Disney"), Option(address))
-    }
-
-  }
-
   object Employments {
-    val acme = Employment(Option(parse("2016-01-01")), Option(parse("2016-06-30")), Option(Acme.employer), Option(FOUR_WEEKLY))
-    val disney = Employment(Option(parse("2017-01-02")), Option(parse("2017-03-01")), Option(Disney.employer), Option(FORTNIGHTLY))
+    val acme = DesEmployment(
+      Seq(
+        DesPayment(new LocalDate(2016, 1, 28), 0),
+        DesPayment(new LocalDate(2016, 2, 28), 0),
+        DesPayment(new LocalDate(2016, 3, 28), 0),
+        DesPayment(new LocalDate(2016, 4, 28), 0),
+        DesPayment(new LocalDate(2016, 5, 28), 0)
+      ),
+      Some("Acme"),
+      Some(DesAddress(line1 = "Acme Inc Building", postalCode = Some("AI22 9LL"), line2 = Some("Acme Inc Campus"), line3 = Some("Acme Street"), line4 = Some("AcmeVille"), line5 = Some("Acme State"))),
+      Some("123"),
+      Some("AI45678"),
+      Some(new LocalDate(2016, 1, 1)),
+      Some(new LocalDate(2016, 6, 30)),
+      Some(DesPayFrequency.W4),
+      Some(DesAddress("", Some(""), Some(""), Some(""), Some(""), Some(""))),
+      Some("payroll-id")
+    )
+    val disney = DesEmployment(
+      Seq(
+        DesPayment(new LocalDate(2017, 2, 19), 0),
+        DesPayment(new LocalDate(2017, 2, 28), 0)
+      ),
+      Some("Disney"),
+      Some(DesAddress(line1 = "Friars House", postalCode = Some("TF22 3BC"), line2 = Some("Campus Way"), line3 = Some("New Street"), line4 = Some("Sometown"), line5 = Some("Old County"))),
+      Some("123"),
+      Some("DI45678"),
+      Some(parse("2017-01-02")),
+      Some(parse("2017-03-01")),
+      Some(DesPayFrequency.W2),
+      Some(DesAddress("", Some(""), Some(""), Some(""), Some(""), Some(""))),
+      Some("another-payroll-id")
+    )
   }
 
   object Individuals {
 
-    val amanda = Individual(sandboxMatchId, sandboxNinoString,
-      Seq(Employments.acme, Employments.disney),
-      Seq(
-        Payment(0, parse("2016-01-28"), Option(Acme.empRef)),
-        Payment(0, parse("2016-02-28"), Option(Acme.empRef)),
-        Payment(0, parse("2016-03-28"), Option(Acme.empRef)),
-        Payment(0, parse("2016-04-28"), Option(Acme.empRef)),
-        Payment(0, parse("2016-05-28"), Option(Acme.empRef)),
-        Payment(0, parse("2017-02-09"), Option(Disney.empRef)),
-        Payment(0, parse("2017-02-16"), Option(Disney.empRef))
-      )
+    val amanda = Individual(
+      sandboxMatchId,
+      sandboxNinoString,
+      Seq(Employments.acme, Employments.disney)
     )
 
     val individuals = Seq(amanda)

@@ -26,9 +26,11 @@ case class DesEmployment(payments: Seq[DesPayment],
                          employerSchemeReference: Option[String] = None,
                          employmentStartDate: Option[LocalDate] = None,
                          employmentLeavingDate: Option[LocalDate] = None,
-                         employmentPayFrequency: Option[DesPayFrequency.Value] = None) {
+                         employmentPayFrequency: Option[DesPayFrequency.Value] = None,
+                         employeeAddress: Option[DesAddress] = None,
+                         payrollId: Option[String] = None) {
 
-  val employerPayeReference = {
+  val employerPayeReference: Option[EmpRef] = {
     (employerDistrictNumber, employerSchemeReference) match {
       case (Some(districtNumber), Some(schemeReference)) => Some(EmpRef(districtNumber, schemeReference))
       case _ => None
