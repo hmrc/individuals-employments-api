@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Individual's PAYE payroll records",
+  "type": "object",
+  "properties": {
+    "_links": {
+      "type": "object",
+      "properties": {
+        "self": {
+          "type": "object",
+          "description": "HAL compliant. Refers to itself",
+          "properties": {
+            "href": {
+              "type": "string",
+              "example": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2016-02-28&toDate=2017-03-01"
+            }
+          },
+          "required": [
+            "href"
+          ]
+        }
+      },
+      "required": [
+        "self"
+      ]
+    },
+    "payroll": {
+      "type": "array",
+      "description": "list of payroll records for the given period",
+      "items": {
+        "type": "object",
+        "properties": {
+          "payrollId": {
+            "type": "string",
+            "example": "1234567890"
+          },
+          "employeeAddress": {
+            "type": "object",
+            "properties": {
+              "line1": {
+                "type": "string",
+                "description": "Address line 1"
+              },
+              "line2": {
+                "type": "string",
+                "description": "Address line 2"
+              },
+              "line3": {
+                "type": "string",
+                "description": "Address line 3"
+              },
+              "line4": {
+                "type": "string",
+                "description": "Address line 4"
+              },
+              "line5": {
+                "type": "string",
+                "description": "Address line 5"
+              },
+              "postcode": {
+                "type": "string",
+                "description": "Postcode"
+              }
+            },
+            "required": [
+              "line1"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "_links",
+    "payroll"
+  ]
+}
