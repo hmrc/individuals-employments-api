@@ -131,7 +131,7 @@ uses:
         description: !include docs/employments-payroll-endpoint-description.md
         is: [headers.acceptHeader]
         (annotations.sandboxData): !include sandbox/employments-request.md
-        (annotations.scope): "read:individuals-employments-paye"
+        (annotations.scope): "read:individuals-employments-payroll"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:individuals-employments-payroll" ] } ]
         headers:
           Authorization:
