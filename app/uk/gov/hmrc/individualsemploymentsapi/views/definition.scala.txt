@@ -13,6 +13,11 @@
       "description":"Access paye employments history for all individuals"
     },
     {
+      "key":"read:individuals-employments-payroll",
+      "name":"access all paye individuals payroll information",
+      "description":"Access paye payroll history for all individuals"
+    },
+    {
       "key":"read:individual-employments",
       "name":"access employment information",
       "description":"Access employment history",
