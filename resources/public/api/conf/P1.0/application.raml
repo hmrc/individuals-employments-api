@@ -125,17 +125,17 @@ uses:
                   description: Not found
                   value:
                     code: NOT_FOUND
-  /paye/employee:
+  /paye/payroll:
       get:
         displayName: Retrieve Payroll history
-        description: !include docs/employments-paye-employee-endpoint-description.md
+        description: !include docs/employments-payroll-endpoint-description.md
         is: [headers.acceptHeader]
         (annotations.sandboxData): !include sandbox/employments-request.md
-        (annotations.scope): "read:individuals-employments-paye-employee"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "read:individuals-employments-paye-employee" ] } ]
+        (annotations.scope): "read:individuals-employments-payroll"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:individuals-employments-payroll" ] } ]
         headers:
           Authorization:
-            description: OAuth 2.0 Bearer Token with the read:individuals-employments-paye-employee scope.
+            description: OAuth 2.0 Bearer Token with the read:individuals-employments-payroll scope.
             type: string
             required: true
             example: Bearer <BEARER_TOKEN>
@@ -160,8 +160,8 @@ uses:
             description: The individual PAYE employments for the given period
             body:
               application/json:
-                example: !include examples/employments-paye-employee-response.json
-                type: !include schemas/employments-paye-employee-response.json
+                example: !include examples/employments-payroll-response.json
+                type: !include schemas/employments-payroll-response.json
           400:
             body:
               application/json:
