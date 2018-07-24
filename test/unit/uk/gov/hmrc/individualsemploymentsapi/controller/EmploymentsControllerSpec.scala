@@ -19,14 +19,12 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.controller
 import java.util.UUID
 
 import org.joda.time.{Interval, LocalDate}
-import org.mockito.BDDMockito.given
-import org.mockito.Matchers.{any, refEq}
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verifyZeroInteractions, when}
 import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play._
 import play.api.http.Status.OK
-import play.api.libs.json.Json.parse
-import play.api.mvc._
+import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
@@ -41,73 +39,72 @@ import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, s
 import uk.gov.hmrc.individualsemploymentsapi.service.{LiveEmploymentsService, SandboxEmploymentsService}
 
 import scala.concurrent.Future
-import scala.concurrent.Future.{failed, successful}
 
-class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar {
+class EmploymentsControllerSpec extends PlaySpec with MockitoSugar {
 
   trait Setup {
     val mockSandboxEmploymentsService = mock[SandboxEmploymentsService]
     val mockLiveEmploymentsService = mock[LiveEmploymentsService]
-
     val mockAuthConnector = mock[ServiceAuthConnector]
+    val hmctsClientId = "hmctsClientId"
 
-    val sandboxEmploymentsController = new SandboxEmploymentsController(mockSandboxEmploymentsService, mockAuthConnector)
-    val liveEmploymentsController = new LiveEmploymentsController(mockLiveEmploymentsService, mockAuthConnector)
+    val sandboxEmploymentsController = new SandboxEmploymentsController(mockSandboxEmploymentsService, mockAuthConnector, hmctsClientId)
+    val liveEmploymentsController = new LiveEmploymentsController(mockLiveEmploymentsService, mockAuthConnector, hmctsClientId)
 
-    implicit val hc = HeaderCarrier()
+    implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    given(mockAuthConnector.authorise(any(), refEq(EmptyRetrieval))(any(), any())).willReturn(successful(()))
+    when(mockAuthConnector.authorise(any(), eqTo(EmptyRetrieval))(any(), any())).thenReturn(Future.successful(()))
   }
 
   "Root" should {
     val randomMatchId = UUID.randomUUID()
 
     "return a 404 (not found) when a match id does not match live data" in new Setup {
-      when(mockLiveEmploymentsService.resolve(refEq(randomMatchId))(any[HeaderCarrier])).thenReturn(failed(MatchNotFoundException))
+      when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(MatchNotFoundException))
 
-      val eventualResult = liveEmploymentsController.root(randomMatchId).apply(FakeRequest())
+      val eventualResult = liveEmploymentsController.root(randomMatchId)(FakeRequest())
 
       status(eventualResult) mustBe NOT_FOUND
-      contentAsJson(eventualResult) mustBe parse(
-        """
-          {
-            "code":"NOT_FOUND",
-            "message":"The resource can not be found"
-          }
-        """)
+      contentAsJson(eventualResult) mustBe Json.obj(
+        "code" -> "NOT_FOUND",
+        "message" -> "The resource can not be found"
+      )
     }
 
     "return a 200 (ok) when a match id matches live data" in new Setup {
-      when(mockLiveEmploymentsService.resolve(refEq(randomMatchId))(any[HeaderCarrier])).thenReturn(successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
-      val eventualResult = liveEmploymentsController.root(randomMatchId).apply(FakeRequest())
+      when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
+      val eventualResult = liveEmploymentsController.root(randomMatchId)(FakeRequest())
       status(eventualResult) mustBe OK
-      contentAsJson(eventualResult) mustBe parse(
-        s"""
-          {
-            "_links":{
-              "paye":{
-                "href":"/individuals/employments/paye?matchId=$randomMatchId{&fromDate,toDate}",
-                "title":"View individual's employments"
-              },
-              "self":{
-                "href":"/individuals/employments/?matchId=$randomMatchId"
-              }
-            }
-          }
-        """)
+      contentAsJson(eventualResult) mustBe Json.obj(
+        "_links" -> Json.obj(
+          "paye" -> Json.obj(
+            "href" -> s"/individuals/employments/paye?matchId=$randomMatchId{&fromDate,toDate}",
+            "title" -> "View individual's employments"
+          ),
+          "self" -> Json.obj(
+            "href" -> s"/individuals/employments/?matchId=$randomMatchId"
+          )
+        )
+      )
     }
 
     "fail with AuthorizedException when the bearer token does not have enrolment read:individuals-employments" in new Setup {
-      given(mockAuthConnector.authorise(refEq(Enrolment("read:individuals-employments")), refEq(EmptyRetrieval))(any(), any())).willReturn(failed(new InsufficientEnrolments()))
+      when(mockAuthConnector.authorise(eqTo(Enrolment("read:individuals-employments")), eqTo(EmptyRetrieval))(any(), any()))
+        .thenReturn(Future.failed(InsufficientEnrolments()))
 
-      intercept[InsufficientEnrolments]{await(liveEmploymentsController.root(randomMatchId).apply(FakeRequest()))}
+      intercept[InsufficientEnrolments] {
+        await(liveEmploymentsController.root(randomMatchId)(FakeRequest()))
+      }
       verifyZeroInteractions(mockLiveEmploymentsService)
     }
 
     "not require bearer token authentication for sandbox" in new Setup {
-      when(mockSandboxEmploymentsService.resolve(refEq(randomMatchId))(any[HeaderCarrier])).thenReturn(successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
+      when(mockSandboxEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
 
-      val result = sandboxEmploymentsController.root(randomMatchId).apply(FakeRequest())
+      val result = sandboxEmploymentsController.root(randomMatchId)(FakeRequest())
 
       status(result) mustBe OK
       verifyZeroInteractions(mockAuthConnector)
@@ -122,86 +119,150 @@ class EmploymentsControllerSpec extends PlaySpec with Results with MockitoSugar 
 
     "return 404 (not found) for an invalid matchId" in new Setup {
       val invalidMatchId = UUID.randomUUID()
-      when(mockLiveEmploymentsService.paye(refEq(invalidMatchId), refEq(interval))(any())).thenReturn(failed(MatchNotFoundException))
+      when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval))(any()))
+        .thenReturn(Future.failed(MatchNotFoundException))
 
-      val eventualResult = liveEmploymentsController.paye(invalidMatchId, interval).apply(FakeRequest())
+      val eventualResult = liveEmploymentsController.paye(invalidMatchId, interval)(FakeRequest())
       status(eventualResult) mustBe NOT_FOUND
-      contentAsJson(eventualResult) mustBe parse(
-        """
-          {
-            "code":"NOT_FOUND",
-            "message":"The resource can not be found"
-          }
-        """)
+      contentAsJson(eventualResult) mustBe Json.obj(
+        "code" -> "NOT_FOUND",
+        "message" -> "The resource can not be found"
+      )
     }
 
-    "return 200 (ok) when matching succeeds and service returns employments" in new Setup {
-      when(mockLiveEmploymentsService.paye(refEq(sandboxMatchId), refEq(interval))(any()))
-        .thenReturn(Future.successful(Seq(Employment.from(Employments.acme), Employment.from(Employments.disney)).flatten))
+    "return 200 OK with payroll ID and employee address when the X-Client-Id header is set to the HMCTS client ID" in new Setup {
+      val matchId = UUID.randomUUID()
 
-      val eventualResult = liveEmploymentsController.paye(sandboxMatchId, interval).apply(FakeRequest())
-      status(eventualResult) mustBe OK
-      contentAsJson(eventualResult) mustBe parse(
-        """
-          {
-            "_links":{
-              "self":{
-                "href":"/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-03-02"
-              }
-            },
-            "employments":[
-              {
-                "startDate":"2016-01-01",
-                "endDate":"2016-06-30",
-                "employer":{
-                  "payeReference":"123/AI45678",
-                  "name":"Acme",
-                  "address":{
-                    "line1":"Acme Inc Building",
-                    "line2":"Acme Inc Campus",
-                    "line3":"Acme Street",
-                    "line4":"AcmeVille",
-                    "line5":"Acme State",
-                    "postcode":"AI22 9LL"
-                  }
-                },
-                "payFrequency":"FOUR_WEEKLY"
-              },
-              {
-                "startDate":"2017-01-02",
-                "endDate":"2017-03-01",
-                "employer":{
-                  "payeReference":"123/DI45678",
-                  "name":"Disney",
-                  "address":{
-                    "line1":"Friars House",
-                    "line2":"Campus Way",
-                    "line3":"New Street",
-                    "line4":"Sometown",
-                    "line5":"Old County",
-                    "postcode":"TF22 3BC"
-                  }
-                },
-                "payFrequency":"FORTNIGHTLY"
-              }
-            ]
-          }
-        """)
+      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(any()))
+        .thenReturn(Future.successful(Seq(Employment.from(Employments.acme).get)))
+
+      val res = liveEmploymentsController.paye(matchId, interval)(FakeRequest().withHeaders("X-Client-Id" -> hmctsClientId))
+      status(res) mustBe OK
+
+      contentAsJson(res) mustBe Json.obj(
+        "_links" -> Json.obj(
+          "self" -> Json.obj(
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-03-02"
+          )
+        ),
+        "employments" -> Json.arr(
+          Json.obj(
+            "startDate" -> "2016-01-01",
+            "endDate" -> "2016-06-30",
+            "employer" -> Json.obj(
+              "payeReference" -> "123/AI45678",
+              "name" -> "Acme",
+              "address" -> Json.obj(
+                "line1" -> "Acme Inc Building",
+                "line2" -> "Acme Inc Campus",
+                "line3" -> "Acme Street",
+                "line4" -> "AcmeVille",
+                "line5" -> "Acme State",
+                "postcode" -> "AI22 9LL"
+              )
+            ),
+            "payFrequency" -> "FOUR_WEEKLY",
+            "employeeAddress" -> Json.obj(
+              "line1" -> "Employee's House",
+              "line2" -> "Employee Street",
+              "line3" -> "Employee Town",
+              "postcode" -> "AA11 1AA"
+            ),
+            "payrollId" -> "payroll-id"
+          )
+        )
+      )
+    }
+
+    "return 200 OK without payroll ID and employee address when the X-Client-Id header is not set to the HMCTS client ID" in new Setup {
+      val matchId = UUID.randomUUID()
+
+      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(any()))
+        .thenReturn(Future.successful(Seq(Employment.from(Employments.acme).get)))
+
+      val res = liveEmploymentsController.paye(matchId, interval)(FakeRequest().withHeaders("X-Client-Id" -> "not-hmcts"))
+      status(res) mustBe OK
+
+      contentAsJson(res) mustBe Json.obj(
+        "_links" -> Json.obj(
+          "self" -> Json.obj(
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-03-02"
+          )
+        ),
+        "employments" -> Json.arr(
+          Json.obj(
+            "startDate" -> "2016-01-01",
+            "endDate" -> "2016-06-30",
+            "employer" -> Json.obj(
+              "payeReference" -> "123/AI45678",
+              "name" -> "Acme",
+              "address" -> Json.obj(
+                "line1" -> "Acme Inc Building",
+                "line2" -> "Acme Inc Campus",
+                "line3" -> "Acme Street",
+                "line4" -> "AcmeVille",
+                "line5" -> "Acme State",
+                "postcode" -> "AI22 9LL"
+              )
+            ),
+            "payFrequency" -> "FOUR_WEEKLY"
+          )
+        )
+      )
+    }
+
+    "return 200 OK without payroll ID and employee address when the X-Client-Id header is not set" in new Setup {
+      val matchId = UUID.randomUUID()
+
+      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(any()))
+        .thenReturn(Future.successful(Seq(Employment.from(Employments.acme).get)))
+
+      val res = liveEmploymentsController.paye(matchId, interval)(FakeRequest())
+      status(res) mustBe OK
+
+      contentAsJson(res) mustBe Json.obj(
+        "_links" -> Json.obj(
+          "self" -> Json.obj(
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-03-02"
+          )
+        ),
+        "employments" -> Json.arr(
+          Json.obj(
+            "startDate" -> "2016-01-01",
+            "endDate" -> "2016-06-30",
+            "employer" -> Json.obj(
+              "payeReference" -> "123/AI45678",
+              "name" -> "Acme",
+              "address" -> Json.obj(
+                "line1" -> "Acme Inc Building",
+                "line2" -> "Acme Inc Campus",
+                "line3" -> "Acme Street",
+                "line4" -> "AcmeVille",
+                "line5" -> "Acme State",
+                "postcode" -> "AI22 9LL"
+              )
+            ),
+            "payFrequency" -> "FOUR_WEEKLY"
+          )
+        )
+      )
     }
 
     "fail with AuthorizedException when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
+      when(mockAuthConnector.authorise(eqTo(Enrolment("read:individuals-employments-paye")), eqTo(EmptyRetrieval))(any(), any()))
+        .thenReturn(Future.failed(InsufficientEnrolments()))
 
-      given(mockAuthConnector.authorise(refEq(Enrolment("read:individuals-employments-paye")), refEq(EmptyRetrieval))(any(), any())).willReturn(failed(new InsufficientEnrolments()))
-
-      intercept[InsufficientEnrolments]{await(liveEmploymentsController.paye(sandboxMatchId, interval).apply(FakeRequest()))}
+      intercept[InsufficientEnrolments] {
+        await(liveEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest()))
+      }
       verifyZeroInteractions(mockLiveEmploymentsService)
     }
 
     "not require bearer token authentication" in new Setup {
-      when(mockSandboxEmploymentsService.paye(refEq(sandboxMatchId), refEq(interval))(any()))
+      when(mockSandboxEmploymentsService.paye(eqTo(sandboxMatchId), eqTo(interval))(any()))
         .thenReturn(Future.successful(Seq(Employment.from(Employments.acme), Employment.from(Employments.disney)).flatten))
 
-      val eventualResult = sandboxEmploymentsController.paye(sandboxMatchId, interval).apply(FakeRequest())
+      val eventualResult = sandboxEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest())
 
       status(eventualResult) mustBe OK
       verifyZeroInteractions(mockAuthConnector)

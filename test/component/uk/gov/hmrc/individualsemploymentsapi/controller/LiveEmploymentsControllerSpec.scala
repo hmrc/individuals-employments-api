@@ -28,7 +28,7 @@ import scalaj.http.{Http, HttpResponse}
 class LiveEmploymentsControllerSpec extends BaseSpec {
 
   private val matchId = UUID.randomUUID().toString
-  private val nino = """AB123456C"""
+  private val nino = "AB123456C"
   private val employmentsScope = "read:individuals-employments"
   private val payeEmploymentsScope = "read:individuals-employments-paye"
 

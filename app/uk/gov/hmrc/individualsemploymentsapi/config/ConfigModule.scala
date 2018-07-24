@@ -23,7 +23,10 @@ import play.api.{Configuration, Environment}
 class ConfigModule(environment: Environment, configuration: Configuration) extends AbstractModule {
   override def configure(): Unit = {
     val delay = configuration.getInt("retryDelay").getOrElse(1000)
+    val hmctsClientId = configuration.getString("clientIds.hmcts")
+      .getOrElse(throw new RuntimeException("Missing required configuration 'clientIds.hmcts'"))
 
     bindConstant().annotatedWith(Names.named("retryDelay")).to(delay)
+    bindConstant().annotatedWith(Names.named("hmctsClientId")).to(hmctsClientId)
   }
 }
