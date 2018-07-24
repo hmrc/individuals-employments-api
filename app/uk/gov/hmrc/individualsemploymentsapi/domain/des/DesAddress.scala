@@ -17,8 +17,8 @@
 package uk.gov.hmrc.individualsemploymentsapi.domain.des
 
 case class DesAddress(line1: String,
-                      postalCode: Option[String],
                       line2: Option[String] = None,
                       line3: Option[String] = None,
                       line4: Option[String] = None,
-                      line5: Option[String] = None)
+                      line5: Option[String] = None,
+                      postalCode: Option[String])

@@ -118,21 +118,21 @@ class LiveEmploymentsServiceSpec extends UnitSpec with Intervals with MockitoSug
     when(desConnector.fetchEmployments(nino, interval)).thenReturn(eventualDesEmployments)
 
   private def aDesEmployment(employerName: Option[String] = Some("Acme Inc"),
-                     employerAddress: Option[DesAddress] = Some(DesAddress("Acme House", Some("AI22 9LL"), Some("23 Acme Street"), Some("Richmond"), Some("Surrey"), Some("UK"))),
-                     districtNumber: Option[String] = Some("123"),
-                     schemeReference: Option[String] = Some("AI45678"),
-                     startDate: Option[LocalDate] = Some(parse("2016-01-01")),
-                     leavingDate: Option[LocalDate] = Some(parse("2020-02-29")),
-                     frequency: Option[DesPayFrequency] = Some(M1),
-                     payments: Seq[DesPayment] = Seq.empty) = {
+                             employerAddress: Option[DesAddress] = Some(DesAddress("Acme House", Some("23 Acme Street"), Some("Richmond"), Some("Surrey"), Some("UK"), Some("AI22 9LL"))),
+                             districtNumber: Option[String] = Some("123"),
+                             schemeReference: Option[String] = Some("AI45678"),
+                             startDate: Option[LocalDate] = Some(parse("2016-01-01")),
+                             leavingDate: Option[LocalDate] = Some(parse("2020-02-29")),
+                             frequency: Option[DesPayFrequency] = Some(M1),
+                             payments: Seq[DesPayment] = Seq.empty) = {
     DesEmployment(payments, employerName, employerAddress, districtNumber, schemeReference, startDate, leavingDate, frequency)
   }
 
-  private def anEmployment(startDate: Option[LocalDate] = Some(LocalDate.parse("2016-01-01")),
-                   endDate: Option[LocalDate] = Some(LocalDate.parse("2020-02-29")),
-                   employer: Employer = anEmployer(),
-                   payFrequency: Option[PayFrequency.Value] = Some(PayFrequency.CALENDAR_MONTHLY)) = {
-    Employment(startDate, endDate, Some(employer), payFrequency)
+  private def anEmployment(startDate: Option[LocalDate] = Some(new LocalDate(2016, 1, 1)),
+                           endDate: Option[LocalDate] = Some(new LocalDate(2020, 2, 29)),
+                           employer: Employer = anEmployer(),
+                           payFrequency: Option[PayFrequency.Value] = Some(PayFrequency.CALENDAR_MONTHLY)) = {
+    Employment(startDate, endDate, Some(employer), payFrequency, None, None)
   }
 
   private def anEmployer(payeReference: String = "123/AI45678",

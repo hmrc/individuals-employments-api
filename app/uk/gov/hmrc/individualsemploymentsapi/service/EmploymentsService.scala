@@ -23,7 +23,7 @@ import org.joda.time.{Interval, LocalDate}
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
-import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual, NinoMatch, Payroll}
+import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,8 +37,6 @@ trait EmploymentsService {
   def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch]
 
   def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]]
-
-  def payroll(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Payroll]]
 }
 
 @Singleton
@@ -66,22 +64,6 @@ class SandboxEmploymentsService extends EmploymentsService {
       case None => Future.failed(MatchNotFoundException)
     }
   }
-
-  override def payroll(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Payroll]] = payroll(find(matchId), interval)
-
-  private def payroll(maybeIndividual: Option[Individual], interval: Interval): Future[Seq[Payroll]] = {
-    maybeIndividual match {
-      case Some(i) =>
-        val employmentsInInterval = i.employments.filter { e =>
-          e.employmentStartDate.forall(d => interval.contains(d.toDateTimeAtStartOfDay)) &&
-            e.employmentLeavingDate.forall(d => interval.contains(d.toDateTimeAtStartOfDay))
-        }
-        val sorted = employmentsInInterval.sortBy(_.employmentLeavingDate.getOrElse(interval.getEnd.toLocalDate)).reverse
-
-        Future.successful(sorted.flatMap(Payroll.from))
-      case None => Future.failed(MatchNotFoundException)
-    }
-  }
 }
 
 @Singleton
@@ -104,13 +86,6 @@ class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: Individu
       }
     }
 
-  override def payroll(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Payroll]] = {
-    resolve(matchId) flatMap { ninoMatch =>
-      desConnector.fetchEmployments(ninoMatch.nino, interval) map { employments =>
-        employments.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse flatMap Payroll.from
-      }
-    }
-  }
   private def withRetry[T](body: => Future[T]): Future[T] = body recoverWith {
     case Upstream5xxResponse(_, 503, _) => Thread.sleep(retryDelay); body
   }
