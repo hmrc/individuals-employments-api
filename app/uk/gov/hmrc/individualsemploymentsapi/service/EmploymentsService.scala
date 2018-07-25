@@ -25,6 +25,7 @@ import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, Individual
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
+import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -69,7 +70,8 @@ class SandboxEmploymentsService extends EmploymentsService {
 @Singleton
 class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: IndividualsMatchingApiConnector,
                                        desConnector: DesConnector,
-                                       @Named("retryDelay") retryDelay: Int) extends EmploymentsService {
+                                       @Named("retryDelay") retryDelay: Int,
+                                       cacheService: CacheService) extends EmploymentsService {
 
   private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { e: DesEmployment =>
     e.employmentLeavingDate.getOrElse(interval.getEnd.toLocalDate)
@@ -79,10 +81,12 @@ class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: Individu
 
   override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =
     resolve(matchId) flatMap { ninoMatch =>
-      withRetry {
-        desConnector.fetchEmployments(ninoMatch.nino, interval) map { employments =>
-          employments.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse flatMap Employment.from
+      cacheService.get(s"$matchId-${interval.getStart}-${interval.getEnd}",
+        withRetry {
+          desConnector.fetchEmployments(ninoMatch.nino, interval)
         }
+      ) map { employments =>
+        employments.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse flatMap Employment.from
       }
     }
 
