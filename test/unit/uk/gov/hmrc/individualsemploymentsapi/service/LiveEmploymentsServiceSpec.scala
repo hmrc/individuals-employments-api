@@ -20,39 +20,46 @@ import java.util.UUID
 
 import org.joda.time.LocalDate
 import org.joda.time.LocalDate.parse
+import org.mockito.Matchers._
 import org.mockito.Mockito
 import org.mockito.Mockito._
-import org.mockito.Matchers._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
+import play.api.libs.json.Format
 import uk.gov.hmrc.domain.{EmpRef, Nino}
+import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
 import uk.gov.hmrc.individualsemploymentsapi.domain._
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesPayFrequency.{DesPayFrequency, M1}
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
-import uk.gov.hmrc.individualsemploymentsapi.service.LiveEmploymentsService
+import uk.gov.hmrc.individualsemploymentsapi.service.{CacheService, LiveEmploymentsService}
 import uk.gov.hmrc.play.test.UnitSpec
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.Intervals
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
-
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class LiveEmploymentsServiceSpec extends UnitSpec with Intervals with MockitoSugar with BeforeAndAfterEach {
 
   private val individualsMatchingApiConnector = mock[IndividualsMatchingApiConnector]
   private val desConnector = mock[DesConnector]
-  private val liveEmploymentsService = new LiveEmploymentsService(individualsMatchingApiConnector, desConnector, 0)
+
+  // can't mock function with by-value argument
+  private val stubCache = new CacheService(null, null)(null) {
+    override def get[T: Format](cacheId: String, functionToCache: => Future[T])(implicit hc: HeaderCarrier) = {
+      functionToCache
+    }
+  }
+
+  private val liveEmploymentsService = new LiveEmploymentsService(individualsMatchingApiConnector, desConnector, 0, stubCache)
 
   private val matchId = UUID.randomUUID()
   private val nino = Nino("AB123456C")
   private val ninoMatch = NinoMatch(matchId, nino)
   private val interval = toInterval("2016-01-01", "2017-03-01")
 
-  implicit val hc = new HeaderCarrier
+  implicit val hc: HeaderCarrier = new HeaderCarrier
 
   override def beforeEach() {
     Mockito.reset(individualsMatchingApiConnector, desConnector)
@@ -108,9 +115,6 @@ class LiveEmploymentsServiceSpec extends UnitSpec with Intervals with MockitoSug
 
   }
 
-  private def mockIndividualsMatchingApiConnectorToThrow(throwable: Throwable) =
-    when(individualsMatchingApiConnector.resolve(matchId)).thenThrow(throwable)
-
   private def mockIndividualsMatchingApiConnectorToReturn(eventualNinoMatch: Future[NinoMatch]) =
     when(individualsMatchingApiConnector.resolve(matchId)).thenReturn(eventualNinoMatch)
 
@@ -126,13 +130,6 @@ class LiveEmploymentsServiceSpec extends UnitSpec with Intervals with MockitoSug
                              frequency: Option[DesPayFrequency] = Some(M1),
                              payments: Seq[DesPayment] = Seq.empty) = {
     DesEmployment(payments, employerName, employerAddress, districtNumber, schemeReference, startDate, leavingDate, frequency)
-  }
-
-  private def anEmployment(startDate: Option[LocalDate] = Some(new LocalDate(2016, 1, 1)),
-                           endDate: Option[LocalDate] = Some(new LocalDate(2020, 2, 29)),
-                           employer: Employer = anEmployer(),
-                           payFrequency: Option[PayFrequency.Value] = Some(PayFrequency.CALENDAR_MONTHLY)) = {
-    Employment(startDate, endDate, Some(employer), payFrequency, None, None)
   }
 
   private def anEmployer(payeReference: String = "123/AI45678",
