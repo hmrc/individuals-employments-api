@@ -8,7 +8,7 @@ This API provides individual's employment information (PAYE only) from HM Revenu
 
 Unit, integration and component tests can be run with the following:
 
-    sbt test it:test component:test
+    sbt test component:test
 
 ### License
 
