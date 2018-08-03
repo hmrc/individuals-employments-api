@@ -16,24 +16,18 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service
 
-import javax.inject.{Inject, Named}
+import javax.inject.Inject
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.cache.CachingClient
-import uk.gov.hmrc.play.config.inject.ServicesConfig
+import uk.gov.hmrc.individualsemploymentsapi.cache.{CacheConfiguration, ShortLivedCache}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CacheService @Inject()(cachingClient: CachingClient, conf: ServicesConfig)
+class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheConfiguration)
                             (implicit ec: ExecutionContext) {
 
-  lazy val cacheEnabled: Boolean = conf.getConfBool(
-    "cacheable.short-lived-cache.enabled",
-    throw new RuntimeException("cacheable.short-lived-cache.enabled")
-  )
-
   def get[T: Format](cacheId: String, functionToCache: => Future[T])(implicit hc: HeaderCarrier): Future[T] = {
-    if(cacheEnabled) {
+    if (conf.cacheEnabled) {
       cachingClient.fetchAndGetEntry[T](cacheId, "paye-income") flatMap {
         case Some(value) => Future.successful(value)
         case None => functionToCache map { res =>
