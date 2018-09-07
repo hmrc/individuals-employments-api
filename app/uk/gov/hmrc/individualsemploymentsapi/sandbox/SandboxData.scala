@@ -42,13 +42,27 @@ object SandboxData {
         DesPayment(new LocalDate(2016, 5, 28), 0)
       ),
       Some("Acme"),
-      Some(DesAddress(line1 = "Acme Inc Building", line2 = Some("Acme Inc Campus"), line3 = Some("Acme Street"), line4 = Some("AcmeVille"), line5 = Some("Acme State"), postalCode = Some("AI22 9LL"))),
+      Some(DesAddress(
+        line1 = Some("Acme Inc Building"),
+        line2 = Some("Acme Inc Campus"),
+        line3 = Some("Acme Street"),
+        line4 = Some("AcmeVille"),
+        line5 = Some("Acme State"),
+        postalCode = Some("AI22 9LL")
+      )),
       Some("123"),
       Some("AI45678"),
       Some(new LocalDate(2016, 1, 1)),
       Some(new LocalDate(2016, 6, 30)),
       Some(DesPayFrequency.W4),
-      Some(DesAddress("Employee's House", Some("Employee Street"), Some("Employee Town"), None, None, Some("AA11 1AA"))),
+      Some(DesAddress(
+        line1 = Some("Employee's House"),
+        line2 = Some("Employee Street"),
+        line3 = Some("Employee Town"),
+        line4 = None,
+        line5 = None,
+        postalCode = Some("AA11 1AA")
+      )),
       Some("payroll-id")
     )
     val disney = DesEmployment(
@@ -57,13 +71,27 @@ object SandboxData {
         DesPayment(new LocalDate(2017, 2, 28), 0)
       ),
       Some("Disney"),
-      Some(DesAddress(line1 = "Friars House", line2 = Some("Campus Way"), line3 = Some("New Street"), line4 = Some("Sometown"), line5 = Some("Old County"), postalCode = Some("TF22 3BC"))),
+      Some(DesAddress(
+        line1 = Some("Friars House"),
+        line2 = Some("Campus Way"),
+        line3 = Some("New Street"),
+        line4 = Some("Sometown"),
+        line5 = Some("Old County"),
+        postalCode = Some("TF22 3BC")
+      )),
       Some("123"),
       Some("DI45678"),
       Some(parse("2017-01-02")),
       Some(parse("2017-03-01")),
       Some(DesPayFrequency.W2),
-      Some(DesAddress("", Some(""), Some(""), Some(""), Some(""), Some(""))),
+      Some(DesAddress(
+        line1 = None,
+        line2 = None,
+        line3 = None,
+        line4 = None,
+        line5 = None,
+        postalCode = None
+      )),
       Some("another-payroll-id")
     )
   }

@@ -122,7 +122,14 @@ class LiveEmploymentsServiceSpec extends UnitSpec with Intervals with MockitoSug
     when(desConnector.fetchEmployments(nino, interval)).thenReturn(eventualDesEmployments)
 
   private def aDesEmployment(employerName: Option[String] = Some("Acme Inc"),
-                             employerAddress: Option[DesAddress] = Some(DesAddress("Acme House", Some("23 Acme Street"), Some("Richmond"), Some("Surrey"), Some("UK"), Some("AI22 9LL"))),
+                             employerAddress: Option[DesAddress] = Some(DesAddress(
+                               line1 = Some("Acme House"),
+                               line2 = Some("23 Acme Street"),
+                               line3 = Some("Richmond"),
+                               line4 = Some("Surrey"),
+                               line5 = Some("UK"),
+                               postalCode = Some("AI22 9LL")
+                             )),
                              districtNumber: Option[String] = Some("123"),
                              schemeReference: Option[String] = Some("AI45678"),
                              startDate: Option[LocalDate] = Some(parse("2016-01-01")),
@@ -138,12 +145,12 @@ class LiveEmploymentsServiceSpec extends UnitSpec with Intervals with MockitoSug
     Employer(Some(EmpRef.fromIdentifiers(payeReference)), name, address)
   }
 
-  private def anAddress(line1: String = "Acme House",
+  private def anAddress(line1: Option[String] = Some("Acme House"),
                         line2: Option[String] = Some("23 Acme Street"),
                         line3: Option[String] = Some("Richmond"),
                         line4: Option[String] = Some("Surrey"),
                         line5: Option[String] = Some("UK"),
-                        postcode: String = "AI22 9LL") = {
-    Some(Address(line1, line2, line3, line4, line5, Some(postcode)))
+                        postcode: Option[String] = Some("AI22 9LL")): Option[Address] = {
+    Some(Address(line1, line2, line3, line4, line5, postcode))
   }
 }

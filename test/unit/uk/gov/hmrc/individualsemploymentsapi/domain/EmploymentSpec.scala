@@ -28,7 +28,7 @@ class EmploymentSpec extends FlatSpec with Matchers {
     val desEmployment = DesEmployment(
       Seq.empty,
       Some("Acme Inc"),
-      Some(DesAddress("line 1", postalCode = Some("AB1 2CD"))),
+      Some(DesAddress(Some("line 1"), postalCode = Some("AB1 2CD"))),
       Some("123"),
       Some("AB12345"),
       Some(new LocalDate(2016, 1, 1)),
@@ -42,7 +42,14 @@ class EmploymentSpec extends FlatSpec with Matchers {
       Some(Employer(
         Some(EmpRef("123", "AB12345")),
         Some("Acme Inc"),
-        Some(Address("line 1", None, None, None, None, Some("AB1 2CD")))
+        Some(Address(
+          line1 = Some("line 1"),
+          line2 = None,
+          line3 = None,
+          line4 = None,
+          line5 = None,
+          postcode = Some("AB1 2CD")
+        ))
       )),
       Some(PayFrequency.withName("CALENDAR_MONTHLY")),
       None,
