@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.config
 
+import akka.actor.ActorSystem
 import com.typesafe.config.Config
 import net.ceedubs.ficus.Ficus._
+import play.api.Mode.Mode
 import play.api.libs.json.Json
 import play.api.mvc.{RequestHeader, Result}
 import play.api.{Application, Configuration, Logger, Play}
@@ -34,13 +36,13 @@ import scala.concurrent.Future
 import scala.concurrent.Future.successful
 import scala.util.Try
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.microservice.filters.{ AuditFilter, LoggingFilter, MicroserviceFilterSupport }
+import uk.gov.hmrc.play.microservice.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
 
 object ControllerConfiguration extends ControllerConfig {
   lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
 }
 
-object MicroserviceAuditFilter extends AuditFilter with AppName with MicroserviceFilterSupport {
+object MicroserviceAuditFilter extends AuditFilter with AppName with MicroserviceFilterSupport with ConfigSupport {
   override val auditConnector = MicroserviceAuditConnector
 
   override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
@@ -51,7 +53,7 @@ object MicroserviceLoggingFilter extends LoggingFilter with MicroserviceFilterSu
 }
 
 
-object MicroserviceGlobal extends DefaultMicroserviceGlobal with ServiceLocatorRegistration with ServiceLocatorConfig with MicroserviceFilterSupport {
+object MicroserviceGlobal extends DefaultMicroserviceGlobal with ServiceLocatorRegistration with ServiceLocatorConfig with MicroserviceFilterSupport with ConfigSupport {
   override val auditConnector = MicroserviceAuditConnector
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig("microservice.metrics")
@@ -94,4 +96,15 @@ object MicroserviceGlobal extends DefaultMicroserviceGlobal with ServiceLocatorR
         successful(ErrorInternalServer.toHttpResponse)
     }
   }
+}
+
+trait ConfigSupport {
+  private def current: Application = Play.current
+
+  def playConfiguration: Configuration = current.configuration
+  def mode: Mode = current.mode
+
+  def runModeConfiguration: Configuration = playConfiguration
+  def appNameConfiguration: Configuration = playConfiguration
+  def actorSystem: ActorSystem = current.actorSystem
 }

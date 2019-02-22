@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@
 package uk.gov.hmrc.individualsemploymentsapi.connector
 
 import javax.inject.{Inject, Singleton}
-
 import org.joda.time.Interval
 import play.api.Configuration
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.individualsemploymentsapi.config.WSHttp
+import uk.gov.hmrc.individualsemploymentsapi.config.{ConfigSupport, WSHttp}
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments}
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 import uk.gov.hmrc.play.config.ServicesConfig
@@ -31,12 +30,12 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, HttpReads, NotFoundException}
 import uk.gov.hmrc.http.logging.Authorization
 
 @Singleton
-class DesConnector @Inject()(configuration: Configuration) extends ServicesConfig {
+class DesConnector @Inject()(override val playConfiguration: Configuration) extends ServicesConfig with ConfigSupport {
 
   private val serviceUrl = baseUrl("des")
   private val http: HttpGet = WSHttp
-  private val desBearerToken = configuration.getString("microservice.services.des.authorization-token") getOrElse (throw new RuntimeException("DES authorization token must be defined"))
-  private val desEnvironment = configuration.getString("microservice.services.des.environment") getOrElse (throw new RuntimeException("DES environment must be defined"))
+  private val desBearerToken = playConfiguration.getString("microservice.services.des.authorization-token") getOrElse (throw new RuntimeException("DES authorization token must be defined"))
+  private val desEnvironment = playConfiguration.getString("microservice.services.des.environment") getOrElse (throw new RuntimeException("DES environment must be defined"))
 
   def fetchEmployments(nino: Nino, interval: Interval)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[DesEmployment]] = {
     val fromDate = interval.getStart.toLocalDate
