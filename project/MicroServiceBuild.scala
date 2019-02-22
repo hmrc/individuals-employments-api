@@ -21,13 +21,13 @@ object MicroServiceBuild extends Build with MicroService {
     "uk.gov.hmrc" %% "domain" % "5.3.0",
     "uk.gov.hmrc" %% "auth-client" % "2.19.0-play-25",
     "uk.gov.hmrc" %% "play-hal" % "1.8.0-play-25",
-    "uk.gov.hmrc" %% "play-hmrc-api" % "2.0.0",
+    "uk.gov.hmrc" %% "play-hmrc-api" % "3.4.0-play-25",
     "uk.gov.hmrc" %% "mongo-caching" % "5.7.0",
     "uk.gov.hmrc" %% "json-encryption" % "3.3.0"
   )
 
   def test(scope: String = "test,it") = Seq(
-    "uk.gov.hmrc" %% "hmrctest" % "2.3.0" % scope,
+    "uk.gov.hmrc" %% "hmrctest" % "3.5.0-play-25" % scope,
     "org.scalatest" %% "scalatest" % "2.2.6" % scope,
     "org.pegdown" % "pegdown" % "1.6.0" % scope,
     "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
