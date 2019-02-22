@@ -18,14 +18,14 @@ package uk.gov.hmrc.individualsemploymentsapi.error
 
 import play.api.http.Status.{NOT_FOUND, _}
 import play.api.libs.json.Json.toJson
+import play.api.mvc.Result
 import play.api.mvc.Results.Status
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 object ErrorResponses {
 
   sealed abstract class ErrorResponse(val httpStatusCode: Int, val errorCode: String, val message: String) {
-
-    def toHttpResponse = Status(httpStatusCode)(toJson(this))
+    def toHttpResponse: Result = Status(httpStatusCode)(toJson(this))
   }
 
   case object ErrorNotFound extends ErrorResponse(NOT_FOUND, "NOT_FOUND", "The resource can not be found")

@@ -80,12 +80,12 @@ class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: Individu
   override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] = individualsMatchingApiConnector.resolve(matchId)
 
   override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =
-    resolve(matchId) flatMap { ninoMatch =>
+    resolve(matchId).flatMap { ninoMatch =>
       cacheService.get(s"$matchId-${interval.getStart}-${interval.getEnd}",
         withRetry {
           desConnector.fetchEmployments(ninoMatch.nino, interval)
         }
-      ) map { employments =>
+      ).map { employments =>
         employments.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse flatMap Employment.from
       }
     }

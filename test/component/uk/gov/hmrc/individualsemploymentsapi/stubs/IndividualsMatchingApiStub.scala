@@ -16,8 +16,9 @@
 
 package component.uk.gov.hmrc.individualsemploymentsapi.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, get, urlEqualTo}
+import com.github.tomakehurst.wiremock.client.WireMock._
 import component.uk.gov.hmrc.individualsemploymentsapi.controller.MockHost
+import play.api.libs.json.Json
 
 object IndividualsMatchingApiStub extends MockHost(21000) {
 
@@ -25,4 +26,8 @@ object IndividualsMatchingApiStub extends MockHost(21000) {
     mock.register(get(urlEqualTo(s"/match-record/$matchId"))
       .willReturn(aResponse().withStatus(responseCode).withBody(responseBody)))
 
+  def hasMatchForNino(matchId: String, nino: String): Unit = {
+    mock.register(get(s"/match-record/$matchId")
+      .willReturn(okJson(Json.obj("matchId" -> matchId, "nino" -> nino).toString)))
+  }
 }

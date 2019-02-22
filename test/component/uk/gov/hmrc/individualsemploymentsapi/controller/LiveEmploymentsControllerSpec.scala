@@ -19,10 +19,10 @@ package component.uk.gov.hmrc.individualsemploymentsapi.controller
 import java.util.UUID
 
 import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec, DesStub, IndividualsMatchingApiStub}
+import play.api.libs.json.Json
 import play.api.libs.json.Json.parse
 import play.api.test.Helpers._
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments}
-
 import scalaj.http.{Http, HttpResponse}
 
 class LiveEmploymentsControllerSpec extends BaseSpec {
@@ -249,9 +249,37 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         """)
     }
 
+    scenario("the DES rate limit is exceeded") {
+      val matchId = UUID.randomUUID().toString
+      val nino = "AA112233B"
+
+      Given("a valid privileged Auth Bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
+
+      And("a valid record in the matching API")
+      IndividualsMatchingApiStub.hasMatchForNino(matchId, nino)
+
+      And("DES will return an error due to rate limiting")
+      DesStub.enforceRateLimit(nino, fromDate, toDate)
+
+      When("the PAYE endpoint is invoked with a valid match ID")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+
+      Then("The response status is 429 Too Many Requests")
+      response.code shouldBe TOO_MANY_REQUESTS
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "TOO_MANY_REQUESTS",
+        "message" -> "Rate limit exceeded"
+      )
+    }
   }
 
-  private def invokeEndpoint(endpoint: String) = Http(endpoint).timeout(10000, 10000).headers(requestHeaders()).asString
+  private def invokeEndpoint(endpoint: String) = {
+    Http(endpoint)
+      .timeout(10000, 10000)
+      .headers(requestHeaders())
+      .asString
+  }
 
   private def assertResponseIs(httpResponse: HttpResponse[String], expectedResponseCode: Int, expectedResponseBody: String) = {
     httpResponse.code shouldBe expectedResponseCode

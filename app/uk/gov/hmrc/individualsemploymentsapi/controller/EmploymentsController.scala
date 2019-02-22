@@ -50,13 +50,13 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
     requiresPrivilegedAuthentication("read:individuals-employments-paye") {
-      employmentsService.paye(matchId, interval) map { employments =>
+      employmentsService.paye(matchId, interval).map { employments =>
         val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
         val filtered = filterPayrollData(employments)
         val employmentsJsObject = Json.obj("employments" -> Json.toJson(filtered))
         Ok(state(employmentsJsObject) ++ selfLink)
       }
-    } recover recovery
+    }.recover(recovery)
   }
 
   // Home Office and HMCTS want to use the same endpoint,

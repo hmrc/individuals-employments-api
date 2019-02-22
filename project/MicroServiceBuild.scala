@@ -34,7 +34,7 @@ object MicroServiceBuild extends Build with MicroService {
     "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.0" % scope,
     "org.scalaj" %% "scalaj-http" % "1.1.6" % scope,
     "org.mockito" % "mockito-all" % "1.10.19" % scope,
-    "com.github.tomakehurst" % "wiremock" % "2.6.0" % scope,
+    "com.github.tomakehurst" % "wiremock" % "2.21.0" % scope,
     "uk.gov.hmrc" %% "reactivemongo-test" % "2.0.0" % scope
   )
 

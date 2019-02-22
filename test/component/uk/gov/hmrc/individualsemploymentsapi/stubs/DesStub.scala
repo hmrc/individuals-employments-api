@@ -18,10 +18,8 @@ package component.uk.gov.hmrc.individualsemploymentsapi.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import component.uk.gov.hmrc.individualsemploymentsapi.controller.MockHost
-import play.api.http.Status
-import play.api.http.Status.OK
 import play.api.libs.json.Json
-import play.api.libs.json.Json.toJson
+import play.api.test.Helpers._
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployments
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
@@ -31,7 +29,18 @@ object DesStub extends MockHost(22003) {
     mock.register(get(urlPathEqualTo(s"/individuals/nino/$nino/employments/income"))
       .withQueryParam("from", equalTo(fromDate))
       .withQueryParam("to", equalTo(toDate))
-      .willReturn(aResponse().withStatus(OK).withBody(toJson(desEmployments).toString())))
+      .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(desEmployments).toString())))
   }
+
+  def enforceRateLimit(nino: String, fromDate: String, toDate: String): Unit = {
+    mock.register(get(urlPathEqualTo(s"/individuals/nino/$nino/employments/income"))
+      .withQueryParam("from", equalTo(fromDate))
+      .withQueryParam("to", equalTo(toDate))
+      // DES/BigIP returns a 503 when rate limited, rather than 429
+      .willReturn(aResponse().withStatus(SERVICE_UNAVAILABLE).withBody(desRateLimitError.toString))
+    )
+  }
+
+  private lazy val desRateLimitError = Json.obj("response" -> Json.obj("incidentReference" -> "LTM000503"))
 
 }

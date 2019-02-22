@@ -26,7 +26,7 @@ import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, HttpReads, NotFoundException}
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.logging.Authorization
 
 @Singleton
@@ -42,9 +42,12 @@ class DesConnector @Inject()(override val playConfiguration: Configuration) exte
     val toDate = interval.getEnd.toLocalDate
     val header = hc.copy(authorization = Some(Authorization(s"Bearer $desBearerToken"))).withExtraHeaders("Environment" -> desEnvironment, "Source" -> "MDTP")
 
-    http.GET[DesEmployments](s"$serviceUrl/individuals/nino/$nino/employments/income?from=$fromDate&to=$toDate")(
-      implicitly[HttpReads[DesEmployments]], header, ec) map (_.employments) recover {
-      case _: NotFoundException => Seq.empty
+    val employmentsUrl = s"$serviceUrl/individuals/nino/$nino/employments/income?from=$fromDate&to=$toDate"
+
+    http.GET[DesEmployments](employmentsUrl)(implicitly, header, ec).map(_.employments).recoverWith {
+      case _: NotFoundException => Future.successful(Seq.empty)
+      case Upstream5xxResponse(msg, 503, _) if msg.contains("LTM000503") /*DES's Magic error code*/ =>
+        Future.failed(new TooManyRequestException(msg))
     }
   }
 }

@@ -22,11 +22,12 @@ import net.ceedubs.ficus.Ficus._
 import play.api.Mode.Mode
 import play.api.libs.json.Json
 import play.api.mvc.{Handler, RequestHeader, Result}
+import play.api.mvc.Results.TooManyRequests
 import play.api.{Application, Configuration, Logger, Play}
 import uk.gov.hmrc.api.config.ServiceLocatorConfig
 import uk.gov.hmrc.api.connector.ServiceLocatorConnector
 import uk.gov.hmrc.auth.core.AuthorisationException
-import uk.gov.hmrc.http.{CorePost, HeaderCarrier}
+import uk.gov.hmrc.http.{CorePost, HeaderCarrier, TooManyRequestException}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInternalServer, ErrorInvalidRequest, ErrorUnauthorized}
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.errorInvalidRequestFormat
 import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils._
@@ -35,7 +36,6 @@ import uk.gov.hmrc.play.microservice.bootstrap.DefaultMicroserviceGlobal
 import uk.gov.hmrc.play.microservice.filters.{AuditFilter, LoggingFilter, MicroserviceFilterSupport}
 
 import scala.concurrent.Future
-import scala.concurrent.Future.successful
 import scala.util.Try
 import scala.util.matching.Regex
 
@@ -59,7 +59,7 @@ object MicroserviceGlobal
     with ServiceLocatorConfig
     with MicroserviceFilterSupport
     with ConfigSupport {
-  
+
   override val auditConnector = MicroserviceAuditConnector
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig("microservice.metrics")
@@ -83,17 +83,22 @@ object MicroserviceGlobal
 
   override def onBadRequest(request: RequestHeader, error: String): Future[Result] = {
     Try(Json.parse(error).as[ErrorInvalidRequest]).toOption match {
-      case Some(errorResponse) => successful(errorResponse.toHttpResponse)
-      case _ => successful(ErrorInvalidRequest("Invalid Request").toHttpResponse)
+      case Some(errorResponse) => Future.successful(errorResponse.toHttpResponse)
+      case _ => Future.successful(ErrorInvalidRequest("Invalid Request").toHttpResponse)
     }
   }
 
   override def onError(request: RequestHeader, ex: Throwable): Future[Result] = {
     ex match {
-      case _: AuthorisationException => successful(ErrorUnauthorized.toHttpResponse)
+      case _: AuthorisationException => Future.successful(ErrorUnauthorized.toHttpResponse)
+      case _: TooManyRequestException =>
+        Future.successful(TooManyRequests(Json.obj(
+          "code" -> "TOO_MANY_REQUESTS",
+          "message" -> "Rate limit exceeded"
+        )))
       case _ =>
-        Logger.error("An unexpected error occured", ex)
-        successful(ErrorInternalServer.toHttpResponse)
+        Logger.error("An unexpected error occurred", ex)
+        Future.successful(ErrorInternalServer.toHttpResponse)
     }
   }
 
