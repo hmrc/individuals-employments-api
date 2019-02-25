@@ -19,34 +19,31 @@ package component.uk.gov.hmrc.individualsemploymentsapi.stubs
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import component.uk.gov.hmrc.individualsemploymentsapi.controller.MockHost
+import play.api.http.HeaderNames
 import play.api.http.HeaderNames.AUTHORIZATION
-import play.api.http.{HeaderNames, Status}
 import play.api.libs.json.{JsArray, Json}
 import uk.gov.hmrc.auth.core.Enrolment
 
 object AuthStub extends MockHost(22000) {
 
   def willAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping = {
-    mock.register(post(urlEqualTo("/auth/authorise"))
+    mock.register(post("/auth/authorise")
       .withRequestBody(equalToJson(privilegedAuthority(scope).toString()))
       .withHeader(AUTHORIZATION, equalTo(authBearerToken))
-      .willReturn(aResponse()
-        .withStatus(Status.OK)
-        .withBody("""{"internalId": "some-id"}""")))
+      .willReturn(okJson(Json.obj("internalId" -> "some-id").toString)))
   }
 
   def willNotAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping = {
     mock.register(post(urlEqualTo("/auth/authorise"))
       .withRequestBody(equalToJson(privilegedAuthority(scope).toString()))
       .withHeader(AUTHORIZATION, equalTo(authBearerToken))
-      .willReturn(aResponse()
-        .withStatus(Status.UNAUTHORIZED)
-        .withHeader(HeaderNames.WWW_AUTHENTICATE, """MDTP detail="InsufficientConfidenceLevel"""")))
+      .willReturn(
+        unauthorized()
+          .withHeader(HeaderNames.WWW_AUTHENTICATE, """MDTP detail="InsufficientConfidenceLevel"""")))
   }
 
-  def privilegedAuthority(scope: String) = Json.obj(
+  private def privilegedAuthority(scope: String) = Json.obj(
     "authorise" -> Json.arr(Json.toJson(Enrolment(scope))),
     "retrieve" -> JsArray()
   )
-
 }

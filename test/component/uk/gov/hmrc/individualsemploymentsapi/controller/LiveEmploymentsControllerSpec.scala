@@ -20,10 +20,9 @@ import java.util.UUID
 
 import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec, DesStub, IndividualsMatchingApiStub}
 import play.api.libs.json.Json
-import play.api.libs.json.Json.parse
 import play.api.test.Helpers._
+import scalaj.http.Http
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments}
-import scalaj.http.{Http, HttpResponse}
 
 class LiveEmploymentsControllerSpec extends BaseSpec {
 
@@ -42,13 +41,11 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       val response = invokeEndpoint(s"$serviceUrl/?matchId=$matchId")
 
       Then("the response status should be 401 (unauthorized)")
-      assertResponseIs(response, UNAUTHORIZED,
-        """
-          {
-             "code" : "UNAUTHORIZED",
-             "message" : "Bearer token is missing or not authorized"
-          }
-        """)
+      response.code shouldBe UNAUTHORIZED
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "UNAUTHORIZED",
+        "message" -> "Bearer token is missing or not authorized"
+      )
     }
 
     scenario("missing match id") {
@@ -59,13 +56,11 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       val response = invokeEndpoint(serviceUrl)
 
       Then("the response status should be 400 (bad request)")
-      assertResponseIs(response, BAD_REQUEST,
-        """
-          {
-             "code" : "INVALID_REQUEST",
-             "message" : "matchId is required"
-          }
-        """)
+      response.code shouldBe BAD_REQUEST
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message" -> "matchId is required"
+      )
     }
 
     scenario("malformed match id") {
@@ -76,13 +71,11 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       val response = invokeEndpoint(s"$serviceUrl/?matchId=malformed-match-id-value")
 
       Then("the response status should be 400 (bad request)")
-      assertResponseIs(response, BAD_REQUEST,
-        """
-          {
-             "code" : "INVALID_REQUEST",
-             "message" : "matchId format is invalid"
-          }
-        """)
+      response.code shouldBe BAD_REQUEST
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message" -> "matchId format is invalid"
+      )
     }
 
     scenario("invalid match id") {
@@ -93,13 +86,11 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       val response = invokeEndpoint(s"$serviceUrl/?matchId=$matchId")
 
       Then("the response status should be 404 (not found)")
-      assertResponseIs(response, NOT_FOUND,
-        """
-          {
-             "code" : "NOT_FOUND",
-             "message" : "The resource can not be found"
-          }
-        """)
+      response.code shouldBe NOT_FOUND
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "NOT_FOUND",
+        "message" -> "The resource can not be found"
+      )
     }
 
     scenario("valid request to the live root endpoint implementation") {
@@ -107,34 +98,23 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope)
 
       And("a valid record in the matching API")
-      IndividualsMatchingApiStub.willRespondWith(matchId, OK,
-        s"""
-          {
-            "matchId" : "$matchId",
-            "nino" : "$nino"
-          }
-        """)
+      IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       When("the root entry point to the API is invoked with a valid match id")
       val response = invokeEndpoint(s"$serviceUrl/?matchId=$matchId")
 
       Then("the response status should be 200 (ok)")
-      assertResponseIs(response, OK,
-        s"""
-          {
-            "_links":{
-              "paye":{
-                "href":"/individuals/employments/paye?matchId=$matchId{&fromDate,toDate}",
-                "title":"View individual's employments"
-              },
-              "self":{
-                "href":"/individuals/employments/?matchId=$matchId"
-              }
-            }
-          }
-        """)
+      response.code shouldBe OK
+      Json.parse(response.body) shouldBe Json.obj(
+        "_links" -> Json.obj(
+          "paye" -> Json.obj(
+            "href" -> s"/individuals/employments/paye?matchId=$matchId{&fromDate,toDate}",
+            "title" -> "View individual's employments"
+          ),
+          "self" -> Json.obj("href" -> s"/individuals/employments/?matchId=$matchId")
+        )
+      )
     }
-
   }
 
   feature("Paye endpoint") {
@@ -150,13 +130,11 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
 
       Then("the response status should be 401 (unauthorized)")
-      assertResponseIs(response, UNAUTHORIZED,
-        """
-          {
-             "code" : "UNAUTHORIZED",
-             "message" : "Bearer token is missing or not authorized"
-          }
-        """)
+      response.code shouldBe UNAUTHORIZED
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "UNAUTHORIZED",
+        "message" -> "Bearer token is missing or not authorized"
+      )
     }
 
     scenario("missing match id") {
@@ -167,13 +145,11 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       val response = invokeEndpoint(s"$serviceUrl/paye?fromDate=$fromDate&toDate=$toDate")
 
       Then("the response status should be 400 (bad request)")
-      assertResponseIs(response, BAD_REQUEST,
-        """
-          {
-             "code" : "INVALID_REQUEST",
-             "message" : "matchId is required"
-          }
-        """)
+      response.code shouldBe BAD_REQUEST
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message" -> "matchId is required"
+      )
     }
 
     scenario("malformed match id") {
@@ -184,13 +160,11 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=malformed-match-id-value&fromDate=$fromDate&toDate=$toDate")
 
       Then("the response status should be 400 (bad request)")
-      assertResponseIs(response, BAD_REQUEST,
-        """
-          {
-             "code" : "INVALID_REQUEST",
-             "message" : "matchId format is invalid"
-          }
-        """)
+      response.code shouldBe BAD_REQUEST
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message" -> "matchId format is invalid"
+      )
     }
 
     scenario("invalid match id") {
@@ -201,13 +175,11 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
 
       Then("the response status should be 404 (not found)")
-      assertResponseIs(response, NOT_FOUND,
-        """
-          {
-             "code" : "NOT_FOUND",
-             "message" : "The resource can not be found"
-          }
-        """)
+      response.code shouldBe NOT_FOUND
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "NOT_FOUND",
+        "message" -> "The resource can not be found"
+      )
     }
 
     scenario("valid request to the live paye endpoint implementation") {
@@ -215,13 +187,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
 
       And("a valid record in the matching API")
-      IndividualsMatchingApiStub.willRespondWith(matchId, OK,
-        s"""
-          {
-            "matchId" : "$matchId",
-            "nino" : "$nino"
-          }
-        """)
+      IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       And("DES will return employments for the NINO")
       DesStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, DesEmployments(Seq(DesEmployment(Seq.empty, Some("employer name")))))
@@ -230,23 +196,17 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
 
       Then("the response status should be 200 (ok)")
-      assertResponseIs(response, OK,
-        s"""
-           {
-             "_links":{
-               "self":{
-                 "href":"/individuals/employments/paye?matchId=$matchId&fromDate=2017-01-01&toDate=2017-09-25"
-               }
-             },
-             "employments":[
-               {
-                 "employer":{
-                   "name":"employer name"
-                 }
-               }
-             ]
-           }
-        """)
+      response.code shouldBe OK
+      Json.parse(response.body) shouldBe Json.obj(
+        "_links" -> Json.obj(
+          "self" -> Json.obj(
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-01-01&toDate=2017-09-25"
+          )
+        ),
+        "employments" -> Json.arr(Json.obj(
+          "employer" -> Json.obj("name" -> "employer name")
+        ))
+      )
     }
 
     scenario("the DES rate limit is exceeded") {
@@ -257,7 +217,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
 
       And("a valid record in the matching API")
-      IndividualsMatchingApiStub.hasMatchForNino(matchId, nino)
+      IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       And("DES will return an error due to rate limiting")
       DesStub.enforceRateLimit(nino, fromDate, toDate)
@@ -280,10 +240,4 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       .headers(requestHeaders())
       .asString
   }
-
-  private def assertResponseIs(httpResponse: HttpResponse[String], expectedResponseCode: Int, expectedResponseBody: String) = {
-    httpResponse.code shouldBe expectedResponseCode
-    parse(httpResponse.body) shouldBe parse(expectedResponseBody)
-  }
-
 }
