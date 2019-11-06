@@ -13,7 +13,12 @@ lazy val playSettings: Seq[Setting[_]] = Seq(routesImport ++= Seq(
 )
 
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
-lazy val plugins : Seq[Plugins] = Seq.empty
+lazy val plugins: Seq[Plugins] = Seq.empty
+
+def intTestFilter(name: String): Boolean = name startsWith "it"
+def unitFilter(name: String): Boolean = name startsWith "unit"
+def componentFilter(name: String): Boolean = name startsWith "component"
+lazy val ComponentTest = config("component") extend Test
 
 val compile = Seq(
   ws,
@@ -38,14 +43,9 @@ def test(scope: String = "test,it") = Seq(
   "com.github.tomakehurst" % "wiremock" % "2.21.0" % scope
 )
 
-def intTestFilter(name: String): Boolean = name startsWith "it"
-def unitFilter(name: String): Boolean = name startsWith "unit"
-def componentFilter(name: String): Boolean = name startsWith "component"
-lazy val ComponentTest = config("component") extend Test
-
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(Seq(play.sbt.PlayScala,SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory) ++ plugins : _*)
-  .settings(playSettings : _*)
+  .enablePlugins(Seq(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin, SbtArtifactory) ++ plugins: _*)
+  .settings(playSettings: _*)
   .settings(scalaSettings: _*)
   .settings(publishingSettings: _*)
   .settings(defaultSettings(): _*)
@@ -61,7 +61,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(
     Keys.fork in IntegrationTest := false,
-    unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest)(base => Seq(base / "test")),
+    unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest) (base => Seq(base / "test")),
     testOptions in IntegrationTest := Seq(Tests.Filter(intTestFilter)),
     addTestReportOption(IntegrationTest, "int-test-reports"),
     testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
@@ -70,7 +70,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(inConfig(ComponentTest)(Defaults.testSettings): _*)
   .settings(
     testOptions in ComponentTest := Seq(Tests.Filter(componentFilter)),
-    unmanagedSourceDirectories   in ComponentTest <<= (baseDirectory in ComponentTest)(base => Seq(base / "test")),
+    unmanagedSourceDirectories in ComponentTest <<= (baseDirectory in ComponentTest) (base => Seq(base / "test")),
     testGrouping in ComponentTest := oneForkedJvmPerTest((definedTests in ComponentTest).value),
     parallelExecution in ComponentTest := false
   )
@@ -81,7 +81,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(PlayKeys.playDefaultPort := 9651)
   .settings(majorVersion := 0)
 
-  def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
-    tests map {
-      test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name))))
-    }
+def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
+  tests map {
+    test => Group(test.name, Seq(test), SubProcess(ForkOptions(runJVMOptions = Seq("-Dtest.name=" + test.name))))
+  }
