@@ -28,10 +28,9 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
-import uk.gov.hmrc.auth.core.{Enrolment, InsufficientEnrolments}
+import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.config.ServiceAuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.{LiveEmploymentsController, SandboxEmploymentsController}
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
@@ -45,7 +44,7 @@ class EmploymentsControllerSpec extends PlaySpec with MockitoSugar {
   trait Setup {
     val mockSandboxEmploymentsService = mock[SandboxEmploymentsService]
     val mockLiveEmploymentsService = mock[LiveEmploymentsService]
-    val mockAuthConnector = mock[ServiceAuthConnector]
+    val mockAuthConnector = mock[AuthConnector]
     val hmctsClientId = "hmctsClientId"
 
     val sandboxEmploymentsController = new SandboxEmploymentsController(mockSandboxEmploymentsService, mockAuthConnector, hmctsClientId)

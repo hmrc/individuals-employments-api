@@ -19,6 +19,7 @@ package uk.gov.hmrc.individualsemploymentsapi.config
 import com.google.inject.AbstractModule
 import com.google.inject.name.Names
 import play.api.{Configuration, Environment}
+import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
 
 class ConfigModule(environment: Environment, configuration: Configuration) extends AbstractModule {
   override def configure(): Unit = {
@@ -28,5 +29,6 @@ class ConfigModule(environment: Environment, configuration: Configuration) exten
 
     bindConstant().annotatedWith(Names.named("retryDelay")).to(delay)
     bindConstant().annotatedWith(Names.named("hmctsClientId")).to(hmctsClientId)
+    bind(classOf[HttpClient]).to(classOf[DefaultHttpClient])
   }
 }
