@@ -22,9 +22,9 @@ import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.{Interval, LocalDate}
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
+import uk.gov.hmrc.individualsemploymentsapi.controller.CustomExceptions.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual, NinoMatch}
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 import scala.concurrent.ExecutionContext.Implicits.global

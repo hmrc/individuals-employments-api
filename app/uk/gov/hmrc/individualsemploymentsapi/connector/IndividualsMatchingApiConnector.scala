@@ -22,8 +22,8 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.individualsemploymentsapi.config.ConfigSupport
+import uk.gov.hmrc.individualsemploymentsapi.controller.CustomExceptions.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.ninoMatchJsonFormat
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.config.ServicesConfig

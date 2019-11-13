@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.util
+package uk.gov.hmrc.individualsemploymentsapi.filters
 
-import play.api.libs.json.Json.toJson
-import play.api.mvc.QueryStringBindable
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ErrorInvalidRequest
-import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.errorInvalidRequestFormat
+import com.google.inject.{Inject, Singleton}
+import play.api.http.HttpFilters
+import play.api.mvc.EssentialFilter
+import uk.gov.hmrc.play.bootstrap.filters.MicroserviceFilters
 
-abstract class AbstractQueryStringBinder[T] extends QueryStringBindable[T] {
-
-  protected def errorResponse(message: String) = toJson(ErrorInvalidRequest(message)).toString
-
+@Singleton
+class Filters @Inject()(microserviceFilters: MicroserviceFilters, acceptHeaderFilter: AcceptHeaderFilter) extends HttpFilters {
+  override def filters: Seq[EssentialFilter] = microserviceFilters.filters :+ acceptHeaderFilter
 }

@@ -18,13 +18,13 @@ package uk.gov.hmrc.individualsemploymentsapi.cache
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.cache.TimeToLive
 import uk.gov.hmrc.cache.model.Cache
 import uk.gov.hmrc.cache.repository.CacheRepository
 import uk.gov.hmrc.crypto._
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 import scala.concurrent.Future
 

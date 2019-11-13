@@ -19,7 +19,7 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.util
 import org.joda.time.DateTime
 import org.joda.time.LocalDate.parse
 import org.scalatest.{FlatSpec, Matchers}
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ValidationException
+import uk.gov.hmrc.individualsemploymentsapi.controller.CustomExceptions.ValidationException
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates
 
 class DatesSpec extends FlatSpec with Matchers {

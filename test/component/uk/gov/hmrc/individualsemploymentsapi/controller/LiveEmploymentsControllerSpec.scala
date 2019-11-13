@@ -38,12 +38,12 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, employmentsScope)
 
       When("the root entry point to the API is invoked")
-      val response = invokeEndpoint(s"$serviceUrl/?matchId=$matchId")
+      val response = invokeEndpoint(s"$serviceUrl/vP1.0/?matchId=$matchId")
 
       Then("the response status should be 401 (unauthorized)")
       response.code shouldBe UNAUTHORIZED
       Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "UNAUTHORIZED",
+        "statusCode" -> 401,
         "message" -> "Bearer token is missing or not authorized"
       )
     }
@@ -53,12 +53,12 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope)
 
       When("the root entry point to the API is invoked with a missing match id")
-      val response = invokeEndpoint(serviceUrl)
+      val response = invokeEndpoint(s"$serviceUrl/vP1.0/")
 
       Then("the response status should be 400 (bad request)")
       response.code shouldBe BAD_REQUEST
       Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "INVALID_REQUEST",
+        "statusCode" -> 400,
         "message" -> "matchId is required"
       )
     }
@@ -68,12 +68,12 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope)
 
       When("the root entry point to the API is invoked with a malformed match id")
-      val response = invokeEndpoint(s"$serviceUrl/?matchId=malformed-match-id-value")
+      val response = invokeEndpoint(s"$serviceUrl/vP1.0/?matchId=malformed-match-id-value")
 
       Then("the response status should be 400 (bad request)")
       response.code shouldBe BAD_REQUEST
       Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "INVALID_REQUEST",
+        "statusCode" -> 400,
         "message" -> "matchId format is invalid"
       )
     }
@@ -83,12 +83,13 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope)
 
       When("the root entry point to the API is invoked with an invalid match id")
-      val response = invokeEndpoint(s"$serviceUrl/?matchId=$matchId")
+      val response = invokeEndpoint(s"$serviceUrl/vP1.0/?matchId=$matchId")
 
       Then("the response status should be 404 (not found)")
       response.code shouldBe NOT_FOUND
+      println(s">>>>> ${response.body}")
       Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "NOT_FOUND",
+        "statusCode" -> 404,
         "message" -> "The resource can not be found"
       )
     }
@@ -101,7 +102,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       When("the root entry point to the API is invoked with a valid match id")
-      val response = invokeEndpoint(s"$serviceUrl/?matchId=$matchId")
+      val response = invokeEndpoint(s"$serviceUrl/vP1.0/?matchId=$matchId")
 
       Then("the response status should be 200 (ok)")
       response.code shouldBe OK
@@ -127,12 +128,12 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
 
       When("the paye endpoint is invoked")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+      val response = invokeEndpoint(s"$serviceUrl/vP1.0/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
 
       Then("the response status should be 401 (unauthorized)")
       response.code shouldBe UNAUTHORIZED
       Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "UNAUTHORIZED",
+        "statusCode" -> 401,
         "message" -> "Bearer token is missing or not authorized"
       )
     }
@@ -142,12 +143,12 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
 
       When("the paye endpoint is invoked with a missing match id")
-      val response = invokeEndpoint(s"$serviceUrl/paye?fromDate=$fromDate&toDate=$toDate")
+      val response = invokeEndpoint(s"$serviceUrl/vP1.0/paye?fromDate=$fromDate&toDate=$toDate")
 
       Then("the response status should be 400 (bad request)")
       response.code shouldBe BAD_REQUEST
       Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "INVALID_REQUEST",
+        "statusCode" -> 400,
         "message" -> "matchId is required"
       )
     }
@@ -157,12 +158,12 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
 
       When("the paye endpoint is invoked with a malformed match id")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=malformed-match-id-value&fromDate=$fromDate&toDate=$toDate")
+      val response = invokeEndpoint(s"$serviceUrl/vP1.0/paye?matchId=malformed-match-id-value&fromDate=$fromDate&toDate=$toDate")
 
       Then("the response status should be 400 (bad request)")
       response.code shouldBe BAD_REQUEST
       Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "INVALID_REQUEST",
+        "statusCode" -> 400,
         "message" -> "matchId format is invalid"
       )
     }
@@ -172,12 +173,12 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
 
       When("the paye endpoint is invoked with an invalid match id")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+      val response = invokeEndpoint(s"$serviceUrl/vP1.0/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
 
       Then("the response status should be 404 (not found)")
       response.code shouldBe NOT_FOUND
       Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "NOT_FOUND",
+        "statusCode" -> 404,
         "message" -> "The resource can not be found"
       )
     }
@@ -193,7 +194,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       DesStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, DesEmployments(Seq(DesEmployment(Seq.empty, Some("employer name")))))
 
       When("the paye endpoint is invoked with a valid match id")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+      val response = invokeEndpoint(s"$serviceUrl/vP1.0/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
 
       Then("the response status should be 200 (ok)")
       response.code shouldBe OK
@@ -223,12 +224,12 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       DesStub.enforceRateLimit(nino, fromDate, toDate)
 
       When("the PAYE endpoint is invoked with a valid match ID")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+      val response = invokeEndpoint(s"$serviceUrl/vP1.0/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
 
       Then("The response status is 429 Too Many Requests")
       response.code shouldBe TOO_MANY_REQUESTS
       Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "TOO_MANY_REQUESTS",
+        "statusCode" -> 429,
         "message" -> "Rate limit exceeded"
       )
     }
