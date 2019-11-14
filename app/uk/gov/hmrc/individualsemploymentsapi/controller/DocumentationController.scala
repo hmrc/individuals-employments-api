@@ -18,10 +18,9 @@ package uk.gov.hmrc.individualsemploymentsapi.controller
 
 
 import javax.inject.{Inject, Singleton}
-
 import play.api.Configuration
 import play.api.http.HttpErrorHandler
-import play.api.mvc.{Action, AnyContent, RequestHeader}
+import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.individualsemploymentsapi.views._
 
 @Singleton

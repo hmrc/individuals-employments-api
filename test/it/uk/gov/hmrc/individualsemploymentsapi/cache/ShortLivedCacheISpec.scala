@@ -20,11 +20,11 @@ import java.util.UUID
 
 import org.scalatest.BeforeAndAfterEach
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.{JsString, Json, OFormat}
 import uk.gov.hmrc.individualsemploymentsapi.cache.ShortLivedCache
 import uk.gov.hmrc.mongo.MongoSpecSupport
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 class ShortLivedCacheISpec extends UnitSpec with MongoSpecSupport with WithFakeApplication with BeforeAndAfterEach {
 

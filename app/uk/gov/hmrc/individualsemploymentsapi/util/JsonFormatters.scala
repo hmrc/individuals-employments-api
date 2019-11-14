@@ -21,7 +21,6 @@ import java.util.UUID
 import play.api.libs.json._
 import uk.gov.hmrc.individualsemploymentsapi.domain._
 import uk.gov.hmrc.individualsemploymentsapi.domain.des._
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorResponse}
 
 import scala.util.{Failure, Try}
 
@@ -32,19 +31,6 @@ object JsonFormatters {
   implicit val employerJsonFormat = Json.format[Employer]
   implicit val payFrequencyJsonFormat = EnumJson.enumFormat(PayFrequency)
   implicit val employmentJsonFormat = Json.format[Employment]
-
-  implicit val errorResponseWrites = new Writes[ErrorResponse] {
-    def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
-  }
-
-  implicit val errorInvalidRequestFormat = new Format[ErrorInvalidRequest] {
-    def reads(json: JsValue): JsResult[ErrorInvalidRequest] = JsSuccess(
-      ErrorInvalidRequest((json \ "message").as[String])
-    )
-
-    def writes(error: ErrorInvalidRequest): JsValue =
-      Json.obj("code" -> error.errorCode, "message" -> error.message)
-  }
 
   implicit val uuidJsonFormat = new Format[UUID] {
     override def writes(uuid: UUID) = JsString(uuid.toString)

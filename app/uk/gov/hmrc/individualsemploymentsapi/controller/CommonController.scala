@@ -17,13 +17,15 @@
 package uk.gov.hmrc.individualsemploymentsapi.controller
 
 import org.joda.time.DateTime
+import play.api.libs.json.Json
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolment}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, TooManyRequestException}
+import uk.gov.hmrc.individualsemploymentsapi.controller.CustomExceptions.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.SANDBOX
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorNotFound, MatchNotFoundException}
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates._
-import uk.gov.hmrc.play.microservice.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.http.ErrorResponse
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -37,11 +39,20 @@ trait CommonController extends BaseController {
     getQueryParam("toDate") map (toDate => s"$urlWithFromDate&toDate=$toDate") getOrElse urlWithFromDate
   }
 
+  implicit val erFormats = Json.format[ErrorResponse]
+
   private[controller] def recovery: PartialFunction[Throwable, Result] = {
-    case MatchNotFoundException => ErrorNotFound.toHttpResponse
-    case e: IllegalArgumentException => ErrorInvalidRequest(e.getMessage).toHttpResponse
+    case MatchNotFoundException => NotFound(Json.toJson(ErrorResponse(NOT_FOUND, "The resource can not be found")))
+    case e: TooManyRequestException =>TooManyRequests(Json.toJson(ErrorResponse(TOO_MANY_REQUESTS, "Rate limit exceeded")))
+    case e: IllegalArgumentException => BadRequest(Json.toJson(ErrorResponse(BAD_REQUEST, e.getMessage)))
   }
 
+}
+
+object CustomExceptions {
+  class ValidationException(message: String) extends RuntimeException(message)
+
+  case object MatchNotFoundException extends RuntimeException
 }
 
 trait PrivilegedAuthentication extends AuthorisedFunctions {

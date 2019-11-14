@@ -18,12 +18,13 @@ package uk.gov.hmrc.individualsemploymentsapi.util
 
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.{Interval, LocalDate}
+import play.api.mvc.QueryStringBindable
 import uk.gov.hmrc.individualsemploymentsapi.config.ConfigSupport
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ValidationException
+import uk.gov.hmrc.individualsemploymentsapi.controller.CustomExceptions.ValidationException
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates.toInterval
 import uk.gov.hmrc.play.config.ServicesConfig
 
-class IntervalQueryStringBinder extends AbstractQueryStringBinder[Interval] with ServicesConfig with ConfigSupport {
+class IntervalQueryStringBinder extends QueryStringBindable[Interval] with ServicesConfig with ConfigSupport {
 
   private val dateTimeFormatter = DateTimeFormat.forPattern(Dates.localDatePattern)
 
@@ -38,18 +39,18 @@ class IntervalQueryStringBinder extends AbstractQueryStringBinder[Interval] with
   private def interval(fromDate: LocalDate, toDate: LocalDate): Either[String, Interval] = try {
     Right(toInterval(fromDate, toDate))
   } catch {
-    case e: ValidationException => Left(errorResponse(e.getMessage))
-    case _: Throwable => Left(errorResponse("Invalid time period requested"))
+    case e: ValidationException => Left(e.getMessage)
+    case _: Throwable => Left("Invalid time period requested")
   }
 
   private def getParam(params: Map[String, Seq[String]], paramName: String, default: Option[LocalDate] = None): Either[String, LocalDate] = {
     try {
       params.get(paramName).flatMap(_.headOption) match {
         case Some(date) => Right(dateTimeFormatter.parseLocalDate(date))
-        case None => default.map(Right(_)).getOrElse(Left(errorResponse(s"$paramName is required")))
+        case None => default.map(Right(_)).getOrElse(Left(s"$paramName is required"))
       }
     } catch {
-      case _: Throwable => Left(errorResponse(s"$paramName: invalid date format"))
+      case _: Throwable => Left(s"$paramName: invalid date format")
     }
   }
 
