@@ -18,19 +18,17 @@ package uk.gov.hmrc.individualsemploymentsapi.util
 
 import java.util.UUID
 
-import play.api.mvc.QueryStringBindable
-
 import scala.util.Try
 
-class MatchUuidQueryStringBinder extends QueryStringBindable[UUID] {
+class MatchUuidQueryStringBinder extends AbstractQueryStringBinder[UUID] {
 
   private val parameterName = "matchId"
 
   override def bind(key: String, params: Map[String, Seq[String]]) = {
     Option(Try(params.get(parameterName) flatMap (_.headOption) match {
       case Some(parameterValue) => Right(UUID.fromString(parameterValue))
-      case None => Left(s"$parameterName is required")
-    }) getOrElse Left(s"$parameterName format is invalid"))
+      case None => Left(errorResponse(s"$parameterName is required"))
+    }) getOrElse Left(errorResponse(s"$parameterName format is invalid")))
   }
 
   override def unbind(key: String, uuid: UUID) = s"$key=${uuid.toString}"

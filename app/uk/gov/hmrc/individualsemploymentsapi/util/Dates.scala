@@ -17,7 +17,7 @@
 package uk.gov.hmrc.individualsemploymentsapi.util
 
 import org.joda.time.{DateTime, Interval, LocalDate}
-import uk.gov.hmrc.individualsemploymentsapi.controller.CustomExceptions.ValidationException
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ValidationException
 
 object Dates {
 

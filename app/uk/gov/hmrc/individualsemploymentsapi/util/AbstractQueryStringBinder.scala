@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.config
+package uk.gov.hmrc.individualsemploymentsapi.util
 
-import akka.actor.ActorSystem
-import play.api.Mode.Mode
-import play.api.{Application, Configuration, Play}
+import play.api.libs.json.Json.toJson
+import play.api.mvc.QueryStringBindable
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ErrorInvalidRequest
+import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.errorInvalidRequestFormat
 
-trait ConfigSupport {
-  private def current: Application = Play.current
+abstract class AbstractQueryStringBinder[T] extends QueryStringBindable[T] {
 
-  def config: Configuration = current.configuration
-  def mode: Mode = current.mode
+  protected def errorResponse(message: String) = toJson(ErrorInvalidRequest(message)).toString
 
-  def runModeConfiguration: Configuration = config
-  def appNameConfiguration: Configuration = config
-  def actorSystem: ActorSystem = current.actorSystem
 }

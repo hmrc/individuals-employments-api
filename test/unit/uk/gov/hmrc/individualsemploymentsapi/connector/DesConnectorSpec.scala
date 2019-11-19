@@ -25,11 +25,10 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.DesConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayFrequency, DesPayment}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-
+import uk.gov.hmrc.http.{ HeaderCarrier, Upstream5xxResponse }
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class DesConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApplication with MockitoSugar {

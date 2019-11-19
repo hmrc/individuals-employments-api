@@ -39,7 +39,7 @@ object AuthStub extends MockHost(22000) {
       .withHeader(AUTHORIZATION, equalTo(authBearerToken))
       .willReturn(
         unauthorized()
-          .withHeader(HeaderNames.WWW_AUTHENTICATE, """MDTP detail="Bearer token is missing or not authorized"""")))
+          .withHeader(HeaderNames.WWW_AUTHENTICATE, """MDTP detail="InsufficientConfidenceLevel"""")))
   }
 
   private def privilegedAuthority(scope: String) = Json.obj(
