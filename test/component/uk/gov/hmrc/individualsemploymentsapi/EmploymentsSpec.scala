@@ -16,11 +16,12 @@
 
 package component.uk.gov.hmrc.individualsemploymentsapi
 
-import component.uk.gov.hmrc.individualsemploymentsapi.stubs.BaseSpec
+import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec}
 import play.api.http.Status._
 import play.api.libs.json.Json.parse
-import scalaj.http.Http
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.sandboxMatchId
+
+import scalaj.http.Http
 
 class EmploymentsSpec extends BaseSpec {
   private val payeEmploymentsScope = "read:individuals-employments-paye"
@@ -30,7 +31,7 @@ class EmploymentsSpec extends BaseSpec {
     scenario("Valid request to the sandbox implementation") {
 
       When("I request individual employments for the sandbox matchId")
-      val response = Http(s"$serviceUrl/vP1.0/sandbox/paye?matchId=$sandboxMatchId&fromDate=2016-04-01&toDate=2017-01-01")
+      val response = Http(s"$serviceUrl/sandbox/paye?matchId=$sandboxMatchId&fromDate=2016-04-01&toDate=2017-01-01")
         .headers(requestHeaders(acceptHeaderVP1)).asString
 
       Then("The response status should be 200 (OK)")

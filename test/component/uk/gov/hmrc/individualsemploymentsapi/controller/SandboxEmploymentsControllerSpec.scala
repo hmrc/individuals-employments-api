@@ -16,9 +16,10 @@
 
 package component.uk.gov.hmrc.individualsemploymentsapi.controller
 
-import component.uk.gov.hmrc.individualsemploymentsapi.stubs.BaseSpec
+import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec}
 import play.api.libs.json.Json.parse
 import play.api.test.Helpers._
+
 import scalaj.http.{Http, HttpResponse}
 
 class SandboxEmploymentsControllerSpec extends BaseSpec {
@@ -28,13 +29,13 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
 
     scenario("missing match id") {
       When("the root entry point to the API is invoked with a missing match id")
-      val response = invokeEndpoint(s"$serviceUrl/vP1.0/sandbox")
+      val response = invokeEndpoint(s"$serviceUrl/sandbox")
 
       Then("the response status should be 400 (bad request)")
       assertResponseIs(response, BAD_REQUEST,
         """
           {
-             "statusCode" : 400,
+             "code" : "INVALID_REQUEST",
              "message" : "matchId is required"
           }
         """)
@@ -42,13 +43,13 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
 
     scenario("malformed match id") {
       When("the root entry point to the API is invoked with a malformed match id")
-      val response = invokeEndpoint(s"$serviceUrl/vP1.0/sandbox?matchId=malformed-match-id-value")
+      val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=malformed-match-id-value")
 
       Then("the response status should be 400 (bad request)")
       assertResponseIs(response, BAD_REQUEST,
         """
           {
-             "statusCode" : 400,
+             "code" : "INVALID_REQUEST",
              "message" : "matchId format is invalid"
           }
         """)
@@ -57,13 +58,13 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
     scenario("invalid match id") {
 
       When("the root entry point to the API is invoked with an invalid match id")
-      val response = invokeEndpoint(s"$serviceUrl/vP1.0/sandbox?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366")
+      val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366")
 
       Then("the response status should be 404 (not found)")
       assertResponseIs(response, NOT_FOUND,
         """
           {
-             "statusCode" : 404,
+             "code" : "NOT_FOUND",
              "message" : "The resource can not be found"
           }
         """)
@@ -71,7 +72,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
 
     scenario("valid request to the sandbox implementation") {
       When("I request the root entry point to the API")
-      val response = invokeEndpoint(s"$serviceUrl/vP1.0/sandbox?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430")
+      val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430")
 
       Then("The response status should be 200 (ok)")
       assertResponseIs(response, OK,
@@ -96,13 +97,13 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
 
     scenario("missing match id") {
       When("the root entry point to the API is invoked with a missing match id")
-      val response = invokeEndpoint(s"$serviceUrl/vP1.0/sandbox/paye")
+      val response = invokeEndpoint(s"$serviceUrl/sandbox/paye")
 
       Then("the response status should be 400 (bad request)")
       assertResponseIs(response, BAD_REQUEST,
         """
           {
-             "statusCode" : 400,
+             "code" : "INVALID_REQUEST",
              "message" : "matchId is required"
           }
         """)
@@ -110,13 +111,13 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
 
     scenario("malformed match id") {
       When("the root entry point to the API is invoked with a malformed match id")
-      val response = invokeEndpoint(s"$serviceUrl/vP1.0/sandbox/paye?matchId=malformed-match-id-value")
+      val response = invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=malformed-match-id-value")
 
       Then("the response status should be 400 (bad request)")
       assertResponseIs(response, BAD_REQUEST,
         """
           {
-             "statusCode" : 400,
+             "code" : "INVALID_REQUEST",
              "message" : "matchId format is invalid"
           }
         """)
@@ -124,13 +125,13 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
 
     scenario("invalid match id") {
       When("the root entry point to the API is invoked with an invalid match id")
-      val response = invokeEndpoint(s"$serviceUrl/vP1.0/sandbox/paye?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366&fromDate=2017-01-01")
+      val response = invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366&fromDate=2017-01-01")
 
       Then("the response status should be 404 (not found)")
       assertResponseIs(response, NOT_FOUND,
         """
           {
-             "statusCode" : 404,
+             "code" : "NOT_FOUND",
              "message" : "The resource can not be found"
           }
         """)
@@ -138,7 +139,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
 
     scenario("valid request to the sandbox implementation") {
       When("I request the root entry point to the API")
-      val response = invokeEndpoint(s"$serviceUrl/vP1.0/sandbox/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01")
+      val response = invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01")
 
       Then("The response status should be 200 (ok)")
       assertResponseIs(response, OK,

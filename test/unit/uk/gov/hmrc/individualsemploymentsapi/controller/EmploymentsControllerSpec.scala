@@ -28,12 +28,13 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
-import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, InsufficientEnrolments}
+import uk.gov.hmrc.auth.core.{Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.controller.CustomExceptions.MatchNotFoundException
+import uk.gov.hmrc.individualsemploymentsapi.config.ServiceAuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.{LiveEmploymentsController, SandboxEmploymentsController}
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, NinoMatch}
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
 import uk.gov.hmrc.individualsemploymentsapi.service.{LiveEmploymentsService, SandboxEmploymentsService}
 
@@ -44,7 +45,7 @@ class EmploymentsControllerSpec extends PlaySpec with MockitoSugar {
   trait Setup {
     val mockSandboxEmploymentsService = mock[SandboxEmploymentsService]
     val mockLiveEmploymentsService = mock[LiveEmploymentsService]
-    val mockAuthConnector = mock[AuthConnector]
+    val mockAuthConnector = mock[ServiceAuthConnector]
     val hmctsClientId = "hmctsClientId"
 
     val sandboxEmploymentsController = new SandboxEmploymentsController(mockSandboxEmploymentsService, mockAuthConnector, hmctsClientId)
@@ -66,7 +67,7 @@ class EmploymentsControllerSpec extends PlaySpec with MockitoSugar {
 
       status(eventualResult) mustBe NOT_FOUND
       contentAsJson(eventualResult) mustBe Json.obj(
-        "statusCode" -> 404,
+        "code" -> "NOT_FOUND",
         "message" -> "The resource can not be found"
       )
     }
@@ -124,7 +125,7 @@ class EmploymentsControllerSpec extends PlaySpec with MockitoSugar {
       val eventualResult = liveEmploymentsController.paye(invalidMatchId, interval)(FakeRequest())
       status(eventualResult) mustBe NOT_FOUND
       contentAsJson(eventualResult) mustBe Json.obj(
-        "statusCode" -> 404,
+        "code" -> "NOT_FOUND",
         "message" -> "The resource can not be found"
       )
     }

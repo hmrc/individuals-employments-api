@@ -20,11 +20,12 @@ import component.uk.gov.hmrc.individualsemploymentsapi.stubs._
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION}
 import play.api.libs.json.Json.parse
 import play.api.test.Helpers._
+
 import scalaj.http.{Http, HttpResponse}
 
 class VersioningSpec extends BaseSpec {
 
-  private val sandboxMatchEndpointWithSandboxMatchId = "/vP1.0/sandbox?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+  private val sandboxMatchEndpointWithSandboxMatchId = "/sandbox?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
 
   feature("Versioning") {
 
@@ -33,8 +34,8 @@ class VersioningSpec extends BaseSpec {
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made without an accept header")
       val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken)
 
-      Then("The response status should be 200")
-      response.code shouldBe OK
+      Then("The response status should be 404")
+      response.code shouldBe NOT_FOUND
     }
 
     scenario("Requests with an accept header with an invalid version") {
@@ -42,8 +43,8 @@ class VersioningSpec extends BaseSpec {
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version 10.0")
       val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken,  ACCEPT -> "application/vnd.hmrc.10.0+json")
 
-      Then("The response status should be 400")
-      response.code shouldBe BAD_REQUEST
+      Then("The response status should be 404")
+      response.code shouldBe NOT_FOUND
     }
 
     scenario("Requests with an accept header version P1.0") {
