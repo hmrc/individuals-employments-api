@@ -47,7 +47,7 @@ class SandboxEmploymentsService extends EmploymentsService {
   import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData._
 
   override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] = {
-    if (matchId.equals(sandboxMatchId)) successful(NinoMatch(sandboxMatchId, sandboxNino)) else failed(MatchNotFoundException)
+    if (matchId.equals(sandboxMatchId)) successful(NinoMatch(sandboxMatchId, sandboxNino)) else failed(new MatchNotFoundException)
   }
 
   override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] = paye(find(matchId), interval)
@@ -62,7 +62,7 @@ class SandboxEmploymentsService extends EmploymentsService {
         }
 
         Future.successful(employmentsWithinInterval.sortBy(_.endDate.getOrElse(interval.getEnd.toLocalDate)).reverse)
-      case None => Future.failed(MatchNotFoundException)
+      case None => Future.failed(new MatchNotFoundException)
     }
   }
 }

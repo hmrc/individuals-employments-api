@@ -22,18 +22,18 @@ lazy val ComponentTest = config("component") extend Test
 
 val compile = Seq(
   ws,
-  hmrc %% "microservice-bootstrap" % "10.4.0",
-  hmrc %% "domain" % "5.3.0",
-  hmrc %% "auth-client" % "2.19.0-play-25",
-  hmrc %% "play-hal" % "1.8.0-play-25",
-  hmrc %% "play-hmrc-api" % "3.4.0-play-25",
-  hmrc %% "mongo-caching" % "5.7.0",
-  hmrc %% "json-encryption" % "3.3.0"
+  hmrc %% "bootstrap-play-25" % "5.1.0",
+  hmrc %% "domain"            % "5.6.0-play-25",
+  hmrc %% "auth-client"       % "2.31.0-play-25",
+  hmrc %% "play-hal"          % "1.8.0-play-25",
+  hmrc %% "play-hmrc-api"     % "3.6.0-play-25",
+  hmrc %% "mongo-caching"     % "6.6.0-play-25",
+  hmrc %% "json-encryption"   % "3.3.0"
 )
 
 def test(scope: String = "test,it") = Seq(
   hmrc %% "hmrctest" % "3.5.0-play-25" % scope,
-  hmrc %% "reactivemongo-test" % "2.0.0" % scope,
+  hmrc %% "reactivemongo-test" % "4.15.0-play-25" % scope,
   "org.scalatest" %% "scalatest" % "2.2.6" % scope,
   "org.pegdown" % "pegdown" % "1.6.0" % scope,
   "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,

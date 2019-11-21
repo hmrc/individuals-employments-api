@@ -18,12 +18,12 @@ package uk.gov.hmrc.individualsemploymentsapi.controller
 
 import org.joda.time.DateTime
 import play.api.mvc.{Request, Result}
-import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolment}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment}
+import uk.gov.hmrc.http.{HeaderCarrier, TooManyRequestException}
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.SANDBOX
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorNotFound, MatchNotFoundException}
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorNotFound, ErrorTooManyRequests, ErrorUnauthorized, MatchNotFoundException}
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates._
-import uk.gov.hmrc.play.microservice.controller.BaseController
+import uk.gov.hmrc.play.bootstrap.controller.BaseController
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -38,7 +38,9 @@ trait CommonController extends BaseController {
   }
 
   private[controller] def recovery: PartialFunction[Throwable, Result] = {
-    case MatchNotFoundException => ErrorNotFound.toHttpResponse
+    case _: MatchNotFoundException   => ErrorNotFound.toHttpResponse
+    case e: AuthorisationException   => ErrorUnauthorized(e.getMessage).toHttpResponse
+    case _: TooManyRequestException  => ErrorTooManyRequests.toHttpResponse
     case e: IllegalArgumentException => ErrorInvalidRequest(e.getMessage).toHttpResponse
   }
 

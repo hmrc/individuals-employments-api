@@ -26,7 +26,7 @@ import play.api.hal.HalLink
 import play.api.libs.json.Json
 import play.api.mvc.hal._
 import play.api.mvc.{Action, AnyContent, Request}
-import uk.gov.hmrc.individualsemploymentsapi.config.ServiceAuthConnector
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.domain.Employment
 import uk.gov.hmrc.individualsemploymentsapi.service.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService}
@@ -44,8 +44,8 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
         val payeLink = HalLink("paye", s"/individuals/employments/paye?matchId=$matchId{&fromDate,toDate}", title = Option("View individual's employments"))
         val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
         Ok(links(payeLink, selfLink))
-      } recover recovery
-    }
+      }
+    }.recover(recovery)
   }
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
@@ -76,8 +76,8 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
 
 @Singleton
 class SandboxEmploymentsController @Inject()(sandboxEmploymentsService: SandboxEmploymentsService,
-                                             val authConnector: ServiceAuthConnector,
-                                            @Named("hmctsClientId") val hmctsClientId: String)
+                                             val authConnector: AuthConnector,
+                                             @Named("hmctsClientId") val hmctsClientId: String)
   extends EmploymentsController(sandboxEmploymentsService) {
 
   override val environment: String = SANDBOX
@@ -85,7 +85,7 @@ class SandboxEmploymentsController @Inject()(sandboxEmploymentsService: SandboxE
 
 @Singleton
 class LiveEmploymentsController @Inject()(liveEmploymentsService: LiveEmploymentsService,
-                                          val authConnector: ServiceAuthConnector,
+                                          val authConnector: AuthConnector,
                                           @Named("hmctsClientId") val hmctsClientId: String)
   extends EmploymentsController(liveEmploymentsService) {
 
