@@ -28,10 +28,9 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
-import uk.gov.hmrc.auth.core.{Enrolment, InsufficientEnrolments}
+import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.config.ServiceAuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.{LiveEmploymentsController, SandboxEmploymentsController}
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
@@ -45,7 +44,7 @@ class EmploymentsControllerSpec extends PlaySpec with MockitoSugar {
   trait Setup {
     val mockSandboxEmploymentsService = mock[SandboxEmploymentsService]
     val mockLiveEmploymentsService = mock[LiveEmploymentsService]
-    val mockAuthConnector = mock[ServiceAuthConnector]
+    val mockAuthConnector = mock[AuthConnector]
     val hmctsClientId = "hmctsClientId"
 
     val sandboxEmploymentsController = new SandboxEmploymentsController(mockSandboxEmploymentsService, mockAuthConnector, hmctsClientId)
@@ -61,7 +60,7 @@ class EmploymentsControllerSpec extends PlaySpec with MockitoSugar {
 
     "return a 404 (not found) when a match id does not match live data" in new Setup {
       when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
-        .thenReturn(Future.failed(MatchNotFoundException))
+        .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult = liveEmploymentsController.root(randomMatchId)(FakeRequest())
 
@@ -90,13 +89,13 @@ class EmploymentsControllerSpec extends PlaySpec with MockitoSugar {
       )
     }
 
-    "fail with AuthorizedException when the bearer token does not have enrolment read:individuals-employments" in new Setup {
+    "fail with status 401 when the bearer token does not have enrolment read:individuals-employments" in new Setup {
       when(mockAuthConnector.authorise(eqTo(Enrolment("read:individuals-employments")), eqTo(EmptyRetrieval))(any(), any()))
         .thenReturn(Future.failed(InsufficientEnrolments()))
 
-      intercept[InsufficientEnrolments] {
-        await(liveEmploymentsController.root(randomMatchId)(FakeRequest()))
-      }
+      val result = liveEmploymentsController.root(randomMatchId)(FakeRequest())
+
+      status(result) mustBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
     }
 
@@ -120,7 +119,7 @@ class EmploymentsControllerSpec extends PlaySpec with MockitoSugar {
     "return 404 (not found) for an invalid matchId" in new Setup {
       val invalidMatchId = UUID.randomUUID()
       when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval))(any()))
-        .thenReturn(Future.failed(MatchNotFoundException))
+        .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult = liveEmploymentsController.paye(invalidMatchId, interval)(FakeRequest())
       status(eventualResult) mustBe NOT_FOUND
@@ -248,13 +247,13 @@ class EmploymentsControllerSpec extends PlaySpec with MockitoSugar {
       )
     }
 
-    "fail with AuthorizedException when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
+    "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
       when(mockAuthConnector.authorise(eqTo(Enrolment("read:individuals-employments-paye")), eqTo(EmptyRetrieval))(any(), any()))
         .thenReturn(Future.failed(InsufficientEnrolments()))
 
-      intercept[InsufficientEnrolments] {
-        await(liveEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest()))
-      }
+      val result = liveEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest())
+
+      status(result) mustBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
     }
 

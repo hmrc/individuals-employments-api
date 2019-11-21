@@ -21,14 +21,13 @@ import java.util.UUID
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
-import org.mockito.{Matchers => MM}
 import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.IndividualsMatchingApiConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
+import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 class IndividualsMatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApplication {
@@ -40,7 +39,7 @@ class IndividualsMatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEa
   trait Fixture {
     implicit val hc = HeaderCarrier()
 
-    val individualsMatchingApiConnector = new IndividualsMatchingApiConnector {
+    val individualsMatchingApiConnector = new IndividualsMatchingApiConnector(fakeApplication.injector.instanceOf[HttpClient]) {
       override val serviceUrl = "http://localhost:11121"
     }
   }

@@ -16,9 +16,14 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.config
 
+import akka.actor.ActorSystem
 import com.google.inject.AbstractModule
 import com.google.inject.name.Names
-import play.api.{Configuration, Environment}
+import play.api.Mode.Mode
+import play.api.{Application, Configuration, Environment, Play}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
+import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
 
 class ConfigModule(environment: Environment, configuration: Configuration) extends AbstractModule {
   override def configure(): Unit = {
@@ -28,5 +33,19 @@ class ConfigModule(environment: Environment, configuration: Configuration) exten
 
     bindConstant().annotatedWith(Names.named("retryDelay")).to(delay)
     bindConstant().annotatedWith(Names.named("hmctsClientId")).to(hmctsClientId)
+
+    bind(classOf[HttpClient]).to(classOf[DefaultHttpClient])
+    bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
   }
+}
+
+trait ConfigSupport {
+  private def current: Application = Play.current
+
+  def config: Configuration = current.configuration
+  def mode: Mode = current.mode
+
+  def runModeConfiguration: Configuration = config
+  def appNameConfiguration: Configuration = config
+  def actorSystem: ActorSystem = current.actorSystem
 }
