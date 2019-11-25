@@ -27,10 +27,14 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.IndividualsMatchingApiConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
-class IndividualsMatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApplication {
+class IndividualsMatchingApiConnectorSpec
+    extends UnitSpec
+    with BeforeAndAfterEach
+    with WithFakeApplication {
 
   val stubPort = sys.env.getOrElse("WIREMOCK", "11121").toInt
   val stubHost = "localhost"
@@ -38,8 +42,9 @@ class IndividualsMatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEa
 
   trait Fixture {
     implicit val hc = HeaderCarrier()
-
-    val individualsMatchingApiConnector = new IndividualsMatchingApiConnector(fakeApplication.injector.instanceOf[HttpClient]) {
+    val individualsMatchingApiConnector = new IndividualsMatchingApiConnector(
+      fakeApplication.injector.instanceOf[ServicesConfig],
+      fakeApplication.injector.instanceOf[HttpClient]) {
       override val serviceUrl = "http://localhost:11121"
     }
   }
@@ -54,8 +59,9 @@ class IndividualsMatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEa
     val matchId = UUID.randomUUID()
 
     def stubWithResponseStatus(responseStatus: Int, body: String = ""): Unit =
-      stubFor(get(urlPathMatching(s"/match-record/$matchId"))
-        .willReturn(aResponse().withStatus(responseStatus).withBody(body)))
+      stubFor(
+        get(urlPathMatching(s"/match-record/$matchId"))
+          .willReturn(aResponse().withStatus(responseStatus).withBody(body)))
 
     "fail when upstream service fails" in new Fixture {
       stubWithResponseStatus(INTERNAL_SERVER_ERROR)
@@ -66,13 +72,15 @@ class IndividualsMatchingApiConnectorSpec extends UnitSpec with BeforeAndAfterEa
 
     "return a nino match when upstream service call succeeds" in new Fixture {
       stubWithResponseStatus(OK,
-        s"""
+                             s"""
           {
             "matchId":"${matchId.toString}",
             "nino":"AB123456C"
           }
         """)
-      await(individualsMatchingApiConnector.resolve(matchId)) shouldBe NinoMatch(matchId, Nino("AB123456C"))
+      await(individualsMatchingApiConnector.resolve(matchId)) shouldBe NinoMatch(
+        matchId,
+        Nino("AB123456C"))
     }
 
   }
