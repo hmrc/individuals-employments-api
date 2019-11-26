@@ -18,24 +18,22 @@ package uk.gov.hmrc.individualsemploymentsapi.connector
 
 import javax.inject.{Inject, Singleton}
 import org.joda.time.Interval
-import play.api.Configuration
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.logging.Authorization
-import uk.gov.hmrc.individualsemploymentsapi.config.ConfigSupport
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments}
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class DesConnector @Inject()(override val config: Configuration, http: HttpClient) extends ServicesConfig with ConfigSupport {
+class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
 
-  private val serviceUrl = baseUrl("des")
-  private val desBearerToken = config.getString("microservice.services.des.authorization-token") getOrElse (throw new RuntimeException("DES authorization token must be defined"))
-  private val desEnvironment = config.getString("microservice.services.des.environment") getOrElse (throw new RuntimeException("DES environment must be defined"))
+  private val serviceUrl =servicesConfig. baseUrl("des")
+  private val desBearerToken = servicesConfig.getString("microservice.services.des.authorization-token")
+  private val desEnvironment = servicesConfig.getString("microservice.services.des.environment")
 
   def fetchEmployments(nino: Nino, interval: Interval)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[DesEmployment]] = {
     val fromDate = interval.getStart.toLocalDate

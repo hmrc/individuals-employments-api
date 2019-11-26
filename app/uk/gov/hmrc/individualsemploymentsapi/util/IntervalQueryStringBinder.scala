@@ -19,12 +19,10 @@ package uk.gov.hmrc.individualsemploymentsapi.util
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.{Interval, LocalDate}
 import play.api.mvc.QueryStringBindable
-import uk.gov.hmrc.individualsemploymentsapi.config.ConfigSupport
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ValidationException
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates.toInterval
-import uk.gov.hmrc.play.config.ServicesConfig
 
-class IntervalQueryStringBinder extends QueryStringBindable[Interval] with ServicesConfig with ConfigSupport {
+class IntervalQueryStringBinder extends QueryStringBindable[Interval]  {
 
   private val dateTimeFormatter = DateTimeFormat.forPattern(Dates.localDatePattern)
 

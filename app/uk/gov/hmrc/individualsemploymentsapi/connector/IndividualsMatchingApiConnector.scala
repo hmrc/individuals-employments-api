@@ -20,20 +20,19 @@ import java.util.UUID
 
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
-import uk.gov.hmrc.individualsemploymentsapi.config.ConfigSupport
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.ninoMatchJsonFormat
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class IndividualsMatchingApiConnector @Inject()(http: HttpClient) extends ServicesConfig with ConfigSupport {
+class IndividualsMatchingApiConnector @Inject()(serviceConfig : ServicesConfig,http: HttpClient){
 
-  private[connector] val serviceUrl = baseUrl("individuals-matching-api")
+  private[connector] val serviceUrl = serviceConfig.baseUrl("individuals-matching-api")
 
   def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
     http.GET[NinoMatch](s"$serviceUrl/match-record/$matchId") recover {

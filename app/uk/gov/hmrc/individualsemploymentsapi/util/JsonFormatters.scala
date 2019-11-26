@@ -22,6 +22,8 @@ import play.api.libs.json._
 import uk.gov.hmrc.individualsemploymentsapi.domain._
 import uk.gov.hmrc.individualsemploymentsapi.domain.des._
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorResponse}
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
 
 import scala.util.{Failure, Try}
 

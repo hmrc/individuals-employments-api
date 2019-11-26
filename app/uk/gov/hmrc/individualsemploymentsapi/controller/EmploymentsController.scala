@@ -25,7 +25,7 @@ import play.api.hal.Hal._
 import play.api.hal.HalLink
 import play.api.libs.json.Json
 import play.api.mvc.hal._
-import play.api.mvc.{Action, AnyContent, Request}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.domain.Employment
@@ -34,7 +34,7 @@ import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-abstract class EmploymentsController(employmentsService: EmploymentsService) extends CommonController with PrivilegedAuthentication {
+abstract class EmploymentsController(employmentsService: EmploymentsService , cc: ControllerComponents) extends CommonController(cc) with PrivilegedAuthentication {
 
   val hmctsClientId: String
 
@@ -77,8 +77,8 @@ abstract class EmploymentsController(employmentsService: EmploymentsService) ext
 @Singleton
 class SandboxEmploymentsController @Inject()(sandboxEmploymentsService: SandboxEmploymentsService,
                                              val authConnector: AuthConnector,
-                                             @Named("hmctsClientId") val hmctsClientId: String)
-  extends EmploymentsController(sandboxEmploymentsService) {
+                                             @Named("hmctsClientId") val hmctsClientId: String,cc: ControllerComponents)
+  extends EmploymentsController(sandboxEmploymentsService,cc) {
 
   override val environment: String = SANDBOX
 }
@@ -86,8 +86,8 @@ class SandboxEmploymentsController @Inject()(sandboxEmploymentsService: SandboxE
 @Singleton
 class LiveEmploymentsController @Inject()(liveEmploymentsService: LiveEmploymentsService,
                                           val authConnector: AuthConnector,
-                                          @Named("hmctsClientId") val hmctsClientId: String)
-  extends EmploymentsController(liveEmploymentsService) {
+                                          @Named("hmctsClientId") val hmctsClientId: String , cc: ControllerComponents)
+  extends EmploymentsController(liveEmploymentsService,cc) {
 
   override val environment: String = PRODUCTION
 }
