@@ -46,14 +46,11 @@ import uk.gov.hmrc.individualsemploymentsapi.service.{
   LiveEmploymentsService,
   SandboxEmploymentsService
 }
-import uk.gov.hmrc.play.test.WithFakeApplication
+import unit.uk.gov.hmrc.individualsemploymentsapi.util.{SpecBase, UnitSpec}
 
 import scala.concurrent.Future
 
-class EmploymentsControllerSpec
-    extends PlaySpec
-    with MockitoSugar
-    with WithFakeApplication {
+class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
   val controllerComponent =
     fakeApplication.injector.instanceOf[ControllerComponents]
@@ -93,8 +90,8 @@ class EmploymentsControllerSpec
       val eventualResult =
         liveEmploymentsController.root(randomMatchId)(FakeRequest())
 
-      status(eventualResult) mustBe NOT_FOUND
-      contentAsJson(eventualResult) mustBe Json.obj(
+      status(eventualResult) shouldBe NOT_FOUND
+      contentAsJson(eventualResult) shouldBe Json.obj(
         "code" -> "NOT_FOUND",
         "message" -> "The resource can not be found"
       )
@@ -108,8 +105,8 @@ class EmploymentsControllerSpec
           Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
       val eventualResult =
         liveEmploymentsController.root(randomMatchId)(FakeRequest())
-      status(eventualResult) mustBe OK
-      contentAsJson(eventualResult) mustBe Json.obj(
+      status(eventualResult) shouldBe OK
+      contentAsJson(eventualResult) shouldBe Json.obj(
         "_links" -> Json.obj(
           "paye" -> Json.obj(
             "href" -> s"/individuals/employments/paye?matchId=$randomMatchId{&fromDate,toDate}",
@@ -131,7 +128,7 @@ class EmploymentsControllerSpec
 
       val result = liveEmploymentsController.root(randomMatchId)(FakeRequest())
 
-      status(result) mustBe UNAUTHORIZED
+      status(result) shouldBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
     }
 
@@ -145,7 +142,7 @@ class EmploymentsControllerSpec
       val result =
         sandboxEmploymentsController.root(randomMatchId)(FakeRequest())
 
-      status(result) mustBe OK
+      status(result) shouldBe OK
       verifyZeroInteractions(mockAuthConnector)
     }
   }
@@ -164,8 +161,8 @@ class EmploymentsControllerSpec
 
       val eventualResult =
         liveEmploymentsController.paye(invalidMatchId, interval)(FakeRequest())
-      status(eventualResult) mustBe NOT_FOUND
-      contentAsJson(eventualResult) mustBe Json.obj(
+      status(eventualResult) shouldBe NOT_FOUND
+      contentAsJson(eventualResult) shouldBe Json.obj(
         "code" -> "NOT_FOUND",
         "message" -> "The resource can not be found"
       )
@@ -181,9 +178,9 @@ class EmploymentsControllerSpec
 
       val res = liveEmploymentsController.paye(matchId, interval)(
         FakeRequest().withHeaders("X-Client-Id" -> hmctsClientId))
-      status(res) mustBe OK
+      status(res) shouldBe OK
 
-      contentAsJson(res) mustBe Json.obj(
+      contentAsJson(res) shouldBe Json.obj(
         "_links" -> Json.obj(
           "self" -> Json.obj(
             "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-03-02"
@@ -228,9 +225,9 @@ class EmploymentsControllerSpec
 
       val res = liveEmploymentsController.paye(matchId, interval)(
         FakeRequest().withHeaders("X-Client-Id" -> "not-hmcts"))
-      status(res) mustBe OK
+      status(res) shouldBe OK
 
-      contentAsJson(res) mustBe Json.obj(
+      contentAsJson(res) shouldBe Json.obj(
         "_links" -> Json.obj(
           "self" -> Json.obj(
             "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-03-02"
@@ -267,9 +264,9 @@ class EmploymentsControllerSpec
           Future.successful(Seq(Employment.from(Employments.acme).get)))
 
       val res = liveEmploymentsController.paye(matchId, interval)(FakeRequest())
-      status(res) mustBe OK
+      status(res) shouldBe OK
 
-      contentAsJson(res) mustBe Json.obj(
+      contentAsJson(res) shouldBe Json.obj(
         "_links" -> Json.obj(
           "self" -> Json.obj(
             "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-03-02"
@@ -307,7 +304,7 @@ class EmploymentsControllerSpec
       val result =
         liveEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest())
 
-      status(result) mustBe UNAUTHORIZED
+      status(result) shouldBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
     }
 
@@ -323,7 +320,7 @@ class EmploymentsControllerSpec
         sandboxEmploymentsController.paye(sandboxMatchId, interval)(
           FakeRequest())
 
-      status(eventualResult) mustBe OK
+      status(eventualResult) shouldBe OK
       verifyZeroInteractions(mockAuthConnector)
     }
 
