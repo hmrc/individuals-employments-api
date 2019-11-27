@@ -25,13 +25,22 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatest.mockito.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.DesConnector
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayFrequency, DesPayment}
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
-import uk.gov.hmrc.http.{ HeaderCarrier, Upstream5xxResponse }
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.{
+  DesAddress,
+  DesEmployment,
+  DesPayFrequency,
+  DesPayment
+}
+import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class DesConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApplication with MockitoSugar {
+class DesConnectorSpec
+    extends SpecBase
+    with BeforeAndAfterEach
+    with MockitoSugar {
   val stubPort = sys.env.getOrElse("WIREMOCK", "11122").toInt
   val stubHost = "localhost"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
@@ -45,7 +54,8 @@ class DesConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApp
       "microservice.services.des.port" -> "11122",
       "microservice.services.des.authorization-token" -> desAuthorizationToken,
       "microservice.services.des.environment" -> desEnvironment
-    ).build()
+    )
+    .build()
 
   trait Setup {
     implicit val hc = HeaderCarrier()
@@ -71,16 +81,14 @@ class DesConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApp
     postalCode = Some("AI22 9LL")
   )
   val desPayments = Seq(
-    DesPayment(
-      paymentDate = LocalDate.parse("2016-11-28"),
-      totalPayInPeriod = 100,
-      weekPayNumber = None,
-      monthPayNumber = Some(8)),
-    DesPayment(
-      paymentDate = LocalDate.parse("2016-12-06"),
-      totalPayInPeriod = 50,
-      weekPayNumber = Some(49),
-      monthPayNumber = None)
+    DesPayment(paymentDate = LocalDate.parse("2016-11-28"),
+               totalPayInPeriod = 100,
+               weekPayNumber = None,
+               monthPayNumber = Some(8)),
+    DesPayment(paymentDate = LocalDate.parse("2016-12-06"),
+               totalPayInPeriod = 50,
+               weekPayNumber = Some(49),
+               monthPayNumber = None)
   )
   val desEmployment = DesEmployment(
     employerName = Some("Acme Inc"),
@@ -90,7 +98,8 @@ class DesConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApp
     employmentStartDate = Some(LocalDate.parse("2016-01-01")),
     employmentLeavingDate = Some(LocalDate.parse("2016-06-30")),
     employmentPayFrequency = Some(DesPayFrequency.M1),
-    payments = desPayments)
+    payments = desPayments
+  )
 
   "fetchEmployments" should {
     val nino = Nino("NA000799C")
@@ -99,13 +108,18 @@ class DesConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApp
     val interval = toInterval(fromDate, toDate)
 
     "return the employments" in new Setup {
-      stubFor(get(urlPathMatching(s"/individuals/nino/$nino/employments/income"))
-        .withQueryParam("from", equalTo(fromDate))
-        .withQueryParam("to", equalTo(toDate))
-        .withHeader("Authorization", equalTo(s"Bearer $desAuthorizationToken"))
-        .withHeader("Environment", equalTo(desEnvironment))
-        .willReturn(aResponse().withStatus(200).withBody(
-          """
+      stubFor(
+        get(urlPathMatching(s"/individuals/nino/$nino/employments/income"))
+          .withQueryParam("from", equalTo(fromDate))
+          .withQueryParam("to", equalTo(toDate))
+          .withHeader("Authorization",
+                      equalTo(s"Bearer $desAuthorizationToken"))
+          .withHeader("Environment", equalTo(desEnvironment))
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withBody(
+                """
              {
                "employments": [
                  {
@@ -139,7 +153,7 @@ class DesConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApp
                ]
              }
           """
-        )))
+              )))
 
       val result = await(underTest.fetchEmployments(nino, interval))
 
@@ -147,10 +161,11 @@ class DesConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApp
     }
 
     "return an empty list when there is no employments" in new Setup {
-      stubFor(get(urlPathMatching(s"/individuals/nino/$nino/employments/income"))
-        .withQueryParam("from", equalTo("2016-01-01"))
-        .withQueryParam("to", equalTo("2017-03-01"))
-        .willReturn(aResponse().withStatus(404)))
+      stubFor(
+        get(urlPathMatching(s"/individuals/nino/$nino/employments/income"))
+          .withQueryParam("from", equalTo("2016-01-01"))
+          .withQueryParam("to", equalTo("2017-03-01"))
+          .willReturn(aResponse().withStatus(404)))
 
       val result = await(underTest.fetchEmployments(nino, interval))
 
@@ -158,8 +173,9 @@ class DesConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApp
     }
 
     "fail when DES returns an error" in new Setup {
-      stubFor(get(urlPathMatching(s"/individuals/nino/$nino/employments/income"))
-        .willReturn(aResponse().withStatus(500)))
+      stubFor(
+        get(urlPathMatching(s"/individuals/nino/$nino/employments/income"))
+          .willReturn(aResponse().withStatus(500)))
 
       intercept[Upstream5xxResponse] {
         await(underTest.fetchEmployments(nino, interval))
@@ -171,7 +187,8 @@ class DesConnectorSpec extends UnitSpec with BeforeAndAfterEach with WithFakeApp
   private def toInterval(fromDate: String, toDate: String): Interval =
     toInterval(parse(fromDate), parse(toDate))
 
-  private def toInterval(fromDate: LocalDateTime, toDate: LocalDateTime): Interval =
+  private def toInterval(fromDate: LocalDateTime,
+                         toDate: LocalDateTime): Interval =
     new Interval(fromDate.toDate.getTime, toDate.toDate.getTime)
 
 }

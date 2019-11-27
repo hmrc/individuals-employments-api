@@ -29,12 +29,11 @@ import uk.gov.hmrc.individualsemploymentsapi.connector.IndividualsMatchingApiCon
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 class IndividualsMatchingApiConnectorSpec
-    extends UnitSpec
-    with BeforeAndAfterEach
-    with WithFakeApplication {
+    extends SpecBase
+    with BeforeAndAfterEach {
 
   val stubPort = sys.env.getOrElse("WIREMOCK", "11121").toInt
   val stubHost = "localhost"

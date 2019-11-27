@@ -1,7 +1,10 @@
 import play.core.PlayVersion
 import sbt.Tests.{Group, SubProcess}
 import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
+import uk.gov.hmrc.ExternalService
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
+import uk.gov.hmrc.ServiceManagerPlugin.Keys.itDependenciesList
+
 
 val appName = "individuals-employments-api"
 val hmrc = "uk.gov.hmrc"
@@ -14,7 +17,7 @@ lazy val playSettings: Seq[Setting[_]] = Seq(routesImport ++= Seq(
 
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins: Seq[Plugins] = Seq.empty
-
+lazy val externalServices = List(ExternalService("AUTH"), ExternalService("INDIVIDUALS_MATCHING_API"), ExternalService("DES"))
 def intTestFilter(name: String): Boolean = name startsWith "it"
 def unitFilter(name: String): Boolean = name startsWith "unit"
 def componentFilter(name: String): Boolean = name startsWith "component"
@@ -33,7 +36,7 @@ val compile = Seq(
 )
 
 def test(scope: String = "test,it") = Seq(
-  hmrc %% "hmrctest" % "3.9.0-play-26" % scope,
+  hmrc %% "service-integration-test" % "0.9.0-play-26" % scope,
   hmrc %% "reactivemongo-test" % "4.15.0-play-26" % scope,
   "org.scalatest" %% "scalatest" % "3.0.0" % scope,
   "org.pegdown" % "pegdown" % "1.6.0" % scope,
@@ -59,6 +62,7 @@ lazy val microservice = Project(appName, file("."))
   .settings(unmanagedResourceDirectories in Compile += baseDirectory.value / "resources")
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+  .settings(itDependenciesList := externalServices)
   .settings(
     Keys.fork in IntegrationTest := false,
     unmanagedSourceDirectories in IntegrationTest <<= (baseDirectory in IntegrationTest) (base => Seq(base / "test")),
