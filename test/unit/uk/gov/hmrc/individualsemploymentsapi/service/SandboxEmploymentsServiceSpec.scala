@@ -18,10 +18,7 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.service
 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.domain.Employment
-import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{
-  Employments,
-  sandboxMatchId
-}
+import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
 import uk.gov.hmrc.individualsemploymentsapi.service.SandboxEmploymentsService
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.{Intervals, SpecBase}
 
@@ -33,38 +30,27 @@ class SandboxEmploymentsServiceSpec extends SpecBase with Intervals {
   "Sandbox employments service paye function" should {
 
     "return employments for the entire available history ordered by date descending" in {
-      val res = await(
-        sandboxEmploymentsService.paye(sandboxMatchId,
-                                       toInterval("2016-01-01", "2017-03-01")))
-      val expected = Seq(Employment.from(Employments.disney).get,
-                         Employment.from(Employments.acme).get)
+      val res = await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2016-01-01", "2017-03-01")))
+      val expected = Seq(Employment.from(Employments.disney).get, Employment.from(Employments.acme).get)
 
       res shouldBe expected
     }
 
     "return employments for a limited period" in {
-      val res = await(
-        sandboxEmploymentsService.paye(sandboxMatchId,
-                                       toInterval("2016-01-01", "2016-07-01")))
+      val res = await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2016-01-01", "2016-07-01")))
 
       res shouldBe Employment.from(Employments.acme).toSeq
     }
 
     "return correct employments when range includes a period of no payments" in {
-      val res = await(
-        sandboxEmploymentsService.paye(sandboxMatchId,
-                                       toInterval("2016-04-30", "2017-02-15")))
-      val expected = Seq(Employment.from(Employments.disney).get,
-                         Employment.from(Employments.acme).get)
+      val res = await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2016-04-30", "2017-02-15")))
+      val expected = Seq(Employment.from(Employments.disney).get, Employment.from(Employments.acme).get)
 
       res shouldBe expected
     }
 
     "return no employments when the individual has no employment for a given period" in {
-      await(
-        sandboxEmploymentsService.paye(
-          sandboxMatchId,
-          toInterval("2016-08-01", "2016-09-01"))) shouldBe Nil
+      await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2016-08-01", "2016-09-01"))) shouldBe Nil
     }
 
   }

@@ -31,9 +31,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.bootstrap.http.HttpClient
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
-class IndividualsMatchingApiConnectorSpec
-    extends SpecBase
-    with BeforeAndAfterEach {
+class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEach {
 
   val stubPort = sys.env.getOrElse("WIREMOCK", "11121").toInt
   val stubHost = "localhost"
@@ -70,16 +68,15 @@ class IndividualsMatchingApiConnectorSpec
     }
 
     "return a nino match when upstream service call succeeds" in new Fixture {
-      stubWithResponseStatus(OK,
-                             s"""
+      stubWithResponseStatus(
+        OK,
+        s"""
           {
             "matchId":"${matchId.toString}",
             "nino":"AB123456C"
           }
         """)
-      await(individualsMatchingApiConnector.resolve(matchId)) shouldBe NinoMatch(
-        matchId,
-        Nino("AB123456C"))
+      await(individualsMatchingApiConnector.resolve(matchId)) shouldBe NinoMatch(matchId, Nino("AB123456C"))
     }
 
   }

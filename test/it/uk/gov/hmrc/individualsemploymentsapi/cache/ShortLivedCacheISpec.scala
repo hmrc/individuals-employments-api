@@ -26,10 +26,7 @@ import uk.gov.hmrc.individualsemploymentsapi.cache.ShortLivedCache
 import uk.gov.hmrc.mongo.MongoSpecSupport
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
-class ShortLivedCacheISpec
-    extends SpecBase
-    with MongoSpecSupport
-    with BeforeAndAfterEach {
+class ShortLivedCacheISpec extends SpecBase with MongoSpecSupport with BeforeAndAfterEach {
 
   val cacheTtl = 60
   val id = UUID.randomUUID().toString
@@ -56,35 +53,28 @@ class ShortLivedCacheISpec
   "cache" should {
     "store the encrypted version of a value" in {
       await(shortLivedCache.cache(id, cachekey, testValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString(
-        "6aZpkTxkw3C4e5xTyfy3Lf/OZOFz+GcaSkeFI++0HOs=")
+      retrieveRawCachedValue(id, cachekey) shouldBe JsString("6aZpkTxkw3C4e5xTyfy3Lf/OZOFz+GcaSkeFI++0HOs=")
     }
 
     "update a cached value for a given id and key" in {
       val newValue = TestClass("three", "four")
 
       await(shortLivedCache.cache(id, cachekey, testValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString(
-        "6aZpkTxkw3C4e5xTyfy3Lf/OZOFz+GcaSkeFI++0HOs=")
+      retrieveRawCachedValue(id, cachekey) shouldBe JsString("6aZpkTxkw3C4e5xTyfy3Lf/OZOFz+GcaSkeFI++0HOs=")
 
       await(shortLivedCache.cache(id, cachekey, newValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString(
-        "8jVeGr+Ivyk5mkBj2VsQE3G+oPGXoYejrSp5hfVAPYU=")
+      retrieveRawCachedValue(id, cachekey) shouldBe JsString("8jVeGr+Ivyk5mkBj2VsQE3G+oPGXoYejrSp5hfVAPYU=")
     }
   }
 
   "fetch" should {
     "retrieve the unencrypted cached value for a given id and key" in {
       await(shortLivedCache.cache(id, cachekey, testValue)(TestClass.format))
-      await(
-        shortLivedCache.fetchAndGetEntry[TestClass](id, cachekey)(
-          TestClass.format)) shouldBe Some(testValue)
+      await(shortLivedCache.fetchAndGetEntry[TestClass](id, cachekey)(TestClass.format)) shouldBe Some(testValue)
     }
 
     "return None if no cached value exists for a given id and key" in {
-      await(
-        shortLivedCache.fetchAndGetEntry[TestClass](id, cachekey)(
-          TestClass.format)) shouldBe None
+      await(shortLivedCache.fetchAndGetEntry[TestClass](id, cachekey)(TestClass.format)) shouldBe None
     }
   }
 

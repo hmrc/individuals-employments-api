@@ -27,9 +27,8 @@ object Dates {
 
   def toFormattedLocalDate(date: DateTime) = date.toLocalDate.toString(localDatePattern)
 
-  def toInterval(fromDate: LocalDate, toDate: LocalDate): Interval = {
+  def toInterval(fromDate: LocalDate, toDate: LocalDate): Interval =
     if (fromDate.isBefore(desDataInceptionDate)) throw new ValidationException("fromDate earlier than 31st March 2013")
     else new Interval(fromDate.toDate.getTime, toDate.toDateTimeAtStartOfDay.plusMillis(1).toDate.getTime)
-  }
 
 }

@@ -23,20 +23,19 @@ import uk.gov.hmrc.individualsemploymentsapi.cache.{CacheConfiguration, ShortLiv
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheConfiguration)
-                            (implicit ec: ExecutionContext) {
+class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheConfiguration)(implicit ec: ExecutionContext) {
 
-  def get[T: Format](cacheId: String, functionToCache: => Future[T])(implicit hc: HeaderCarrier): Future[T] = {
+  def get[T: Format](cacheId: String, functionToCache: => Future[T])(implicit hc: HeaderCarrier): Future[T] =
     if (conf.cacheEnabled) {
       cachingClient.fetchAndGetEntry[T](cacheId, "paye-income") flatMap {
         case Some(value) => Future.successful(value)
-        case None => functionToCache map { res =>
-          cachingClient.cache(cacheId, "paye-income", res)
-          res
-        }
+        case None =>
+          functionToCache map { res =>
+            cachingClient.cache(cacheId, "paye-income", res)
+            res
+          }
       }
     } else {
       functionToCache
     }
-  }
 }

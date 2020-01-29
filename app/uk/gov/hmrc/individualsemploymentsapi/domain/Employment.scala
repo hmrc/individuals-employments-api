@@ -20,12 +20,13 @@ import org.joda.time.LocalDate
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequency.PayFrequency
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
 
-case class Employment(startDate: Option[LocalDate],
-                      endDate: Option[LocalDate],
-                      employer: Option[Employer],
-                      payFrequency: Option[PayFrequency],
-                      employeeAddress: Option[Address],
-                      payrollId: Option[String])
+case class Employment(
+  startDate: Option[LocalDate],
+  endDate: Option[LocalDate],
+  employer: Option[Employer],
+  payFrequency: Option[PayFrequency],
+  employeeAddress: Option[Address],
+  payrollId: Option[String])
 
 object Employment {
 
@@ -44,7 +45,7 @@ object Employment {
 
     (startDate, endDate, employer, payFrequency) match {
       case (None, None, None, None) => None
-      case _ => Some(Employment(startDate, endDate, employer, payFrequency, address, payrollId))
+      case _                        => Some(Employment(startDate, endDate, employer, payFrequency, address, payrollId))
     }
   }
 

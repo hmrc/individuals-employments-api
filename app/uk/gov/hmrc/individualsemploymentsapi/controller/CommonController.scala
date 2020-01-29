@@ -31,7 +31,8 @@ import scala.concurrent.Future
 
 abstract class CommonController @Inject()(cc: ControllerComponents) extends BackendController(cc) {
 
-  private def getQueryParam[T](name: String)(implicit request: Request[T]) = request.queryString.get(name).flatMap(_.headOption)
+  private def getQueryParam[T](name: String)(implicit request: Request[T]) =
+    request.queryString.get(name).flatMap(_.headOption)
 
   private[controller] def urlWithInterval[T](url: String, fromDate: DateTime)(implicit request: Request[T]) = {
     val urlWithFromDate = s"$url&fromDate=${toFormattedLocalDate(fromDate)}"
@@ -51,10 +52,10 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
 
   val environment: String
 
-  def requiresPrivilegedAuthentication(scope: String)(body: => Future[Result])(implicit hc: HeaderCarrier): Future[Result] = {
+  def requiresPrivilegedAuthentication(scope: String)(body: => Future[Result])(
+    implicit hc: HeaderCarrier): Future[Result] =
     if (environment == SANDBOX) body
     else authorised(Enrolment(scope))(body)
-  }
 }
 
 object Environment {

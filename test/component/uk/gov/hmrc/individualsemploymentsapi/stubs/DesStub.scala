@@ -25,21 +25,24 @@ import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 object DesStub extends MockHost(22003) {
 
-  def searchEmploymentIncomeForPeriodReturns(nino: String, fromDate: String, toDate: String, desEmployments: DesEmployments) = {
-    mock.register(get(urlPathEqualTo(s"/individuals/nino/$nino/employments/income"))
-      .withQueryParam("from", equalTo(fromDate))
-      .withQueryParam("to", equalTo(toDate))
-      .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(desEmployments).toString())))
-  }
+  def searchEmploymentIncomeForPeriodReturns(
+    nino: String,
+    fromDate: String,
+    toDate: String,
+    desEmployments: DesEmployments) =
+    mock.register(
+      get(urlPathEqualTo(s"/individuals/nino/$nino/employments/income"))
+        .withQueryParam("from", equalTo(fromDate))
+        .withQueryParam("to", equalTo(toDate))
+        .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(desEmployments).toString())))
 
-  def enforceRateLimit(nino: String, fromDate: String, toDate: String): Unit = {
-    mock.register(get(urlPathEqualTo(s"/individuals/nino/$nino/employments/income"))
-      .withQueryParam("from", equalTo(fromDate))
-      .withQueryParam("to", equalTo(toDate))
-      // DES/BigIP returns a 503 when rate limited, rather than 429
-      .willReturn(aResponse().withStatus(SERVICE_UNAVAILABLE).withBody(desRateLimitError.toString))
-    )
-  }
+  def enforceRateLimit(nino: String, fromDate: String, toDate: String): Unit =
+    mock.register(
+      get(urlPathEqualTo(s"/individuals/nino/$nino/employments/income"))
+        .withQueryParam("from", equalTo(fromDate))
+        .withQueryParam("to", equalTo(toDate))
+        // DES/BigIP returns a 503 when rate limited, rather than 429
+        .willReturn(aResponse().withStatus(SERVICE_UNAVAILABLE).withBody(desRateLimitError.toString)))
 
   private lazy val desRateLimitError = Json.obj("response" -> Json.obj("incidentReference" -> "LTM000503"))
 

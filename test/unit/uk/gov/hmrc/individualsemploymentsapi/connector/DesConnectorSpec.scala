@@ -27,20 +27,12 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.DesConnector
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{
-  DesAddress,
-  DesEmployment,
-  DesPayFrequency,
-  DesPayment
-}
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayFrequency, DesPayment}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class DesConnectorSpec
-    extends SpecBase
-    with BeforeAndAfterEach
-    with MockitoSugar {
+class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSugar {
   val stubPort = sys.env.getOrElse("WIREMOCK", "11122").toInt
   val stubHost = "localhost"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
@@ -50,10 +42,10 @@ class DesConnectorSpec
   override lazy val fakeApplication = new GuiceApplicationBuilder()
     .bindings(bindModules: _*)
     .configure(
-      "microservice.services.des.host" -> "localhost",
-      "microservice.services.des.port" -> "11122",
+      "microservice.services.des.host"                -> "localhost",
+      "microservice.services.des.port"                -> "11122",
       "microservice.services.des.authorization-token" -> desAuthorizationToken,
-      "microservice.services.des.environment" -> desEnvironment
+      "microservice.services.des.environment"         -> desEnvironment
     )
     .build()
 
@@ -81,14 +73,16 @@ class DesConnectorSpec
     postalCode = Some("AI22 9LL")
   )
   val desPayments = Seq(
-    DesPayment(paymentDate = LocalDate.parse("2016-11-28"),
-               totalPayInPeriod = 100,
-               weekPayNumber = None,
-               monthPayNumber = Some(8)),
-    DesPayment(paymentDate = LocalDate.parse("2016-12-06"),
-               totalPayInPeriod = 50,
-               weekPayNumber = Some(49),
-               monthPayNumber = None)
+    DesPayment(
+      paymentDate = LocalDate.parse("2016-11-28"),
+      totalPayInPeriod = 100,
+      weekPayNumber = None,
+      monthPayNumber = Some(8)),
+    DesPayment(
+      paymentDate = LocalDate.parse("2016-12-06"),
+      totalPayInPeriod = 50,
+      weekPayNumber = Some(49),
+      monthPayNumber = None)
   )
   val desEmployment = DesEmployment(
     employerName = Some("Acme Inc"),
@@ -112,8 +106,7 @@ class DesConnectorSpec
         get(urlPathMatching(s"/individuals/nino/$nino/employments/income"))
           .withQueryParam("from", equalTo(fromDate))
           .withQueryParam("to", equalTo(toDate))
-          .withHeader("Authorization",
-                      equalTo(s"Bearer $desAuthorizationToken"))
+          .withHeader("Authorization", equalTo(s"Bearer $desAuthorizationToken"))
           .withHeader("Environment", equalTo(desEnvironment))
           .willReturn(
             aResponse()
@@ -187,8 +180,7 @@ class DesConnectorSpec
   private def toInterval(fromDate: String, toDate: String): Interval =
     toInterval(parse(fromDate), parse(toDate))
 
-  private def toInterval(fromDate: LocalDateTime,
-                         toDate: LocalDateTime): Interval =
+  private def toInterval(fromDate: LocalDateTime, toDate: LocalDateTime): Interval =
     new Interval(fromDate.toDate.getTime, toDate.toDate.getTime)
 
 }

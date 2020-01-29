@@ -33,7 +33,8 @@ class IntervalValidationSpec extends BaseSpec {
 
       When("I request individual income with a missing fromDate")
       val response = Http(s"$serviceUrl/sandbox/paye?matchId=$matchId&toDate=2017-03-01")
-        .headers(requestHeaders(acceptHeaderVP1)).asString
+        .headers(requestHeaders(acceptHeaderVP1))
+        .asString
 
       Then("The response status should be 400 (Bad Request)")
       response.code shouldBe BAD_REQUEST
@@ -46,7 +47,8 @@ class IntervalValidationSpec extends BaseSpec {
 
       When("I request individual income with an incorrectly formatted fromDate")
       val response = Http(s"$serviceUrl/sandbox/paye?matchId=$matchId&fromDate=20160101&toDate=2017-03-01")
-        .headers(requestHeaders(acceptHeaderVP1)).asString
+        .headers(requestHeaders(acceptHeaderVP1))
+        .asString
 
       Then("The response status should be 400 (Bad Request)")
       response.code shouldBe BAD_REQUEST
@@ -59,7 +61,8 @@ class IntervalValidationSpec extends BaseSpec {
 
       When("I request individual income with an incorrectly formatted toDate")
       val response = Http(s"$serviceUrl/sandbox/paye?matchId=$matchId&fromDate=2016-01-01&toDate=20170301")
-        .headers(requestHeaders(acceptHeaderVP1)).asString
+        .headers(requestHeaders(acceptHeaderVP1))
+        .asString
 
       Then("The response status should be 400 (Bad Request)")
       response.code shouldBe BAD_REQUEST
@@ -72,7 +75,8 @@ class IntervalValidationSpec extends BaseSpec {
 
       When("I request individual income with ToDate value before fromDate")
       val response = Http(s"$serviceUrl/sandbox/paye?matchId=$matchId&fromDate=2017-01-01&toDate=2016-03-01")
-        .headers(requestHeaders(acceptHeaderVP1)).asString
+        .headers(requestHeaders(acceptHeaderVP1))
+        .asString
 
       Then("The response status should be 400 (Bad Request)")
       response.code shouldBe BAD_REQUEST

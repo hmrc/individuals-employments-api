@@ -46,48 +46,52 @@ class SandboxEmploymentsService extends EmploymentsService {
   import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.Individuals.find
   import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData._
 
-  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] = {
-    if (matchId.equals(sandboxMatchId)) successful(NinoMatch(sandboxMatchId, sandboxNino)) else failed(new MatchNotFoundException)
-  }
+  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
+    if (matchId.equals(sandboxMatchId)) successful(NinoMatch(sandboxMatchId, sandboxNino))
+    else failed(new MatchNotFoundException)
 
-  override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] = paye(find(matchId), interval)
+  override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =
+    paye(find(matchId), interval)
 
-  private def paye(maybeIndividual: Option[Individual], interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] = {
+  private def paye(maybeIndividual: Option[Individual], interval: Interval)(
+    implicit hc: HeaderCarrier): Future[Seq[Employment]] =
     maybeIndividual match {
       case Some(i) =>
         val employments = i.employments.flatMap(Employment.from)
         val employmentsWithinInterval = employments.filter { e =>
           e.startDate.forall(d => d.toDateTimeAtStartOfDay.isBefore(interval.getEnd)) &&
-            e.endDate.forall(d => d.toDateTimeAtStartOfDay.isAfter(interval.getStart))
+          e.endDate.forall(d => d.toDateTimeAtStartOfDay.isAfter(interval.getStart))
         }
 
         Future.successful(employmentsWithinInterval.sortBy(_.endDate.getOrElse(interval.getEnd.toLocalDate)).reverse)
       case None => Future.failed(new MatchNotFoundException)
     }
-  }
 }
 
 @Singleton
-class LiveEmploymentsService @Inject()(individualsMatchingApiConnector: IndividualsMatchingApiConnector,
-                                       desConnector: DesConnector,
-                                       @Named("retryDelay") retryDelay: Int,
-                                       cacheService: CacheService) extends EmploymentsService {
+class LiveEmploymentsService @Inject()(
+  individualsMatchingApiConnector: IndividualsMatchingApiConnector,
+  desConnector: DesConnector,
+  @Named("retryDelay") retryDelay: Int,
+  cacheService: CacheService)
+    extends EmploymentsService {
 
   private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { e: DesEmployment =>
     e.employmentLeavingDate.getOrElse(interval.getEnd.toLocalDate)
   }
 
-  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] = individualsMatchingApiConnector.resolve(matchId)
+  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
+    individualsMatchingApiConnector.resolve(matchId)
 
   override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =
     resolve(matchId).flatMap { ninoMatch =>
-      cacheService.get(s"$matchId-${interval.getStart}-${interval.getEnd}",
-        withRetry {
+      cacheService
+        .get(s"$matchId-${interval.getStart}-${interval.getEnd}", withRetry {
           desConnector.fetchEmployments(ninoMatch.nino, interval)
+        })
+        .map { employments =>
+          employments.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse flatMap Employment.from
         }
-      ).map { employments =>
-        employments.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse flatMap Employment.from
-      }
     }
 
   private def withRetry[T](body: => Future[T]): Future[T] = body recoverWith {

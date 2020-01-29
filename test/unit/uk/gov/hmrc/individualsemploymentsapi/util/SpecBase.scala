@@ -25,19 +25,17 @@ trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
 
   lazy val additionalConfig = Configuration()
 
-  def buildFakeApplication(extraConfig: Configuration): Application = {
+  def buildFakeApplication(extraConfig: Configuration): Application =
     new GuiceApplicationBuilder()
       .configure(
         Configuration(
           ConfigFactory.parseString("""
-            | metrics.jvm = false
-            | metrics.enabled = true
+                                      | metrics.jvm = false
+                                      | metrics.enabled = true
           """.stripMargin)
         ) ++ extraConfig)
       .build()
-  }
 
-  override lazy val fakeApplication: Application = buildFakeApplication(
-    additionalConfig)
+  override lazy val fakeApplication: Application = buildFakeApplication(additionalConfig)
 
 }
