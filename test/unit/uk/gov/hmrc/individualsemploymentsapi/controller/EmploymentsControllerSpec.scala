@@ -32,20 +32,11 @@ import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.controller.{
-  LiveEmploymentsController,
-  SandboxEmploymentsController
-}
+import uk.gov.hmrc.individualsemploymentsapi.controller.{LiveEmploymentsController, SandboxEmploymentsController}
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
-import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{
-  Employments,
-  sandboxMatchId
-}
-import uk.gov.hmrc.individualsemploymentsapi.service.{
-  LiveEmploymentsService,
-  SandboxEmploymentsService
-}
+import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
+import uk.gov.hmrc.individualsemploymentsapi.service.{LiveEmploymentsService, SandboxEmploymentsService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.{SpecBase, UnitSpec}
 
 import scala.concurrent.Future
@@ -66,11 +57,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       mockAuthConnector,
       hmctsClientId,
       controllerComponent)
-    val liveEmploymentsController = new LiveEmploymentsController(
-      mockLiveEmploymentsService,
-      mockAuthConnector,
-      hmctsClientId,
-      controllerComponent)
+    val liveEmploymentsController =
+      new LiveEmploymentsController(mockLiveEmploymentsService, mockAuthConnector, hmctsClientId, controllerComponent)
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -82,9 +70,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     val randomMatchId = UUID.randomUUID()
 
     "return a 404 (not found) when a match id does not match live data" in new Setup {
-      when(
-        mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(
-          any[HeaderCarrier]))
+      when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
@@ -92,24 +78,21 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
       status(eventualResult) shouldBe NOT_FOUND
       contentAsJson(eventualResult) shouldBe Json.obj(
-        "code" -> "NOT_FOUND",
+        "code"    -> "NOT_FOUND",
         "message" -> "The resource can not be found"
       )
     }
 
     "return a 200 (ok) when a match id matches live data" in new Setup {
-      when(
-        mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(
-          any[HeaderCarrier]))
-        .thenReturn(
-          Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
+      when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
       val eventualResult =
         liveEmploymentsController.root(randomMatchId)(FakeRequest())
       status(eventualResult) shouldBe OK
       contentAsJson(eventualResult) shouldBe Json.obj(
         "_links" -> Json.obj(
           "paye" -> Json.obj(
-            "href" -> s"/individuals/employments/paye?matchId=$randomMatchId{&fromDate,toDate}",
+            "href"  -> s"/individuals/employments/paye?matchId=$randomMatchId{&fromDate,toDate}",
             "title" -> "View individual's employments"
           ),
           "self" -> Json.obj(
@@ -121,9 +104,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments" in new Setup {
       when(
-        mockAuthConnector.authorise(
-          eqTo(Enrolment("read:individuals-employments")),
-          eqTo(EmptyRetrieval))(any(), any()))
+        mockAuthConnector
+          .authorise(eqTo(Enrolment("read:individuals-employments")), eqTo(EmptyRetrieval))(any(), any()))
         .thenReturn(Future.failed(InsufficientEnrolments()))
 
       val result = liveEmploymentsController.root(randomMatchId)(FakeRequest())
@@ -133,11 +115,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "not require bearer token authentication for sandbox" in new Setup {
-      when(
-        mockSandboxEmploymentsService.resolve(eqTo(randomMatchId))(
-          any[HeaderCarrier]))
-        .thenReturn(
-          Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
+      when(mockSandboxEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
+        .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
 
       val result =
         sandboxEmploymentsController.root(randomMatchId)(FakeRequest())
@@ -155,15 +134,14 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     "return 404 (not found) for an invalid matchId" in new Setup {
       val invalidMatchId = UUID.randomUUID()
-      when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId),
-                                           eqTo(interval))(any()))
+      when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval))(any()))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
         liveEmploymentsController.paye(invalidMatchId, interval)(FakeRequest())
       status(eventualResult) shouldBe NOT_FOUND
       contentAsJson(eventualResult) shouldBe Json.obj(
-        "code" -> "NOT_FOUND",
+        "code"    -> "NOT_FOUND",
         "message" -> "The resource can not be found"
       )
     }
@@ -171,13 +149,11 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     "return 200 OK with payroll ID and employee address when the X-Client-Id header is set to the HMCTS client ID" in new Setup {
       val matchId = UUID.randomUUID()
 
-      when(
-        mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(any()))
-        .thenReturn(
-          Future.successful(Seq(Employment.from(Employments.acme).get)))
+      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(any()))
+        .thenReturn(Future.successful(Seq(Employment.from(Employments.acme).get)))
 
-      val res = liveEmploymentsController.paye(matchId, interval)(
-        FakeRequest().withHeaders("X-Client-Id" -> hmctsClientId))
+      val res =
+        liveEmploymentsController.paye(matchId, interval)(FakeRequest().withHeaders("X-Client-Id" -> hmctsClientId))
       status(res) shouldBe OK
 
       contentAsJson(res) shouldBe Json.obj(
@@ -189,24 +165,24 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         "employments" -> Json.arr(
           Json.obj(
             "startDate" -> "2016-01-01",
-            "endDate" -> "2016-06-30",
+            "endDate"   -> "2016-06-30",
             "employer" -> Json.obj(
               "payeReference" -> "123/AI45678",
-              "name" -> "Acme",
+              "name"          -> "Acme",
               "address" -> Json.obj(
-                "line1" -> "Acme Inc Building",
-                "line2" -> "Acme Inc Campus",
-                "line3" -> "Acme Street",
-                "line4" -> "AcmeVille",
-                "line5" -> "Acme State",
+                "line1"    -> "Acme Inc Building",
+                "line2"    -> "Acme Inc Campus",
+                "line3"    -> "Acme Street",
+                "line4"    -> "AcmeVille",
+                "line5"    -> "Acme State",
                 "postcode" -> "AI22 9LL"
               )
             ),
             "payFrequency" -> "FOUR_WEEKLY",
             "employeeAddress" -> Json.obj(
-              "line1" -> "Employee's House",
-              "line2" -> "Employee Street",
-              "line3" -> "Employee Town",
+              "line1"    -> "Employee's House",
+              "line2"    -> "Employee Street",
+              "line3"    -> "Employee Town",
               "postcode" -> "AA11 1AA"
             ),
             "payrollId" -> "payroll-id"
@@ -218,13 +194,11 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     "return 200 OK without payroll ID and employee address when the X-Client-Id header is not set to the HMCTS client ID" in new Setup {
       val matchId = UUID.randomUUID()
 
-      when(
-        mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(any()))
-        .thenReturn(
-          Future.successful(Seq(Employment.from(Employments.acme).get)))
+      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(any()))
+        .thenReturn(Future.successful(Seq(Employment.from(Employments.acme).get)))
 
-      val res = liveEmploymentsController.paye(matchId, interval)(
-        FakeRequest().withHeaders("X-Client-Id" -> "not-hmcts"))
+      val res =
+        liveEmploymentsController.paye(matchId, interval)(FakeRequest().withHeaders("X-Client-Id" -> "not-hmcts"))
       status(res) shouldBe OK
 
       contentAsJson(res) shouldBe Json.obj(
@@ -236,16 +210,16 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         "employments" -> Json.arr(
           Json.obj(
             "startDate" -> "2016-01-01",
-            "endDate" -> "2016-06-30",
+            "endDate"   -> "2016-06-30",
             "employer" -> Json.obj(
               "payeReference" -> "123/AI45678",
-              "name" -> "Acme",
+              "name"          -> "Acme",
               "address" -> Json.obj(
-                "line1" -> "Acme Inc Building",
-                "line2" -> "Acme Inc Campus",
-                "line3" -> "Acme Street",
-                "line4" -> "AcmeVille",
-                "line5" -> "Acme State",
+                "line1"    -> "Acme Inc Building",
+                "line2"    -> "Acme Inc Campus",
+                "line3"    -> "Acme Street",
+                "line4"    -> "AcmeVille",
+                "line5"    -> "Acme State",
                 "postcode" -> "AI22 9LL"
               )
             ),
@@ -258,10 +232,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     "return 200 OK without payroll ID and employee address when the X-Client-Id header is not set" in new Setup {
       val matchId = UUID.randomUUID()
 
-      when(
-        mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(any()))
-        .thenReturn(
-          Future.successful(Seq(Employment.from(Employments.acme).get)))
+      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(any()))
+        .thenReturn(Future.successful(Seq(Employment.from(Employments.acme).get)))
 
       val res = liveEmploymentsController.paye(matchId, interval)(FakeRequest())
       status(res) shouldBe OK
@@ -275,16 +247,16 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         "employments" -> Json.arr(
           Json.obj(
             "startDate" -> "2016-01-01",
-            "endDate" -> "2016-06-30",
+            "endDate"   -> "2016-06-30",
             "employer" -> Json.obj(
               "payeReference" -> "123/AI45678",
-              "name" -> "Acme",
+              "name"          -> "Acme",
               "address" -> Json.obj(
-                "line1" -> "Acme Inc Building",
-                "line2" -> "Acme Inc Campus",
-                "line3" -> "Acme Street",
-                "line4" -> "AcmeVille",
-                "line5" -> "Acme State",
+                "line1"    -> "Acme Inc Building",
+                "line2"    -> "Acme Inc Campus",
+                "line3"    -> "Acme Street",
+                "line4"    -> "AcmeVille",
+                "line5"    -> "Acme State",
                 "postcode" -> "AI22 9LL"
               )
             ),
@@ -296,9 +268,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
       when(
-        mockAuthConnector.authorise(
-          eqTo(Enrolment("read:individuals-employments-paye")),
-          eqTo(EmptyRetrieval))(any(), any()))
+        mockAuthConnector
+          .authorise(eqTo(Enrolment("read:individuals-employments-paye")), eqTo(EmptyRetrieval))(any(), any()))
         .thenReturn(Future.failed(InsufficientEnrolments()))
 
       val result =
@@ -309,16 +280,12 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "not require bearer token authentication" in new Setup {
-      when(
-        mockSandboxEmploymentsService.paye(eqTo(sandboxMatchId),
-                                           eqTo(interval))(any()))
+      when(mockSandboxEmploymentsService.paye(eqTo(sandboxMatchId), eqTo(interval))(any()))
         .thenReturn(
-          Future.successful(Seq(Employment.from(Employments.acme),
-                                Employment.from(Employments.disney)).flatten))
+          Future.successful(Seq(Employment.from(Employments.acme), Employment.from(Employments.disney)).flatten))
 
       val eventualResult =
-        sandboxEmploymentsController.paye(sandboxMatchId, interval)(
-          FakeRequest())
+        sandboxEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest())
 
       status(eventualResult) shouldBe OK
       verifyZeroInteractions(mockAuthConnector)

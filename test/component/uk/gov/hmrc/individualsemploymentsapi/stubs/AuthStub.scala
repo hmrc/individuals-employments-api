@@ -26,24 +26,23 @@ import uk.gov.hmrc.auth.core.Enrolment
 
 object AuthStub extends MockHost(22000) {
 
-  def willAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping = {
-    mock.register(post("/auth/authorise")
-      .withRequestBody(equalToJson(privilegedAuthority(scope).toString()))
-      .withHeader(AUTHORIZATION, equalTo(authBearerToken))
-      .willReturn(okJson(Json.obj("internalId" -> "some-id").toString)))
-  }
+  def willAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping =
+    mock.register(
+      post("/auth/authorise")
+        .withRequestBody(equalToJson(privilegedAuthority(scope).toString()))
+        .withHeader(AUTHORIZATION, equalTo(authBearerToken))
+        .willReturn(okJson(Json.obj("internalId" -> "some-id").toString)))
 
-  def willNotAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping = {
-    mock.register(post(urlEqualTo("/auth/authorise"))
-      .withRequestBody(equalToJson(privilegedAuthority(scope).toString()))
-      .withHeader(AUTHORIZATION, equalTo(authBearerToken))
-      .willReturn(
-        unauthorized()
+  def willNotAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping =
+    mock.register(
+      post(urlEqualTo("/auth/authorise"))
+        .withRequestBody(equalToJson(privilegedAuthority(scope).toString()))
+        .withHeader(AUTHORIZATION, equalTo(authBearerToken))
+        .willReturn(unauthorized()
           .withHeader(HeaderNames.WWW_AUTHENTICATE, """MDTP detail="Bearer token is missing or not authorized"""")))
-  }
 
   private def privilegedAuthority(scope: String) = Json.obj(
     "authorise" -> Json.arr(Json.toJson(Enrolment(scope))),
-    "retrieve" -> JsArray()
+    "retrieve"  -> JsArray()
   )
 }

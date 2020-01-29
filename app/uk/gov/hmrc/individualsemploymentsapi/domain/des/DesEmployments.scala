@@ -21,7 +21,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.Payment
 case class DesEmployments(employments: Seq[DesEmployment])
 
 object DesEmployments {
-  def toPayments(desEmployment: DesEmployment): Seq[Payment] = {
+  def toPayments(desEmployment: DesEmployment): Seq[Payment] =
     desEmployment.payments map { payment =>
       Payment(
         payment.totalPayInPeriod,
@@ -30,5 +30,4 @@ object DesEmployments {
         payment.monthPayNumber,
         payment.weekPayNumber)
     }
-  }
 }

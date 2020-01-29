@@ -31,14 +31,18 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
 
-  private val serviceUrl =servicesConfig. baseUrl("des")
+  private val serviceUrl = servicesConfig.baseUrl("des")
   private val desBearerToken = servicesConfig.getString("microservice.services.des.authorization-token")
   private val desEnvironment = servicesConfig.getString("microservice.services.des.environment")
 
-  def fetchEmployments(nino: Nino, interval: Interval)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[DesEmployment]] = {
+  def fetchEmployments(nino: Nino, interval: Interval)(
+    implicit hc: HeaderCarrier,
+    ec: ExecutionContext): Future[Seq[DesEmployment]] = {
     val fromDate = interval.getStart.toLocalDate
     val toDate = interval.getEnd.toLocalDate
-    val header = hc.copy(authorization = Some(Authorization(s"Bearer $desBearerToken"))).withExtraHeaders("Environment" -> desEnvironment, "Source" -> "MDTP")
+    val header = hc
+      .copy(authorization = Some(Authorization(s"Bearer $desBearerToken")))
+      .withExtraHeaders("Environment" -> desEnvironment, "Source" -> "MDTP")
 
     val employmentsUrl = s"$serviceUrl/individuals/nino/$nino/employments/income?from=$fromDate&to=$toDate"
 

@@ -34,14 +34,18 @@ import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-abstract class EmploymentsController(employmentsService: EmploymentsService , cc: ControllerComponents) extends CommonController(cc) with PrivilegedAuthentication {
+abstract class EmploymentsController(employmentsService: EmploymentsService, cc: ControllerComponents)
+    extends CommonController(cc) with PrivilegedAuthentication {
 
   val hmctsClientId: String
 
   def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
     requiresPrivilegedAuthentication("read:individuals-employments") {
       employmentsService.resolve(matchId) map { _ =>
-        val payeLink = HalLink("paye", s"/individuals/employments/paye?matchId=$matchId{&fromDate,toDate}", title = Option("View individual's employments"))
+        val payeLink = HalLink(
+          "paye",
+          s"/individuals/employments/paye?matchId=$matchId{&fromDate,toDate}",
+          title = Option("View individual's employments"))
         val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
         Ok(links(payeLink, selfLink))
       }
@@ -51,7 +55,8 @@ abstract class EmploymentsController(employmentsService: EmploymentsService , cc
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
     requiresPrivilegedAuthentication("read:individuals-employments-paye") {
       employmentsService.paye(matchId, interval).map { employments =>
-        val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
+        val selfLink =
+          HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
         val filtered = filterPayrollData(employments)
         val employmentsJsObject = Json.obj("employments" -> Json.toJson(filtered))
         Ok(state(employmentsJsObject) ++ selfLink)
@@ -62,32 +67,35 @@ abstract class EmploymentsController(employmentsService: EmploymentsService , cc
   // Home Office and HMCTS want to use the same endpoint,
   // but HO aren't authorised to view payroll IDs or employee addresses
   // so this filters fields based on client ID
-  private def filterPayrollData(employments: Seq[Employment])(implicit request: Request[AnyContent]): Seq[Employment] = {
+  private def filterPayrollData(employments: Seq[Employment])(implicit request: Request[AnyContent]): Seq[Employment] =
     request.headers.get("X-Client-ID") match {
       case Some(clientId) if clientId == hmctsClientId => employments
-      case Some(_) => employments.map(_.copy(payrollId = None, employeeAddress = None))
+      case Some(_)                                     => employments.map(_.copy(payrollId = None, employeeAddress = None))
       case None =>
         Logger.warn("Missing X-Client-Id header")
         employments.map(_.copy(payrollId = None, employeeAddress = None))
     }
-  }
 
 }
 
 @Singleton
-class SandboxEmploymentsController @Inject()(sandboxEmploymentsService: SandboxEmploymentsService,
-                                             val authConnector: AuthConnector,
-                                             @Named("hmctsClientId") val hmctsClientId: String,cc: ControllerComponents)
-  extends EmploymentsController(sandboxEmploymentsService,cc) {
+class SandboxEmploymentsController @Inject()(
+  sandboxEmploymentsService: SandboxEmploymentsService,
+  val authConnector: AuthConnector,
+  @Named("hmctsClientId") val hmctsClientId: String,
+  cc: ControllerComponents)
+    extends EmploymentsController(sandboxEmploymentsService, cc) {
 
   override val environment: String = SANDBOX
 }
 
 @Singleton
-class LiveEmploymentsController @Inject()(liveEmploymentsService: LiveEmploymentsService,
-                                          val authConnector: AuthConnector,
-                                          @Named("hmctsClientId") val hmctsClientId: String , cc: ControllerComponents)
-  extends EmploymentsController(liveEmploymentsService,cc) {
+class LiveEmploymentsController @Inject()(
+  liveEmploymentsService: LiveEmploymentsService,
+  val authConnector: AuthConnector,
+  @Named("hmctsClientId") val hmctsClientId: String,
+  cc: ControllerComponents)
+    extends EmploymentsController(liveEmploymentsService, cc) {
 
   override val environment: String = PRODUCTION
 }

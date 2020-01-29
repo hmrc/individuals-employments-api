@@ -41,7 +41,10 @@ class VersioningSpec extends BaseSpec {
     scenario("Requests with an accept header with an invalid version") {
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version 10.0")
-      val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken,  ACCEPT -> "application/vnd.hmrc.10.0+json")
+      val response = invokeWithHeaders(
+        sandboxMatchEndpointWithSandboxMatchId,
+        AUTHORIZATION -> authToken,
+        ACCEPT        -> "application/vnd.hmrc.10.0+json")
 
       Then("The response status should be 404")
       response.code shouldBe NOT_FOUND
@@ -50,7 +53,8 @@ class VersioningSpec extends BaseSpec {
     scenario("Requests with an accept header version P1.0") {
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version P1")
-      val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken, acceptHeaderVP1)
+      val response =
+        invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken, acceptHeaderVP1)
 
       Then("The response status should be 200")
       response.code shouldBe OK

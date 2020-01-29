@@ -21,11 +21,7 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{EitherValues, FlatSpec, Matchers}
 import uk.gov.hmrc.individualsemploymentsapi.util.IntervalQueryStringBinder
 
-class IntervalQueryStringBinderSpec
-    extends FlatSpec
-    with Matchers
-    with EitherValues
-    with Intervals {
+class IntervalQueryStringBinderSpec extends FlatSpec with Matchers with EitherValues with Intervals {
 
   lazy val intervalQueryStringBinder = new IntervalQueryStringBinder
 
@@ -36,10 +32,8 @@ class IntervalQueryStringBinderSpec
       (Map("fromDate" -> Seq.empty[String]), "fromDate is required"),
       (Map("fromDate" -> Seq("")), "fromDate: invalid date format"),
       (Map("fromDate" -> Seq("20200131")), "fromDate: invalid date format"),
-      (Map("fromDate" -> Seq("2020-01-31"), "toDate" -> Seq("")),
-       "toDate: invalid date format"),
-      (Map("fromDate" -> Seq("2020-01-31"), "toDate" -> Seq("20201231")),
-       "toDate: invalid date format")
+      (Map("fromDate" -> Seq("2020-01-31"), "toDate" -> Seq("")), "toDate: invalid date format"),
+      (Map("fromDate" -> Seq("2020-01-31"), "toDate" -> Seq("20201231")), "toDate: invalid date format")
     )
 
     fixtures foreach {
@@ -53,16 +47,14 @@ class IntervalQueryStringBinderSpec
     val parameters = Map("fromDate" -> Seq("2017-01-31"))
     val maybeEither = intervalQueryStringBinder.bind("", parameters)
     maybeEither shouldBe Some(
-      Right(toInterval("2017-01-31T00:00:00.000",
-                       LocalDateTime.now().withTime(0, 0, 0, 1).toString())))
+      Right(toInterval("2017-01-31T00:00:00.000", LocalDateTime.now().withTime(0, 0, 0, 1).toString())))
   }
 
   it should "succeed in binding an interval from well formed fromDate and toDate parameters" in {
     val parameters =
       Map("fromDate" -> Seq("2020-01-31"), "toDate" -> Seq("2020-12-31"))
     val maybeEither = intervalQueryStringBinder.bind("", parameters)
-    maybeEither shouldBe Some(
-      Right(toInterval("2020-01-31T00:00:00.000", "2020-12-31T00:00:00.001")))
+    maybeEither shouldBe Some(Right(toInterval("2020-01-31T00:00:00.000", "2020-12-31T00:00:00.001")))
   }
 
   it should "fail to bind an interval from an invalid date range" in {
@@ -73,25 +65,20 @@ class IntervalQueryStringBinderSpec
   }
 
   it should "bind an interval from a date range beginning after the des data inception date" in {
-    val maybeEither = intervalQueryStringBinder.bind(
-      "",
-      Map("fromDate" -> Seq("2013-04-01"), "toDate" -> Seq("2014-12-31")))
-    maybeEither shouldBe Some(
-      Right(toInterval("2013-04-01T00:00:00.000", "2014-12-31T00:00:00.001")))
+    val maybeEither =
+      intervalQueryStringBinder.bind("", Map("fromDate" -> Seq("2013-04-01"), "toDate" -> Seq("2014-12-31")))
+    maybeEither shouldBe Some(Right(toInterval("2013-04-01T00:00:00.000", "2014-12-31T00:00:00.001")))
   }
 
   it should "bind an interval from an date range beginning on the des data inception date" in {
-    val maybeEither = intervalQueryStringBinder.bind(
-      "",
-      Map("fromDate" -> Seq("2013-03-31"), "toDate" -> Seq("2014-12-31")))
-    maybeEither shouldBe Some(
-      Right(toInterval("2013-03-31T00:00:00.000", "2014-12-31T00:00:00.001")))
+    val maybeEither =
+      intervalQueryStringBinder.bind("", Map("fromDate" -> Seq("2013-03-31"), "toDate" -> Seq("2014-12-31")))
+    maybeEither shouldBe Some(Right(toInterval("2013-03-31T00:00:00.000", "2014-12-31T00:00:00.001")))
   }
 
   it should "fail to bind an interval from an date range beginning before the des data inception date" in {
-    val maybeEither = intervalQueryStringBinder.bind(
-      "",
-      Map("fromDate" -> Seq("2013-03-30"), "toDate" -> Seq("2014-12-31")))
+    val maybeEither =
+      intervalQueryStringBinder.bind("", Map("fromDate" -> Seq("2013-03-30"), "toDate" -> Seq("2014-12-31")))
     maybeEither shouldBe Some(Left("fromDate earlier than 31st March 2013"))
   }
 

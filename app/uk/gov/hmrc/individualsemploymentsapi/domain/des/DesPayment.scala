@@ -18,7 +18,8 @@ package uk.gov.hmrc.individualsemploymentsapi.domain.des
 
 import org.joda.time.LocalDate
 
-case class DesPayment(paymentDate: LocalDate,
-                      totalPayInPeriod: Double,
-                      weekPayNumber: Option[Int] = None,
-                      monthPayNumber: Option[Int] = None)
+case class DesPayment(
+  paymentDate: LocalDate,
+  totalPayInPeriod: Double,
+  weekPayNumber: Option[Int] = None,
+  monthPayNumber: Option[Int] = None)

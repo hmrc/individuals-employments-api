@@ -19,21 +19,22 @@ package uk.gov.hmrc.individualsemploymentsapi.domain.des
 import org.joda.time.LocalDate
 import uk.gov.hmrc.domain.EmpRef
 
-case class DesEmployment(payments: Seq[DesPayment],
-                         employerName: Option[String] = None,
-                         employerAddress: Option[DesAddress] = None,
-                         employerDistrictNumber: Option[String] = None,
-                         employerSchemeReference: Option[String] = None,
-                         employmentStartDate: Option[LocalDate] = None,
-                         employmentLeavingDate: Option[LocalDate] = None,
-                         employmentPayFrequency: Option[DesPayFrequency.Value] = None,
-                         employeeAddress: Option[DesAddress] = None,
-                         payrollId: Option[String] = None) {
+case class DesEmployment(
+  payments: Seq[DesPayment],
+  employerName: Option[String] = None,
+  employerAddress: Option[DesAddress] = None,
+  employerDistrictNumber: Option[String] = None,
+  employerSchemeReference: Option[String] = None,
+  employmentStartDate: Option[LocalDate] = None,
+  employmentLeavingDate: Option[LocalDate] = None,
+  employmentPayFrequency: Option[DesPayFrequency.Value] = None,
+  employeeAddress: Option[DesAddress] = None,
+  payrollId: Option[String] = None) {
 
   val employerPayeReference: Option[EmpRef] = {
     (employerDistrictNumber, employerSchemeReference) match {
       case (Some(districtNumber), Some(schemeReference)) => Some(EmpRef(districtNumber, schemeReference))
-      case _ => None
+      case _                                             => None
     }
   }
 
