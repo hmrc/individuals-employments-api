@@ -48,8 +48,10 @@ class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
 
     http.GET[DesEmployments](employmentsUrl)(implicitly, header, ec).map(_.employments).recoverWith {
       case _: NotFoundException => Future.successful(Seq.empty)
-      case Upstream5xxResponse(msg, 503, _) if msg.contains("LTM000503") /*DES's Magic error code*/ =>
+      case Upstream4xxResponse(msg, 429, _, _) => {
+        Logger.warn(s"DES Rate limited: $msg")
         Future.failed(new TooManyRequestException(msg))
+      }
     }
   }
 }
