@@ -21,9 +21,7 @@ import java.util.UUID
 import org.joda.time.{Interval, LocalDate}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verifyZeroInteractions, when}
-import org.scalatest.mockito.MockitoSugar
-import org.scalatestplus.play._
-import play.api.http.Status.OK
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
 import play.api.test.Helpers._
@@ -37,7 +35,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
 import uk.gov.hmrc.individualsemploymentsapi.service.{LiveEmploymentsService, SandboxEmploymentsService}
-import unit.uk.gov.hmrc.individualsemploymentsapi.util.{SpecBase, UnitSpec}
+import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import scala.concurrent.Future
 
