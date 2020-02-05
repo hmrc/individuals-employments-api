@@ -25,9 +25,9 @@ import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
 
 class ConfigModule(environment: Environment, configuration: Configuration) extends AbstractModule {
   override def configure(): Unit = {
-    val delay = configuration.getInt("retryDelay").getOrElse(1000)
+    val delay = configuration.getOptional[Int]("retryDelay").getOrElse(1000)
     val hmctsClientId = configuration
-      .getString("clientIds.hmcts")
+      .getOptional[String]("clientIds.hmcts")
       .getOrElse(throw new RuntimeException("Missing required configuration 'clientIds.hmcts'"))
 
     bindConstant().annotatedWith(Names.named("retryDelay")).to(delay)

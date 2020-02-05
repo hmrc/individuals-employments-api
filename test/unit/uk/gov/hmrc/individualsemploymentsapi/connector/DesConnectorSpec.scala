@@ -22,7 +22,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import org.joda.time.LocalDateTime.parse
 import org.joda.time.{Interval, LocalDate, LocalDateTime}
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.mockito.MockitoSugar
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}

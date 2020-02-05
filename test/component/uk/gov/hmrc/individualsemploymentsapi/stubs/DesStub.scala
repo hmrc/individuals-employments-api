@@ -41,9 +41,6 @@ object DesStub extends MockHost(22003) {
       get(urlPathEqualTo(s"/individuals/nino/$nino/employments/income"))
         .withQueryParam("from", equalTo(fromDate))
         .withQueryParam("to", equalTo(toDate))
-        // DES/BigIP returns a 503 when rate limited, rather than 429
-        .willReturn(aResponse().withStatus(SERVICE_UNAVAILABLE).withBody(desRateLimitError.toString)))
-
-  private lazy val desRateLimitError = Json.obj("response" -> Json.obj("incidentReference" -> "LTM000503"))
+        .willReturn(aResponse().withStatus(TOO_MANY_REQUESTS)))
 
 }

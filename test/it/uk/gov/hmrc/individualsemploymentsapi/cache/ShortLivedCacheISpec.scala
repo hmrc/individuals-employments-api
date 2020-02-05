@@ -20,7 +20,7 @@ import java.util.UUID
 
 import org.scalatest.BeforeAndAfterEach
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import scala.concurrent.ExecutionContext.Implicits.global
 import play.api.libs.json.{JsString, Json, OFormat}
 import uk.gov.hmrc.individualsemploymentsapi.cache.ShortLivedCache
 import uk.gov.hmrc.mongo.MongoSpecSupport
@@ -42,12 +42,12 @@ class ShortLivedCacheISpec extends SpecBase with MongoSpecSupport with BeforeAnd
 
   override def beforeEach() {
     super.beforeEach()
-    await(shortLivedCache.repository.drop)
+    await(shortLivedCache.drop)
   }
 
   override def afterEach() {
     super.afterEach()
-    await(shortLivedCache.repository.drop)
+    await(shortLivedCache.drop)
   }
 
   "cache" should {
@@ -79,7 +79,7 @@ class ShortLivedCacheISpec extends SpecBase with MongoSpecSupport with BeforeAnd
   }
 
   private def retrieveRawCachedValue(id: String, key: String) = {
-    val storedValue = await(shortLivedCache.repository.findById(id)).get
+    val storedValue = await(shortLivedCache.findById(id)).get
     (storedValue.data.get \ cachekey).get
   }
 

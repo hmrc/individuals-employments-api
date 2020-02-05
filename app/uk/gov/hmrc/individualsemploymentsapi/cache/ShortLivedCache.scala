@@ -20,30 +20,31 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.cache.TimeToLive
-import uk.gov.hmrc.cache.model.Cache
-import uk.gov.hmrc.cache.repository.CacheRepository
+import uk.gov.hmrc.cache.repository.CacheMongoRepository
 import uk.gov.hmrc.crypto._
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.modules.reactivemongo.ReactiveMongoComponent
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ShortLivedCache @Inject()(val cacheConfig: CacheConfiguration, configuration: Configuration) extends TimeToLive {
-
+class ShortLivedCache @Inject()(
+  val cacheConfig: CacheConfiguration,
+  configuration: Configuration,
+  mongo: ReactiveMongoComponent)(implicit ec: ExecutionContext)
+    extends CacheMongoRepository("shortLivedCache", cacheConfig.cacheTtl)(mongo.mongoConnector.db, ec) with TimeToLive {
   implicit lazy val crypto: CompositeSymmetricCrypto = new ApplicationCrypto(configuration.underlying).JsonCrypto
-  lazy val repository = CacheRepository("shortLivedCache", cacheConfig.cacheTtl, Cache.mongoFormats)
 
   def cache[T](id: String, key: String, value: T)(implicit formats: Format[T]): Future[Unit] = {
     val jsonEncryptor = new JsonEncryptor[T]()
     val encryptedValue: JsValue = jsonEncryptor.writes(Protected[T](value))
-    repository.createOrUpdate(id, key, encryptedValue).map(_ => ())
+    createOrUpdate(id, key, encryptedValue).map(_ => ())
   }
 
   def fetchAndGetEntry[T](id: String, key: String)(implicit formats: Format[T]): Future[Option[T]] = {
     val decryptor = new JsonDecryptor[T]()
 
-    repository.findById(id) map {
+    findById(id) map {
       case Some(cache) =>
         cache.data flatMap { json =>
           (json \ key).toOption flatMap { jsValue =>
@@ -57,6 +58,6 @@ class ShortLivedCache @Inject()(val cacheConfig: CacheConfiguration, configurati
 
 @Singleton
 class CacheConfiguration @Inject()(configuration: Configuration) {
-  lazy val cacheEnabled = configuration.getBoolean("cache.enabled").getOrElse(true)
-  lazy val cacheTtl = configuration.getInt("cache.ttlInSeconds").getOrElse(60 * 15)
+  lazy val cacheEnabled = configuration.getOptional[Boolean]("cache.enabled").getOrElse(true)
+  lazy val cacheTtl = configuration.getOptional[Int]("cache.ttlInSeconds").getOrElse(60 * 15)
 }
