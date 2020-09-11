@@ -47,7 +47,7 @@ val compile = Seq(
   hmrc                %% "play-hmrc-api"             % "4.1.0-play-26",
   hmrc                %% "mongo-caching"             % "6.15.0-play-26",
   hmrc                %% "json-encryption"           % "4.8.0-play-26",
-  "com.typesafe.play" %% "play-json-joda"            % "2.9.0"
+  "com.typesafe.play" %% "play-json-joda"            % "2.9.1"
 )
 
 def test(scope: String = "test,it") = Seq(
@@ -59,7 +59,7 @@ def test(scope: String = "test,it") = Seq(
   "org.scalatestplus.play" %% "scalatestplus-play"       % "3.1.2"             % scope,
   "org.scalaj"             %% "scalaj-http"              % "2.4.2"             % scope,
   "org.mockito"            % "mockito-all"               % "1.10.19"           % scope,
-  "com.github.tomakehurst" % "wiremock-jre8"             % "2.27.1"            % scope
+  "com.github.tomakehurst" % "wiremock-jre8"             % "2.27.2"            % scope
 )
 
 lazy val microservice =
