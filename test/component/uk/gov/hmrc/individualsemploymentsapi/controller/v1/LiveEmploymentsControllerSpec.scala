@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package component.uk.gov.hmrc.individualsemploymentsapi.controller
+package component.uk.gov.hmrc.individualsemploymentsapi.controller.v1
 
 import java.util.UUID
 

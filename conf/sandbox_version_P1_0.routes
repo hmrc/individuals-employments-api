@@ -1,4 +1,4 @@
 # sandbox routes
 
-GET      /                               @uk.gov.hmrc.individualsemploymentsapi.controller.SandboxEmploymentsController.root(matchId: java.util.UUID)
-GET      /paye                           @uk.gov.hmrc.individualsemploymentsapi.controller.SandboxEmploymentsController.paye(matchId: java.util.UUID, interval: org.joda.time.Interval)
+GET      /                               @uk.gov.hmrc.individualsemploymentsapi.controller.v1.SandboxEmploymentsController.root(matchId: java.util.UUID)
+GET      /paye                           @uk.gov.hmrc.individualsemploymentsapi.controller.v1.SandboxEmploymentsController.paye(matchId: java.util.UUID, interval: org.joda.time.Interval)

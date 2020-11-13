@@ -20,7 +20,6 @@ import component.uk.gov.hmrc.individualsemploymentsapi.stubs._
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION}
 import play.api.libs.json.Json.parse
 import play.api.test.Helpers._
-
 import scalaj.http.{Http, HttpResponse}
 
 class VersioningSpec extends BaseSpec {
@@ -74,6 +73,19 @@ class VersioningSpec extends BaseSpec {
             }
           }
         """)
+    }
+
+    scenario("Requests with an accept header version P2.0") {
+
+      When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version P2")
+      val response =
+        invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken, acceptHeaderVP2)
+
+      Then("The response status should be 200")
+      response.code shouldBe INTERNAL_SERVER_ERROR
+
+      Then("And the response body should be for api version P2.0")
+      response.body shouldBe "{\"statusCode\":500,\"message\":\"NOT_IMPLEMENTED\"}"
     }
   }
 

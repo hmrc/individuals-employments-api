@@ -21,22 +21,43 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import component.uk.gov.hmrc.individualsemploymentsapi.controller.MockHost
 import play.api.http.HeaderNames
 import play.api.http.HeaderNames.AUTHORIZATION
+import play.api.libs.json.Json.{arr, obj, toJson}
 import play.api.libs.json.{JsArray, Json}
 import uk.gov.hmrc.auth.core.Enrolment
 
 object AuthStub extends MockHost(22000) {
 
-  def willAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping =
+  def willAuthorizePrivilegedAuthToken(
+    authBearerToken: String,
+    scope: String,
+    retrieveAll: Boolean = false): StubMapping =
     mock.register(
       post("/auth/authorise")
-        .withRequestBody(equalToJson(privilegedAuthority(scope).toString()))
+        .withRequestBody(
+          equalToJson(
+            if (retrieveAll)
+              privilegedAuthorityRetrieveAll(scope).toString()
+            else
+              privilegedAuthority(scope).toString()))
         .withHeader(AUTHORIZATION, equalTo(authBearerToken))
-        .willReturn(okJson(Json.obj("internalId" -> "some-id").toString)))
+        .willReturn(
+          okJson("""{"internalId": "some-id", "allEnrolments": [ { "key": "key", "value": "hello-world" } ]}""")
+        )
+    )
 
-  def willNotAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping =
+  def willNotAuthorizePrivilegedAuthToken(
+    authBearerToken: String,
+    scope: String,
+    retrieveAll: Boolean = false): StubMapping =
     mock.register(
       post(urlEqualTo("/auth/authorise"))
-        .withRequestBody(equalToJson(privilegedAuthority(scope).toString()))
+        .withRequestBody(
+          equalToJson(
+            if (retrieveAll)
+              privilegedAuthorityRetrieveAll(scope).toString()
+            else
+              privilegedAuthority(scope).toString()
+          ))
         .withHeader(AUTHORIZATION, equalTo(authBearerToken))
         .willReturn(unauthorized()
           .withHeader(HeaderNames.WWW_AUTHENTICATE, """MDTP detail="Bearer token is missing or not authorized"""")))
@@ -44,5 +65,10 @@ object AuthStub extends MockHost(22000) {
   private def privilegedAuthority(scope: String) = Json.obj(
     "authorise" -> Json.arr(Json.toJson(Enrolment(scope))),
     "retrieve"  -> JsArray()
+  )
+
+  private def privilegedAuthorityRetrieveAll(scope: String) = obj(
+    "authorise" -> arr(toJson(Enrolment(scope))),
+    "retrieve"  -> arr(toJson("allEnrolments"))
   )
 }
