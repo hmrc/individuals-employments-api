@@ -20,12 +20,10 @@ import java.util.UUID
 
 import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.Interval
-import play.api.Logger
-import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
-import uk.gov.hmrc.individualsemploymentsapi.domain.Employment
 import uk.gov.hmrc.individualsemploymentsapi.service.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesService}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,8 +33,6 @@ abstract class EmploymentsController(
   scopeService: ScopesService,
   cc: ControllerComponents)
     extends CommonController(cc) with PrivilegedAuthentication {
-
-  val hmctsClientId: String
 
   def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
     {
@@ -59,19 +55,6 @@ abstract class EmploymentsController(
         .recover(recovery)
     }
   }
-
-  // Home Office and HMCTS want to use the same endpoint,
-  // but HO aren't authorised to view payroll IDs or employee addresses
-  // so this filters fields based on client ID
-  private def filterPayrollData(employments: Seq[Employment])(implicit request: Request[AnyContent]): Seq[Employment] =
-    request.headers.get("X-Client-ID") match {
-      case Some(clientId) if clientId == hmctsClientId => employments
-      case Some(_)                                     => employments.map(_.copy(payrollId = None, employeeAddress = None))
-      case None =>
-        Logger.warn("Missing X-Client-Id header")
-        employments.map(_.copy(payrollId = None, employeeAddress = None))
-    }
-
 }
 
 @Singleton

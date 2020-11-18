@@ -18,11 +18,10 @@ package component.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
 import java.util.UUID
 
-import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec, DesStub, IndividualsMatchingApiStub}
+import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec, IndividualsMatchingApiStub}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import scalaj.http.Http
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments}
 
 class LiveEmploymentsControllerSpec extends BaseSpec {
 
@@ -100,7 +99,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       When("the root entry point to the API is invoked with a valid match id")
       val response = invokeEndpoint(s"$serviceUrl/?matchId=$matchId")
 
-      Then("the response status should be 200 (ok)")
+      Then("the response status should be 500")
       response.code shouldBe INTERNAL_SERVER_ERROR
       response.body shouldBe "{\"statusCode\":500,\"message\":\"NOT_IMPLEMENTED\"}"
     }
@@ -164,7 +163,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       When("the paye endpoint is invoked with an invalid match id")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
 
-      Then("the response status should be 404 (not found)")
+      Then("the response status should be 500")
       response.code shouldBe INTERNAL_SERVER_ERROR
       response.body shouldBe "{\"statusCode\":500,\"message\":\"NOT_IMPLEMENTED\"}"
     }
@@ -176,22 +175,18 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       And("a valid record in the matching API")
       IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
-      And("DES will return employments for the NINO")
-      DesStub.searchEmploymentIncomeForPeriodReturns(
-        nino,
-        fromDate,
-        toDate,
-        DesEmployments(Seq(DesEmployment(Seq.empty, Some("employer name")))))
+      And("IF will return employments for the NINO")
+      // TODO: Fill in
 
       When("the paye endpoint is invoked with a valid match id")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
 
-      Then("the response status should be 200 (ok)")
+      Then("the response status should be 500")
       response.code shouldBe INTERNAL_SERVER_ERROR
       response.body shouldBe "{\"statusCode\":500,\"message\":\"NOT_IMPLEMENTED\"}"
     }
 
-    scenario("the DES rate limit is exceeded") {
+    scenario("the IF rate limit is exceeded") {
       val matchId = UUID.randomUUID().toString
       val nino = "AA112233B"
 
@@ -201,13 +196,13 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       And("a valid record in the matching API")
       IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
-      And("DES will return an error due to rate limiting")
-      DesStub.enforceRateLimit(nino, fromDate, toDate)
+      And("IF will return an error due to rate limiting")
+      // TODO: Fill in
 
       When("the PAYE endpoint is invoked with a valid match ID")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
 
-      Then("The response status is 429 Too Many Requests")
+      Then("The response status is 500")
       response.code shouldBe INTERNAL_SERVER_ERROR
       response.body shouldBe "{\"statusCode\":500,\"message\":\"NOT_IMPLEMENTED\"}"
     }

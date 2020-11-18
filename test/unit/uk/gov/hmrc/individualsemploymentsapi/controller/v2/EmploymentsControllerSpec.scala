@@ -23,12 +23,9 @@ import org.mockito.BDDMockito.`given`
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verifyZeroInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
-import play.api.test.Helpers._
 import play.api.test._
-import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
-import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, InsufficientEnrolments}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.controller.v2.{LiveEmploymentsController, SandboxEmploymentsController}
@@ -72,8 +69,6 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-//    when(mockAuthConnector.authorise(any(), eqTo(EmptyRetrieval))(any(), any()))
-//      .thenReturn(Future.successful(()))
   }
 
   "Root" should {
@@ -107,10 +102,6 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
     }
 
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments" in new Setup {
-//      when(
-//        mockAuthConnector
-//           .authorise(eqTo(Enrolment("read:individuals-employments")), eqTo(EmptyRetrieval))(any(), any()))
-//        .thenReturn(Future.failed(InsufficientEnrolments()))
 
       val eventualResult = liveEmploymentsController.root(randomMatchId)(FakeRequest())
 
@@ -205,10 +196,6 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
     }
 
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
-//      when(
-//        mockAuthConnector
-//          .authorise(eqTo(Enrolment("read:individuals-employments-paye")), eqTo(EmptyRetrieval))(any(), any()))
-//        .thenReturn(Future.failed(InsufficientEnrolments()))
 
       val eventualResult =
         liveEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest())
@@ -234,9 +221,6 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       }
 
       assert(result.getMessage == "NOT_IMPLEMENTED")
-//      verifyZeroInteractions(mockAuthConnector)
     }
-
   }
-
 }

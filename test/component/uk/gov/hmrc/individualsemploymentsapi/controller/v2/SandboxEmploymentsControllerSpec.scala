@@ -61,7 +61,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       When("the root entry point to the API is invoked with an invalid match id")
       val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366")
 
-      Then("the response status should be 404 (not found)")
+      Then("the response status should be 500")
       assertResponseIs(
         response,
         INTERNAL_SERVER_ERROR,
@@ -73,7 +73,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       When("I request the root entry point to the API")
       val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430")
 
-      Then("The response status should be 200 (ok)")
+      Then("The response status should be 500")
       assertResponseIs(
         response,
         INTERNAL_SERVER_ERROR,
@@ -120,7 +120,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       val response =
         invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366&fromDate=2017-01-01")
 
-      Then("the response status should be 404 (not found)")
+      Then("the response status should be 500")
       assertResponseIs(
         response,
         INTERNAL_SERVER_ERROR,
@@ -133,7 +133,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       val response =
         invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01")
 
-      Then("The response status should be 200 (ok)")
+      Then("The response status should be 500")
       assertResponseIs(
         response,
         INTERNAL_SERVER_ERROR,
