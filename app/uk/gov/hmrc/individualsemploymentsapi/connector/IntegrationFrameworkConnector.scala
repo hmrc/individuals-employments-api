@@ -43,10 +43,10 @@ class IntegrationFrameworkConnector @Inject()(servicesConfig: ServicesConfig, ht
     val startDate: LocalDate = interval.getStart.toLocalDate
     val endDate: LocalDate = interval.getEnd.toLocalDate
 
-    val payeUrl: String =
-      s"$baseUrl/individuals/employment/nino/$nino/?startDate=$startDate&endDate=$endDate&fields=$filter"
+    val employmentsUrl =
+      s"$baseUrl/individuals/employment/nino/$nino?startDate=$startDate&endDate=$endDate&fields=$filter"
 
-    recover[IfEmployment](http.GET[IfEmployments](payeUrl)(implicitly, header(), ec).map(_.employments))
+    recover[IfEmployment](http.GET[IfEmployments](employmentsUrl)(implicitly, header(), ec).map(_.employments))
 
   }
   private def header(extraHeaders: (String, String)*)(implicit hc: HeaderCarrier) =
