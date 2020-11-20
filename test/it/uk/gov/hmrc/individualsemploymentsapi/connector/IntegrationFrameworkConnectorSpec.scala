@@ -23,7 +23,7 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.IntegrationFrameworkConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
@@ -78,6 +78,22 @@ class IntegrationFrameworkConnectorSpec extends SpecBase with BeforeAndAfterEach
     val startDate = "2016-01-01"
     val endDate = "2017-03-01"
     val interval = toInterval(startDate, endDate)
+
+    "Fail when IF returns an error" in new Setup {
+      stubFor(
+        get(urlPathMatching(s"/individuals/employment/nino/$nino"))
+          .willReturn(aResponse().withStatus(500)))
+
+      intercept[Upstream5xxResponse] { await(underTest.fetchEmployments(nino, interval, None)) }
+    }
+
+    "Fail when IF returns a bad request" in new Setup {
+      stubFor(
+        get(urlPathMatching(s"/individuals/employment/nino/$nino"))
+          .willReturn(aResponse().withStatus(400)))
+
+      intercept[BadRequestException] { await(underTest.fetchEmployments(nino, interval, None)) }
+    }
 
     "for no employment data" should {
       "return empty collection" in new Setup {
