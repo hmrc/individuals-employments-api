@@ -50,6 +50,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
     val mockAuthConnector: AuthConnector = fakeAuthConnector(Future.successful(enrolments))
     val hmctsClientId = "hmctsClientId"
 
+    when(scopeService.getAllScopes).thenReturn(List("hello-world"))
     given(scopeService.getEndPointScopes(any())).willReturn(Seq("hello-world"))
 
     val sandboxEmploymentsController = new SandboxEmploymentsController(

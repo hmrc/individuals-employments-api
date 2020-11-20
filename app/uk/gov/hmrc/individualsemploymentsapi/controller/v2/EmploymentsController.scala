@@ -36,7 +36,7 @@ abstract class EmploymentsController(
 
   def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
     {
-      val scopes = scopeService.getEndPointScopes("individuals-employments")
+      val scopes = scopeService.getAllScopes
       requiresPrivilegedAuthentication(scopes)
         .flatMap { authScopes =>
           throw new Exception("NOT_IMPLEMENTED")
@@ -47,7 +47,7 @@ abstract class EmploymentsController(
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
     {
-      val scopes = scopeService.getEndPointScopes("individuals-employments-paye")
+      val scopes = scopeService.getEndPointScopes("employments")
       requiresPrivilegedAuthentication(scopes)
         .flatMap { authScopes =>
           throw new Exception("NOT_IMPLEMENTED")

@@ -27,14 +27,25 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
   private val matchId = UUID.randomUUID().toString
   private val nino = "AB123456C"
-  private val employmentsScope = "read:individuals-employments"
-  private val payeEmploymentsScope = "read:individuals-employments-paye"
+
+  private val allScopes = List(
+    "read:individuals-employments-hmcts-c2",
+    "read:individuals-employments-hmcts-c3",
+    "read:individuals-employments-hmcts-c4",
+    "read:individuals-employments-laa-c1",
+    "read:individuals-employments-laa-c2",
+    "read:individuals-employments-laa-c3",
+    "read:individuals-employments-laa-c4",
+    "read:individuals-employments-lsani-c1",
+    "read:individuals-employments-lsani-c3",
+    "read:individuals-employments-nictsejo-c4"
+  )
 
   feature("Root (hateoas) entry point is accessible") {
 
     scenario("invalid token") {
       Given("an invalid token")
-      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, employmentsScope, retrieveAll = true)
+      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the root entry point to the API is invoked")
       val response = invokeEndpoint(s"$serviceUrl/?matchId=$matchId")
@@ -49,7 +60,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("missing match id") {
       Given("a valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope, retrieveAll = true)
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the root entry point to the API is invoked with a missing match id")
       val response = invokeEndpoint(serviceUrl)
@@ -64,7 +75,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("malformed match id") {
       Given("a valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope, retrieveAll = true)
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the root entry point to the API is invoked with a malformed match id")
       val response = invokeEndpoint(s"$serviceUrl/?matchId=malformed-match-id-value")
@@ -79,7 +90,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("invalid match id") {
       Given("a valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope, retrieveAll = true)
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the root entry point to the API is invoked with an invalid match id")
       val response = invokeEndpoint(s"$serviceUrl/?matchId=$matchId")
@@ -91,7 +102,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("valid request to the live root endpoint implementation") {
       Given("a valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope, retrieveAll = true)
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       And("a valid record in the matching API")
       IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
@@ -112,7 +123,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("invalid token") {
       Given("an invalid token")
-      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope, retrieveAll = true)
+      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the paye endpoint is invoked")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
@@ -127,7 +138,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("missing match id") {
       Given("a valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope, retrieveAll = true)
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the paye endpoint is invoked with a missing match id")
       val response = invokeEndpoint(s"$serviceUrl/paye?fromDate=$fromDate&toDate=$toDate")
@@ -142,7 +153,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("malformed match id") {
       Given("a valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope, retrieveAll = true)
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the paye endpoint is invoked with a malformed match id")
       val response =
@@ -158,7 +169,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("invalid match id") {
       Given("a valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope, retrieveAll = true)
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the paye endpoint is invoked with an invalid match id")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
@@ -170,7 +181,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("valid request to the live paye endpoint implementation") {
       Given("a valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope, retrieveAll = true)
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       And("a valid record in the matching API")
       IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
@@ -191,7 +202,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       val nino = "AA112233B"
 
       Given("a valid privileged Auth Bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope, retrieveAll = true)
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       And("a valid record in the matching API")
       IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
