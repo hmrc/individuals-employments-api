@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package component.uk.gov.hmrc.individualsemploymentsapi
+package component.uk.gov.hmrc.individualsemploymentsapi.v1
 
-import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec}
+import component.uk.gov.hmrc.individualsemploymentsapi.stubs.BaseSpec
 import play.api.http.Status._
 import play.api.libs.json.Json.parse
-import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.sandboxMatchId
-
 import scalaj.http.Http
+import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.sandboxMatchId
 
 class EmploymentsSpec extends BaseSpec {
   private val payeEmploymentsScope = "read:individuals-employments-paye"

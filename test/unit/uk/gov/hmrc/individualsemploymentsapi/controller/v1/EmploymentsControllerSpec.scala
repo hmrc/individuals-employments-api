@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package unit.uk.gov.hmrc.individualsemploymentsapi.controller
+package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v1
 
 import java.util.UUID
 
@@ -30,7 +30,7 @@ import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.controller.{LiveEmploymentsController, SandboxEmploymentsController}
+import uk.gov.hmrc.individualsemploymentsapi.controller.v1.{LiveEmploymentsController, SandboxEmploymentsController}
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}

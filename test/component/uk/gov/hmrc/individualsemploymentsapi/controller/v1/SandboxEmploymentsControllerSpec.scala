@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package component.uk.gov.hmrc.individualsemploymentsapi.controller
+package component.uk.gov.hmrc.individualsemploymentsapi.controller.v1
 
-import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec}
+import component.uk.gov.hmrc.individualsemploymentsapi.stubs.BaseSpec
 import play.api.libs.json.Json.parse
 import play.api.test.Helpers._
-
 import scalaj.http.{Http, HttpResponse}
 
 class SandboxEmploymentsControllerSpec extends BaseSpec {
