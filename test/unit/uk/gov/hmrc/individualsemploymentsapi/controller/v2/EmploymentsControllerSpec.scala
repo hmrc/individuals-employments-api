@@ -32,7 +32,8 @@ import uk.gov.hmrc.individualsemploymentsapi.controller.v2.{LiveEmploymentsContr
 import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, NinoMatch}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
-import uk.gov.hmrc.individualsemploymentsapi.service.{LiveEmploymentsService, SandboxEmploymentsService, ScopesService}
+import uk.gov.hmrc.individualsemploymentsapi.service.v1.{LiveEmploymentsService, SandboxEmploymentsService}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.ScopesService
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.AuthHelper
 

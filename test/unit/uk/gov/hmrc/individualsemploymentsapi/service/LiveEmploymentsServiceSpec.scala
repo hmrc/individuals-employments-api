@@ -32,7 +32,7 @@ import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, Individual
 import uk.gov.hmrc.individualsemploymentsapi.domain._
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesPayFrequency.{DesPayFrequency, M1}
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
-import uk.gov.hmrc.individualsemploymentsapi.service.{CacheService, LiveEmploymentsService}
+import uk.gov.hmrc.individualsemploymentsapi.service.v1.{CacheService, LiveEmploymentsService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.{Intervals, SpecBase}
 
 import scala.concurrent.ExecutionContext.Implicits.global
