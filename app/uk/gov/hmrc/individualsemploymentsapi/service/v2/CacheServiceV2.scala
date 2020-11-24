@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.HeaderCarrier
-
 import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfigurationV2, ShortLivedCacheV2}
 
 import scala.concurrent.{ExecutionContext, Future}
