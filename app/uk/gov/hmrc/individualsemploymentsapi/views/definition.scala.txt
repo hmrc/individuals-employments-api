@@ -36,6 +36,14 @@
           "type":"PRIVATE",
           "whitelistedApplicationIds": @Json.toJson(privilegedWhitelistedApplicationIds)
         }
+      },
+      {
+        "version":"P2.0",
+        "status":"PUBLISHED",
+        "access":{
+          "type":"PRIVATE",
+          "whitelistedApplicationIds": @Json.toJson(privilegedWhitelistedApplicationIds)
+        }
       }
     ]
   }
