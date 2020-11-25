@@ -24,14 +24,14 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, Upstream5xxResponse}
-import uk.gov.hmrc.individualsemploymentsapi.connector.IntegrationFrameworkConnector
+import uk.gov.hmrc.individualsemploymentsapi.connector.IfConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.{EmploymentsHelper, Intervals}
 
 import scala.concurrent.ExecutionContext
 
-class IntegrationFrameworkConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals with EmploymentsHelper {
+class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals with EmploymentsHelper {
 
   val stubPort = sys.env.getOrElse("WIREMOCK", "11122").toInt
   val stubHost = "localhost"
@@ -57,7 +57,7 @@ class IntegrationFrameworkConnectorSpec extends SpecBase with BeforeAndAfterEach
   trait Setup {
     implicit val hc = HeaderCarrier()
 
-    val underTest = fakeApplication.injector.instanceOf[IntegrationFrameworkConnector]
+    val underTest = fakeApplication.injector.instanceOf[IfConnector]
   }
 
   override def beforeEach() {
