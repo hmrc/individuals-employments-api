@@ -23,3 +23,15 @@ uses:
   headers: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml
   annotations: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/annotations.raml
   types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
+
+  /:
+    get:
+      displayName: Root
+      description: A placeholder endpoint for root that will throw an exception
+      is: [headers.acceptHeader]
+      responses:
+        200:
+          description: Throws an exception
+          body:
+              application/json:
+                  example: "\"Not yet implemented\""
