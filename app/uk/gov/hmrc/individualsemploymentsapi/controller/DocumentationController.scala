@@ -31,11 +31,12 @@ class DocumentationController @Inject()(
   errorHandler: HttpErrorHandler,
   config: Configuration)
     extends BackendController(cc) {
-  private lazy val privilegedWhitelistedApplicationIds =
-    config.getOptional[Seq[String]]("api.access.version-P2.0.whitelistedApplicationIds").getOrElse(Seq.empty)
+
+  val V1WhitelistedApplicationIDs = config.getOptional[Seq[String]]("api.access.version-P1.0.whitelistedApplicationIds")
+  val V2WhitelistedApplicationIDs = config.getOptional[Seq[String]]("api.access.version-P2.0.whitelistedApplicationIds")
 
   def definition(): Action[AnyContent] = Action { request =>
-    Ok(txt.definition(privilegedWhitelistedApplicationIds)).withHeaders(CONTENT_TYPE -> JSON)
+    Ok(txt.definition(V1WhitelistedApplicationIDs, V2WhitelistedApplicationIDs)).withHeaders(CONTENT_TYPE -> JSON)
   }
   def documentation(
     version: String,
