@@ -28,12 +28,7 @@ import uk.gov.hmrc.individualsemploymentsapi.service.v2.CacheServiceV2
 import scala.concurrent.Future
 
 class CacheServiceSpec
-    extends FreeSpec
-    with MustMatchers
-    with ScalaFutures
-    with OptionValues
-    with MongoSuite
-    with IntegrationPatience {
+    extends FreeSpec with MustMatchers with ScalaFutures with OptionValues with MongoSuite with IntegrationPatience {
 
   implicit val hc = HeaderCarrier()
 
