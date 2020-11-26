@@ -11,8 +11,9 @@
     </thead>
     <tbody>
     <tr>
-        <td><p>Happy path</p></td>
-        <td><p>matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430</p><p>startDate=2019-01-01</p><p>endDate=2020-03-01</p></td>
+        <td><p>PAYE employments data found</p></td>
+        <td><p>matchId=&lt;obtained from Individuals Matching API. example: 57072660-1df9-4aeb-
+                                               b4ea-cd2d7f96e430&gt;</p><p>startDate=2019-01-01</p><p>endDate=2020-03-01</p></td>
         <td><p>200 (OK)</p><p>Payload as response example above</p></td>
     </tr>
     <tr>
@@ -39,7 +40,7 @@
     <tr>
          <td>From date requested is earlier than available data</td>
          <td>
-           <p>startDate earlier than 31st March 2013</p>
+           <p>startDate earlier than 31 March 2013</p>
            <p>e.g. startDate=2013-02-28</p>
          </td>
          <td>

@@ -9,7 +9,7 @@
       "properties": {
         "self": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get addresses for the requested match ID.",
+          "description": "The Uniform Resource Identifier (URI) for this endpoint.",
           "properties": {
             "href": {
               "type": "string",
@@ -24,7 +24,7 @@
       ]
     },
     "employments": {
-      "description": "The list of an individual’s PAYE employment data for the requested time period. ",
+      "description": "The list of an individual’s PAYE employment data for the requested time period.",
       "type": "array",
       "minItems": 0,
       "items": {
@@ -75,49 +75,43 @@
                     "minLength": 0,
                     "maxLength": 10
                   }
-              },
-              "districtNumber": {
-                "description": "Optional. The district number section of the employer reference.",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 3
-              },
-              "schemeRef": {
-                "description": "Optional. The scheme reference section of the employer reference.",
-                "type": "string",
-                "minLength": 0,
-                "maxLength": 10
+                },
+                "payeReference": {
+                  "type": "string",
+                  "description": "Employer PAYE Reference",
+                  "example": "123/AI45678"
+                }
               }
-            }
-          },
-          "employment": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-              "startDate": {
-                "description": "Format YYYY-MM-DD e.g. 2020-08-18. Range 1900-01-01 to 2099-12-31.",
-                "type": "string",
-                "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
-              },
-              "endDate": {
-                "description": "Format YYYY-MM-DD e.g. 2020-08-18. Range 1900-01-01 to 2099-12-31.",
-                "type": "string",
-                "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
-              },
-              "payFrequency": {
-                "description": "Optional. The frequency of payments: W1 Weekly, W2 Fortnightly, W4 Four weekly, M1 Monthly, M3 Quarterly, M6 Bi-annually, MA Annually, IO One off, IR Irregular.",
-                "type": "string",
-                "enum": [
-                  "W1",
-                  "W2",
-                  "W4",
-                  "M1",
-                  "M3",
-                  "M6",
-                  "MA",
-                  "IO",
-                  "IR"
-                ]
+            },
+            "employment": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "startDate": {
+                  "description": "Format YYYY-MM-DD e.g. 2020-08-18. Range 1900-01-01 to 2099-12-31.",
+                  "type": "string",
+                  "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
+                },
+                "endDate": {
+                  "description": "Format YYYY-MM-DD e.g. 2020-08-18. Range 1900-01-01 to 2099-12-31.",
+                  "type": "string",
+                  "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
+                },
+                "payFrequency": {
+                  "description": "A value representing the frequency of payment for an employment.",
+                  "type": "string",
+                  "enum": [
+                    "WEEKLY",
+                    "FORTNIGHTLY",
+                    "FOUR_WEEKLY",
+                    "CALENDAR_MONTHLY",
+                    "QUARTERLY",
+                    "BI_ANNUALLY",
+                    "ANNUALLY",
+                    "ONE_OFF",
+                    "IRREGULAR"
+                  ]
+                }
               }
             }
           }

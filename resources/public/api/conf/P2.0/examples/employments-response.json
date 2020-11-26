@@ -16,13 +16,12 @@
           "line5": "UK",
           "postcode": "DH4 4YY"
         },
-        "districtNumber": "247",
-        "schemeRef": "ZT6767895A"
+        "payeReference": "123/AI45678"
       },
       "employment": {
         "startDate": "2019-01-01",
         "endDate": "2019-03-31",
-        "payFrequency": "M1"
+        "payFrequency": "WEEKLY"
       }
     },
     {
@@ -36,13 +35,12 @@
           "line5": "UK",
           "postcode": "DH4 2CC"
         },
-        "districtNumber": "247",
-        "schemeRef": "A1987CB"
+        "payeReference": "123/AI45679"
       },
       "employment": {
         "startDate": "2019-05-10",
         "endDate": "2019-07-12",
-        "payFrequency": "M1"
+        "payFrequency": "FOUR_WEEKLY"
       }
     }
   ]

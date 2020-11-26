@@ -5,10 +5,11 @@
   "properties": {
     "_links": {
       "type": "object",
+      "description": "A list of endpoint links that indicate possible actions related to the current resource.",
       "properties": {
         "paye": {
           "type": "object",
-          "description": "The URI for the resource to get the individual's employment data",
+          "description": "The Uniform Resource Identifier (URI) for the endpoint to get an individual’s PAYE employment data for the requested match ID and time period.",
           "properties": {
             "href": {
               "type": "string",
@@ -16,14 +17,14 @@
             },
             "title": {
               "type": "string",
-              "example": "View individual's employments"
+              "example": "Get an individual's PAYE employment data"
             }
           },
           "required": ["href"]
         },
         "self": {
           "type": "object",
-          "description": "HAL compliant. Refers to itself",
+          "description": "The URI for this endpoint.",
           "properties": {
             "href": {
               "type": "string",
