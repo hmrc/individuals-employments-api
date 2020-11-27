@@ -32,7 +32,6 @@ uses:
       is: [headers.acceptHeader]
       (annotations.sandboxData): !include sandbox/root.md
       (annotations.scope): "The scopes you have been assigned"
-      securedBy: [ sec.oauth_2_0: { scopes: [ "The scopes you have been assigned" ] } ]
       headers:
         Authorization:
           description: An OAuth 2.0 Bearer Token with the scopes you have been assigned.
@@ -70,14 +69,13 @@ uses:
                   description: Not found
                   value:
                     code: NOT_FOUND
- /paye:
+  /paye:
     get:
       displayName: Retrieve Employments history
       description: !include docs/employments-endpoint-description.md
       is: [headers.acceptHeader]
       (annotations.sandboxData): !include sandbox/employments-request.md
       (annotations.scope): "The scopes you have been assigned"
-      securedBy: [ sec.oauth_2_0: { scopes: [ "The scopes you have been assigned" ] } ]
       headers:
         Authorization:
           description: OAuth 2.0 Bearer Token with the read:individuals-employments-paye scope.

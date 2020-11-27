@@ -1,0 +1,403 @@
+<!DOCTYPE HTML><html><head><title>Individuals Employments API documentation</title><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta name="generator" content="https://github.com/raml2html/raml2html 7.6.0"><link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css"><script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script type="text/javascript" src="https://netdna.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script><script type="text/javascript">
+      $(document).ready(function() {
+  $('.page-header pre code, .top-resource-description pre code, .modal-body pre code').each(function(i, block) {
+    hljs.highlightBlock(block);
+  });
+
+  $('[data-toggle]').click(function() {
+    var selector = $(this).data('target') + ' pre code';
+    $(selector).each(function(i, block) {
+      hljs.highlightBlock(block);
+    });
+  });
+
+  // open modal on hashes like #_action_get
+  $(window).bind('hashchange', function(e) {
+    var anchor_id = document.location.hash.substr(1); //strip #
+    var element = $('#' + anchor_id);
+
+    // do we have such element + is it a modal?  --> show it
+    if (element.length && element.hasClass('modal')) {
+      element.modal('show');
+    }
+  });
+
+  // execute hashchange on first page load
+  $(window).trigger('hashchange');
+
+  // remove url fragment on modal hide
+  $('.modal').on('hidden.bs.modal', function() {
+    try {
+      if (history && history.replaceState) {
+          history.replaceState({}, '', '#');
+      }
+    } catch(e) {}
+  });
+});
+    </script><style>
+      .hljs {
+  background: transparent;
+}
+.parent {
+  color: #999;
+}
+.list-group-item > .badge {
+  float: none;
+  margin-right: 6px;
+}
+.panel-title > .methods {
+  float: right;
+}
+.badge {
+  border-radius: 0;
+  text-transform: uppercase;
+  width: 70px;
+  font-weight: normal;
+  color: #f3f3f6;
+  line-height: normal;
+}
+.badge_get {
+  background-color: #63a8e2;
+}
+.badge_post {
+  background-color: #6cbd7d;
+}
+.badge_put {
+  background-color: #22bac4;
+}
+.badge_delete {
+  background-color: #d26460;
+}
+.badge_patch {
+  background-color: #ccc444;
+}
+.list-group,
+.panel-group {
+  margin-bottom: 0;
+}
+.panel-group .panel+.panel-white {
+  margin-top: 0;
+}
+.panel-group .panel-white {
+  border-bottom: 1px solid #F5F5F5;
+  border-radius: 0;
+}
+.panel-white:last-child {
+  border-bottom-color: white;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+.panel-white .panel-heading {
+  background: white;
+}
+.tab-pane ul {
+  padding-left: 2em;
+}
+.tab-pane h1 {
+  font-size: 1.3em;
+}
+.tab-pane h2 {
+  font-size: 1.2em;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #ddd;
+}
+.tab-pane h3 {
+  font-size: 1.1em;
+}
+.tab-content {
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+  padding: 10px;
+}
+#sidebar {
+  margin-top: 30px;
+  padding-right: 5px;
+  overflow: auto;
+  height: 90%;
+}
+.top-resource-description {
+  border-bottom: 1px solid #ddd;
+  background: #fcfcfc;
+  padding: 15px 15px 0 15px;
+  margin: -15px -15px 10px -15px;
+}
+.resource-description {
+  border-bottom: 1px solid #fcfcfc;
+  background: #fcfcfc;
+  padding: 15px 15px 0 15px;
+  margin: -15px -15px 10px -15px;
+}
+.resource-description p:last-child {
+  margin: 0;
+}
+.list-group .badge {
+  float: left;
+}
+.method_description {
+  margin-left: 85px;
+}
+.method_description p:last-child {
+  margin: 0;
+}
+.list-group-item {
+  cursor: pointer;
+}
+.list-group-item:hover {
+  background-color: #f5f5f5;
+}
+pre code {
+  overflow: auto;
+  word-wrap: normal;
+  white-space: pre;
+}
+.items {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+}
+.examples {
+  margin-left: 0.5em;
+}
+.resource-modal li > ul {
+  margin-bottom: 1em;
+}
+.required {
+  color: #f00;
+}
+    </style></head><body data-spy="scroll" data-target="#sidebar"><div class="container"><div class="row"><div class="col-md-9" role="main"><div class="page-header"><h1>Individuals Employments API documentation <small>version P2.0</small></h1><p>https://api.service.hmrc.gov.uk/</p><h3 id="overview"><a href="#overview">Overview</a></h3><p>This API allows government departments to get information from HM Revenue and Customs (HMRC) about an individual’s employment. This includes their:</p><ul><li>employer’s name and address</li><li>employer’s PAYE reference</li><li>employment dates</li></ul><p>Data will be filtered using scopes so that only relevant data is shared. We’ll assign scopes based on your data requirements.</p><p>The responses exclude fields when they do not have a value.</p><p>This API is a HAL HATEOAS RESTful API. It has been designed to promote discoverability and to be self documenting.</p><p>A HATEOAS API makes it clear to client software what further actions are available when an action is completed. Responses from an endpoint include URLs to further endpoints you can call. New functionality can be added without breaking your client software.</p><p>This API is still under development and further enhancements are planned. We recommend following the HATEOAS approach from the start, so that your work is not affected by future changes.</p><p>Follow URLs as they are presented to you in the API at runtime. This will prevent you from building state into your client, and will decouple you from changes to the API.</p><p>The default Media Type for responses is hal+json.</p><h3 id="versioning"><a href="#versioning">Versioning</a></h3><p>When an API changes in a way that is backwards-incompatible, we increase the version number of the API. See our <a href="/api-documentation/docs/reference-guide#versioning">reference guide</a> for more on versioning.</p><h3 id="errors"><a href="#errors">Errors</a></h3><p>We use standard HTTP status codes to show whether an API request succeeded or not. They are usually in the range:</p><ul><li>200 to 299 if it succeeded, including code 202 if it was accepted by an API that needs to wait for further action</li><li>400 to 499 if it failed because of a client error by your application</li><li>500 to 599 if it failed because of an error on our server</li></ul><p>Errors specific to each API are shown in the Endpoints section, under Response. See our <a href="/api-documentation/docs/reference-guide#errors">reference guide</a> for more on errors.</p><h3 id="testing"><a href="#testing">Testing</a></h3><p>You can use the sandbox environment to <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/testing">test this API</a>. It does not support <a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/testing/stateful-behaviour">stateful behaviour</a>.</p><p>The Sandbox service for this API supports all the happy path responses and error scenarios described under Resources.</p><p>You can set up PAYE test data for this API using the following resources:</p><ul><li><a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/api-platform-test-user/1.0#_create-a-test-user-which-is-an-individual_post_accordion">Create an individual</a> (with service <code>national-insurance</code>).</li><li><a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/api-platform-test-user/1.0#_create-a-test-user-which-is-an-organisation_post_accordion">Create an employer</a>.</li><li><a href="https://developer.service.hmrc.gov.uk/api-documentation/docs/api/service/individual-income-des-stub/1.0#_create-an-employment_post_accordion">Create an employment</a>.</li></ul></div><div class="panel panel-default"><div class="panel-heading"><h3 id="individuals_employments" class="panel-title">/individuals/employments</h3></div><div class="panel-body"><div class="panel-group"><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_individuals_employments_"><span class="parent">/individuals/employments</span>/</a> <span class="methods"><a href="#individuals_employments__get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_individuals_employments_" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#individuals_employments__get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Use this endpoint to get a list of available endpoints for Individuals Employments.</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="individuals_employments__get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/individuals/employments</span>/</h4></div><div class="modal-body"><div class="alert alert-info"><p>Use this endpoint to get a list of available endpoints for Individuals Employments.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#individuals_employments__get_request" data-toggle="tab">Request</a></li><li><a href="#individuals_employments__get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="individuals_employments__get_request"><h3>Annotations</h3><ul><li><strong>annotations.sandboxData</strong><pre><code>"<table>\n    <col width='\"25%\"'>\n    <col width='\"35%\"'>\n    <col width='\"40%\"'>\n    <thead>\n    <tr>\n        <th>Scenario</th>\n        <th>Parameters</th>\n        <th>Response</th>\n    </tr>\n    </thead>\n    <tbody>\n    <tr>\n        <td><p>Employments data found</p></td>\n        <td><p>matchId=&lt;obtained from Individuals Matching API. example: 57072660-1df9-4aeb-\n                        b4ea-cd2d7f96e430&gt;</p></td>\n        <td><p>200 (OK)</p><p>Payload as per response example above</p></td>\n    </tr>\n    <tr>\n        <td>Missing matchId</td>\n        <td>matchId query parameter missing</td>\n        <td><p>400 (Bad Request)</p>\n        <p>{ "code" : "INVALID_REQUEST",<br>"message" : "matchId is required" }</p>\n        </td>\n    </tr>\n    <tr>\n        <td><p>Incorrect matchId</p></td>\n        <td><p>The matchId is not valid</p></td>\n        <td><p>404 (Not Found)</p>\n        <p>{ "code" : "NOT_FOUND",<br>"message" : "The resource cannot be found" }</p></td>\n    </tr>\n    </tbody>\n</table>"</code></pre></li><li><strong>annotations.scope</strong><pre><code>"The scopes you have been assigned"</code></pre></li></ul><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em><span class="required">required</span>(string)</em><p>An OAuth 2.0 Bearer Token with the scopes you have been assigned.</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>Bearer &lt;BEARER_TOKEN&gt;</code></pre></div></li><li><strong>Accept</strong>: <em><span class="required">required</span>(string)</em><p>Specifies the response format and the <a href="/api-documentation/docs/reference-guide#versioning">version</a> of the API to be used.</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>application/vnd.hmrc.1.0+json</code></pre></div></li></ul><h3>Query Parameters</h3><ul><li><strong>matchId</strong>: <em><span class="required">required</span>(string)</em><p>A short-lived UUID, typically valid for several hours. Generated through the Individuals Matching API.</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>57072660-1df9-4aeb-b4ea-cd2d7f96e430</code></pre></div></li></ul></div><div class="tab-pane" id="individuals_employments__get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The resource available to view an individual&#39;s employments</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>:</p><pre><code>{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Individual&#39;s employments",
+  "type": "object",
+  "properties": {
+    "_links": {
+      "type": "object",
+      "description": "A list of endpoint links that indicate possible actions related to the current resource.",
+      "properties": {
+        "paye": {
+          "type": "object",
+          "description": "The Uniform Resource Identifier (URI) for the endpoint to get an individual’s PAYE employment data for the requested match ID and time period.",
+          "properties": {
+            "href": {
+              "type": "string",
+              "example": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&amp;startDate,endDate}"
+            },
+            "title": {
+              "type": "string",
+              "example": "Get an individual&#39;s PAYE employment data"
+            }
+          },
+          "required": ["href"]
+        },
+        "self": {
+          "type": "object",
+          "description": "The URI for this endpoint.",
+          "properties": {
+            "href": {
+              "type": "string",
+              "example": "/individuals/employments/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+            }
+          },
+          "required": ["href"]
+        }
+      },
+      "required": ["paye", "self"]
+    }
+  },
+  "required": ["_links"]
+}
+</code></pre><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "_links": {
+    "paye": {
+      "href": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&amp;startDate,endDate}",
+      "title": "Get an individual&#39;s PAYE employment data"
+    },
+    "self": {
+      "href": "/individuals/employments/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+    }
+  }
+}
+</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>code</strong>: <em><span class="required">required</span>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><p><strong>BadRequest</strong>:<br>Invalid request</p><pre><code>{
+  "code": "INVALID_REQUEST"
+}</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>code</strong>: <em><span class="required">required</span>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><p><strong>NotFound</strong>:<br>Not found</p><pre><code>{
+  "code": "NOT_FOUND"
+}</code></pre></div></div></div></div></div></div></div></div><div class="panel panel-white resource-modal"><div class="panel-heading"><h4 class="panel-title"><a class="collapsed" data-toggle="collapse" href="#panel_individuals_employments_paye"><span class="parent">/individuals/employments</span>/paye</a> <span class="methods"><a href="#individuals_employments_paye_get"><span class="badge badge_get">get</span></a></span></h4></div><div id="panel_individuals_employments_paye" class="panel-collapse collapse"><div class="panel-body"><div class="list-group"><div onclick="window.location.href = '#individuals_employments_paye_get'" class="list-group-item"><span class="badge badge_get">get</span><div class="method_description"><p>Use this endpoint to get an individual’s employment details for the requested time period.</p></div><div class="clearfix"></div></div></div></div></div><div class="modal fade" tabindex="0" id="individuals_employments_paye_get"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button><h4 class="modal-title" id="myModalLabel"><span class="badge badge_get">get</span> <span class="parent">/individuals/employments</span>/paye</h4></div><div class="modal-body"><div class="alert alert-info"><p>Use this endpoint to get an individual’s employment details for the requested time period.</p></div><ul class="nav nav-tabs"><li class="active"><a href="#individuals_employments_paye_get_request" data-toggle="tab">Request</a></li><li><a href="#individuals_employments_paye_get_response" data-toggle="tab">Response</a></li></ul><div class="tab-content"><div class="tab-pane active" id="individuals_employments_paye_get_request"><h3>Annotations</h3><ul><li><strong>annotations.sandboxData</strong><pre><code>"<table>\n    <col width='\"25%\"'>\n    <col width='\"35%\"'>\n    <col width='\"40%\"'>\n    <thead>\n    <tr>\n        <th>Scenario</th>\n        <th>Parameters</th>\n        <th>Response</th>\n    </tr>\n    </thead>\n    <tbody>\n    <tr>\n        <td><p>PAYE employments data found</p></td>\n        <td><p>matchId=&lt;obtained from Individuals Matching API. example: 57072660-1df9-4aeb-\n                                               b4ea-cd2d7f96e430&gt;</p><p>startDate=2019-01-01</p><p>endDate=2020-03-01</p></td>\n        <td><p>200 (OK)</p><p>Payload as response example above</p></td>\n    </tr>\n    <tr>\n        <td>Missing matchId</td>\n        <td>matchId query parameter missing</td>\n        <td><p>400 (Bad Request)</p>\n        <p>{ "code" : "INVALID_REQUEST",<br>"message" : "matchId is required" }</p>\n        </td>\n    </tr>\n    <tr>\n        <td>Missing startDate</td>\n        <td>startDate query parameter missing</td>\n        <td><p>400 (Bad Request)</p>\n        <p>{ "code" : "INVALID_REQUEST",<br>"message" : "startDate is required" }</p>\n        </td>\n    </tr>\n    <tr>\n         <td><p>endDate earlier than startDate</p></td>\n         <td><p>Any valid dates where endDate is earlier than startDate</p>\n         <p>e.g. startDate=2020-01-01 endDate=2019-01-01</p></td>\n         <td><p>400 (Bad Request)</p>\n         <p>{ "code" : "INVALID_REQUEST",<br>"message" : "Invalid time period requested" }</p></td>\n    </tr>\n    <tr>\n         <td>From date requested is earlier than available data</td>\n         <td>\n           <p>startDate earlier than 31 March 2013</p>\n           <p>e.g. startDate=2013-02-28</p>\n         </td>\n         <td>\n           <p>400 (Bad Request)</p>\n           <p>{ "code" : "INVALID_REQUEST",<br>"message" : "startDate earlier than 31st March 2013" }</p>\n         </td>\n    </tr>\n    <tr>\n         <td><p>Invalid date format</p></td>\n         <td><p>Any date that is not ISO 8601 Extended format</p>\n         <p>e.g. 20200101</p></td>\n         <td><p>400 (Bad Request)</p>\n         <p>{ "code" : "INVALID_REQUEST",<br>"message" : "startDate: invalid date format" }</p>\n         <p>{ "code" : "INVALID_REQUEST",<br>"message" : "endDate: invalid date format" }</p></td>\n    </tr>\n    <tr>\n        <td><p>Incorrect matchId</p></td>\n        <td><p>The matchId is not valid</p></td>\n        <td><p>404 (Not Found)</p>\n        <p>{ "code" : "NOT_FOUND",<br>"message" : "The resource cannot be found" }</p></td>\n    </tr>\n    </tbody>\n</table>"</code></pre></li><li><strong>annotations.scope</strong><pre><code>"The scopes you have been assigned"</code></pre></li></ul><h3>Headers</h3><ul><li><strong>Authorization</strong>: <em><span class="required">required</span>(string)</em><p>OAuth 2.0 Bearer Token with the read:individuals-employments-paye scope.</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>Bearer &lt;BEARER_TOKEN&gt;</code></pre></div></li><li><strong>Accept</strong>: <em><span class="required">required</span>(string)</em><p>Specifies the response format and the <a href="/api-documentation/docs/reference-guide#versioning">version</a> of the API to be used.</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>application/vnd.hmrc.1.0+json</code></pre></div></li></ul><h3>Query Parameters</h3><ul><li><strong>matchId</strong>: <em><span class="required">required</span>(string)</em><p>A short-lived UUID, typically valid for several hours. Generated through the Individuals Matching API</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>57072660-1df9-4aeb-b4ea-cd2d7f96e430</code></pre></div></li><li><strong>startDate</strong>: <em><span class="required">required</span>(string)</em><p>The start date for employment data requested.</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>2019-01-01</code></pre></div></li><li><strong>endDate</strong>: <em>(string)</em><p>The end date for employment data requested. If missing, it defaults to today&#39;s date.</p><p><strong>Example</strong>:</p><div class="examples"><pre><code>2020-03-01</code></pre></div></li></ul></div><div class="tab-pane" id="individuals_employments_paye_get_response"><h2>HTTP status code <a href="http://httpstatus.es/200" target="_blank">200</a></h2><p>The individual PAYE employments for the given period</p><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>:</p><pre><code>{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Individual&#39;s PAYE employments",
+  "type": "object",
+  "properties": {
+    "_links": {
+      "type": "object",
+      "description": "A list of endpoint links that indicate possible actions related to the current resource.",
+      "properties": {
+        "self": {
+          "type": "object",
+          "description": "The Uniform Resource Identifier (URI) for this endpoint.",
+          "properties": {
+            "href": {
+              "type": "string",
+              "example": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&amp;startDate=2019-02-28&amp;endDate=2020-03-01"
+            }
+          },
+          "required": ["href"]
+        }
+      },
+      "required": [
+        "self"
+      ]
+    },
+    "employments": {
+      "description": "The list of an individual’s PAYE employment data for the requested time period.",
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "employer": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "description": "Optional.",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+              },
+              "address": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "line1": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 100
+                  },
+                  "line2": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 100
+                  },
+                  "line3": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 100
+                  },
+                  "line4": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 100
+                  },
+                  "line5": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 100
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 10
+                  }
+                },
+                "payeReference": {
+                  "type": "string",
+                  "description": "Employer PAYE Reference",
+                  "example": "123/AI45678"
+                }
+              }
+            },
+            "employment": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "startDate": {
+                  "description": "Format YYYY-MM-DD e.g. 2020-08-18. Range 1900-01-01 to 2099-12-31.",
+                  "type": "string",
+                  "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
+                },
+                "endDate": {
+                  "description": "Format YYYY-MM-DD e.g. 2020-08-18. Range 1900-01-01 to 2099-12-31.",
+                  "type": "string",
+                  "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
+                },
+                "payFrequency": {
+                  "description": "A value representing the frequency of payment for an employment.",
+                  "type": "string",
+                  "enum": [
+                    "WEEKLY",
+                    "FORTNIGHTLY",
+                    "FOUR_WEEKLY",
+                    "CALENDAR_MONTHLY",
+                    "QUARTERLY",
+                    "BI_ANNUALLY",
+                    "ANNUALLY",
+                    "ONE_OFF",
+                    "IRREGULAR"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["_links", "employments"]
+}
+</code></pre><p><strong>Example</strong>:</p><div class="examples"><pre><code>{
+  "_links": {
+    "self": {
+      "href": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&amp;startDate=2016-02-28&amp;endDate=2017-03-01"
+    }
+  },
+  "employments": [
+    {
+      "employer": {
+        "name": "ACME Industries Limited",
+        "address": {
+          "line1": "Unit 23",
+          "line2": "Utilitarian Industrial Park",
+          "line3": "Utilitown",
+          "line4": "County Durham",
+          "line5": "UK",
+          "postcode": "DH4 4YY"
+        },
+        "payeReference": "123/AI45678"
+      },
+      "employment": {
+        "startDate": "2019-01-01",
+        "endDate": "2019-03-31",
+        "payFrequency": "WEEKLY"
+      }
+    },
+    {
+      "employer": {
+        "name": "Robson &amp; Robson and Sons",
+        "address": {
+          "line1": "Robson House",
+          "line2": "Fairfield Drive",
+          "line3": "Utilitown",
+          "line4": "County Durham",
+          "line5": "UK",
+          "postcode": "DH4 2CC"
+        },
+        "payeReference": "123/AI45679"
+      },
+      "employment": {
+        "startDate": "2019-05-10",
+        "endDate": "2019-07-12",
+        "payFrequency": "FOUR_WEEKLY"
+      }
+    }
+  ]
+}
+</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/400" target="_blank">400</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>code</strong>: <em><span class="required">required</span>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><p><strong>BadRequest</strong>:<br>Invalid request</p><pre><code>{
+  "code": "INVALID_REQUEST"
+}</code></pre></div><h2>HTTP status code <a href="http://httpstatus.es/404" target="_blank">404</a></h2><h3>Body</h3><p><strong>Media type</strong>: application/json</p><p><strong>Type</strong>: object</p><strong>Properties</strong><ul><li><strong>code</strong>: <em><span class="required">required</span>(string)</em></li></ul><p><strong>Example</strong>:</p><div class="examples"><p><strong>NotFound</strong>:<br>Not found</p><pre><code>{
+  "code": "NOT_FOUND"
+}</code></pre></div></div></div></div></div></div></div></div></div></div></div></div><div class="col-md-3"><div id="sidebar" class="hidden-print affix" role="complementary"><ul class="nav nav-pills nav-stacked"><li><a href="#individuals_employments">/individuals/employments</a></li></ul></div></div></div></div></body></html>
