@@ -29,11 +29,9 @@
       "minItems": 0,
       "items": {
         "type": "object",
-        "additionalProperties": false,
         "properties": {
           "employer": {
             "type": "object",
-            "additionalProperties": false,
             "properties": {
               "name": {
                 "description": "Optional.",
@@ -43,7 +41,6 @@
               },
               "address": {
                 "type": "object",
-                "additionalProperties": false,
                 "properties": {
                   "line1": {
                     "type": "string",
@@ -85,7 +82,6 @@
             },
             "employment": {
               "type": "object",
-              "additionalProperties": false,
               "properties": {
                 "startDate": {
                   "description": "Format YYYY-MM-DD e.g. 2020-08-18. Range 1900-01-01 to 2099-12-31.",
