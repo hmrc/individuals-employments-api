@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Individual's PAYE employments",
+  "type": "object",
+  "properties": {
+    "_links": {
+      "type": "object",
+      "description": "A list of endpoint links that indicate possible actions related to the current resource.",
+      "properties": {
+        "self": {
+          "type": "object",
+          "description": "The Uniform Resource Identifier (URI) for this endpoint.",
+          "properties": {
+            "href": {
+              "type": "string",
+              "example": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&startDate=2019-02-28&endDate=2020-03-01"
+            }
+          },
+          "required": ["href"]
+        }
+      },
+      "required": [
+        "self"
+      ]
+    },
+    "employments": {
+      "description": "The list of an individual’s PAYE employment data for the requested time period.",
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "properties": {
+          "employer": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "description": "Optional.",
+                "type": "string",
+                "minLength": 0,
+                "maxLength": 100
+              },
+              "address": {
+                "type": "object",
+                "properties": {
+                  "line1": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 100
+                  },
+                  "line2": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 100
+                  },
+                  "line3": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 100
+                  },
+                  "line4": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 100
+                  },
+                  "line5": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 100
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "minLength": 0,
+                    "maxLength": 10
+                  }
+                },
+                "payeReference": {
+                  "type": "string",
+                  "description": "Employer PAYE Reference",
+                  "example": "123/AI45678"
+                }
+              }
+            },
+            "employment": {
+              "type": "object",
+              "properties": {
+                "startDate": {
+                  "description": "Format YYYY-MM-DD e.g. 2020-08-18. Range 1900-01-01 to 2099-12-31.",
+                  "type": "string",
+                  "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
+                },
+                "endDate": {
+                  "description": "Format YYYY-MM-DD e.g. 2020-08-18. Range 1900-01-01 to 2099-12-31.",
+                  "type": "string",
+                  "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
+                },
+                "payFrequency": {
+                  "description": "A value representing the frequency of payment for an employment.",
+                  "type": "string",
+                  "enum": [
+                    "WEEKLY",
+                    "FORTNIGHTLY",
+                    "FOUR_WEEKLY",
+                    "CALENDAR_MONTHLY",
+                    "QUARTERLY",
+                    "BI_ANNUALLY",
+                    "ANNUALLY",
+                    "ONE_OFF",
+                    "IRREGULAR"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["_links", "employments"]
+}

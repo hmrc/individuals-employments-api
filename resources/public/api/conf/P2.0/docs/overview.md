@@ -1,4 +1,3 @@
-# Overview
 This API allows government departments to get information from HM Revenue and Customs (HMRC) about an individual’s employment. This includes their:
 
 * employer’s name and address

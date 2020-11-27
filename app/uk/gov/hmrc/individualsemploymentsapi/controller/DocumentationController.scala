@@ -32,11 +32,26 @@ class DocumentationController @Inject()(
   config: Configuration)
     extends BackendController(cc) {
 
-  val V1WhitelistedApplicationIDs = config.getOptional[Seq[String]]("api.access.version-P1.0.whitelistedApplicationIds")
-  val V2WhitelistedApplicationIDs = config.getOptional[Seq[String]]("api.access.version-P2.0.whitelistedApplicationIds")
+  val v1WhitelistedApplicationIDs = config
+    .getOptional[Seq[String]](
+      "api.access.version-P1.0.whitelistedApplicationIds"
+    )
+    .getOrElse(Seq.empty)
+
+  val v2WhitelistedApplicationIDs = config
+    .getOptional[Seq[String]](
+      "api.access.version-P2.0.whitelistedApplicationIds"
+    )
+    .getOrElse(Seq.empty)
 
   def definition(): Action[AnyContent] = Action { request =>
-    Ok(txt.definition(V1WhitelistedApplicationIDs, V2WhitelistedApplicationIDs)).withHeaders(CONTENT_TYPE -> JSON)
+    Ok(
+      txt.definition(
+        v1WhitelistedApplicationIDs,
+        v2WhitelistedApplicationIDs
+      )).withHeaders(
+      CONTENT_TYPE -> JSON
+    )
   }
   def documentation(
     version: String,

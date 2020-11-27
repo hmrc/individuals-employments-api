@@ -1,6 +1,6 @@
 @import play.api.libs.json.Json
-@(  V1WhitelistedApplicationIDs: Option[Seq[String]],
-    V2WhitelistedApplicationIDs: Option[Seq[String]])
+@(  V1WhitelistedApplicationIDs: Seq[String],
+    V2WhitelistedApplicationIDs: Seq[String])
 {
   "scopes":[
     {
