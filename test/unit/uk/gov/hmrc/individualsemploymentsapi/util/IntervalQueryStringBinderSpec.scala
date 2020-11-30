@@ -20,6 +20,7 @@ import org.joda.time.LocalDateTime
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{EitherValues, FlatSpec, Matchers}
 import uk.gov.hmrc.individualsemploymentsapi.util.IntervalQueryStringBinder
+import utils.Intervals
 
 class IntervalQueryStringBinderSpec extends FlatSpec with Matchers with EitherValues with Intervals {
 
