@@ -16,15 +16,16 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.util
 
-import org.joda.time.LocalDateTime.parse
-import org.joda.time.{Interval, LocalDateTime}
+import scala.util.Random
 
-trait Intervals {
-
-  protected def toInterval(fromDate: String, toDate: String): Interval =
-    toInterval(parse(fromDate), parse(toDate))
-
-  protected def toInterval(fromDate: LocalDateTime, toDate: LocalDateTime): Interval =
-    new Interval(fromDate.toDate.getTime, toDate.toDate.getTime)
-
+trait StringsSpec {
+  def generateString(length: Int): String = {
+    val chars = "abcdefghijklmnopqrstuvwxyz123456789"
+    def generate(string: String): String =
+      if (string.length < length)
+        generate(string.concat(chars.charAt(Random.nextInt(chars.length - 1)).toString))
+      else
+        string
+    generate("")
+  }
 }

@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Individual's employments",
+  "type": "object",
+  "properties": {
+    "_links": {
+      "type": "object",
+      "description": "A list of endpoint links that indicate possible actions related to the current resource.",
+      "properties": {
+        "paye": {
+          "type": "object",
+          "description": "The Uniform Resource Identifier (URI) for the endpoint to get an individual’s PAYE employment data for the requested match ID and time period.",
+          "properties": {
+            "href": {
+              "type": "string",
+              "example": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&startDate,endDate}"
+            },
+            "title": {
+              "type": "string",
+              "example": "Get an individual's PAYE employment data"
+            }
+          },
+          "required": ["href"]
+        },
+        "self": {
+          "type": "object",
+          "description": "The URI for this endpoint.",
+          "properties": {
+            "href": {
+              "type": "string",
+              "example": "/individuals/employments/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+            }
+          },
+          "required": ["href"]
+        }
+      },
+      "required": ["paye", "self"]
+    }
+  },
+  "required": ["_links"]
+}

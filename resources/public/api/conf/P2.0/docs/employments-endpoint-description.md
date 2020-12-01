@@ -1,1 +1,1 @@
-<p>This endpoint returns an individual's PAYE employments data for the requested time period.</p>
+<p>Use this endpoint to get an individual’s employment details for the requested time period.</p>

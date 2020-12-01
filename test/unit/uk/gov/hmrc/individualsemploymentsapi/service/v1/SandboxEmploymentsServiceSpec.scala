@@ -20,7 +20,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.domain.Employment
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.SandboxEmploymentsService
-import unit.uk.gov.hmrc.individualsemploymentsapi.util.{Intervals, SpecBase}
+import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
+import utils.Intervals
 
 class SandboxEmploymentsServiceSpec extends SpecBase with Intervals {
 
