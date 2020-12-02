@@ -16,6 +16,9 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
+import java.util.UUID
+
+import org.joda.time.{Interval, LocalDate}
 import org.mockito.BDDMockito.given
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions}
@@ -24,7 +27,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfigurationV2, ShortLivedCacheV2}
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheIdBase, CacheServiceV2}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheIdBase, CacheIdV2, CacheServiceV2}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -77,6 +80,27 @@ class CacheServiceV2Spec extends SpecBase with MockitoSugar with ScalaFutures {
       verifyNoMoreInteractions(mockClient)
 
     }
+  }
+
+  "CacheIdV2" should {
+
+    "produce a cache id based on matchId and scopes" in {
+
+      val matchId = UUID.randomUUID()
+      val fromDateString = "2017-03-02"
+      val toDateString = "2017-05-31"
+
+      val interval = new Interval(
+        new LocalDate(fromDateString).toDateTimeAtStartOfDay,
+        new LocalDate(toDateString).toDateTimeAtStartOfDay)
+
+      val fields = "ABDFH"
+
+      CacheIdV2(matchId, interval, fields).id shouldBe
+        s"$matchId-${interval.getStart}-${interval.getEnd}-ABDFH"
+
+    }
+
   }
 }
 
