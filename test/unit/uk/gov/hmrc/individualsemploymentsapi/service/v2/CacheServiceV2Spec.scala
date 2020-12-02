@@ -18,6 +18,7 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
 import java.util.UUID
 
+import it.uk.gov.hmrc.individualsemploymentsapi.cache.v2.services.TestCacheId
 import org.mockito.BDDMockito.given
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions}
@@ -28,7 +29,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.cache.v1.{CacheConfiguration, ShortLivedCache}
 import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfigurationV2, ShortLivedCacheV2}
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.CacheService
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.CacheServiceV2
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheId, CacheServiceV2}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -36,7 +37,7 @@ import scala.concurrent.Future
 
 class CacheServiceV2Spec extends SpecBase with MockitoSugar with ScalaFutures {
 
-  val cacheId = UUID.randomUUID().toString
+  val cacheId = TestCacheId("foo")
   val cachedValue = TestClass("cached value")
   val newValue = TestClass("new value")
 
@@ -55,7 +56,7 @@ class CacheServiceV2Spec extends SpecBase with MockitoSugar with ScalaFutures {
     "return the cached value for a given id and key" in new Setup {
 
       given(mockCacheConfig.key).willReturn("individuals-employments")
-      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId), eqTo("individuals-employments"))(any()))
+      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId.id), eqTo("individuals-employments"))(any()))
         .willReturn(Future.successful(Some(cachedValue)))
 
       await(cacheService.get[TestClass](cacheId, Future.successful(newValue))) shouldBe cachedValue
@@ -65,11 +66,11 @@ class CacheServiceV2Spec extends SpecBase with MockitoSugar with ScalaFutures {
     "cache the result of the fallback function when no cached value exists for a given id and key" in new Setup {
 
       given(mockCacheConfig.key).willReturn("individuals-employments")
-      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId), eqTo("individuals-employments"))(any()))
+      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId.id), eqTo("individuals-employments"))(any()))
         .willReturn(Future.successful(None))
 
       await(cacheService.get[TestClass](cacheId, Future.successful(newValue))) shouldBe newValue
-      verify(mockClient).cache[TestClass](eqTo(cacheId), eqTo("individuals-employments"), eqTo(newValue))(any())
+      verify(mockClient).cache[TestClass](eqTo(cacheId.id), eqTo("individuals-employments"), eqTo(newValue))(any())
 
     }
 
@@ -83,6 +84,8 @@ class CacheServiceV2Spec extends SpecBase with MockitoSugar with ScalaFutures {
     }
   }
 }
+
+case class TestCacheId(id: String) extends CacheId
 
 case class TestClass(value: String)
 
