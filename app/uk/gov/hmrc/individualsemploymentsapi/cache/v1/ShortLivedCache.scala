@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.cache
+package uk.gov.hmrc.individualsemploymentsapi.cache.v1
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
+import play.modules.reactivemongo.ReactiveMongoComponent
 import uk.gov.hmrc.cache.TimeToLive
 import uk.gov.hmrc.cache.repository.CacheMongoRepository
 import uk.gov.hmrc.crypto._
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
-import play.modules.reactivemongo.ReactiveMongoComponent
 
 import scala.concurrent.{ExecutionContext, Future}
 

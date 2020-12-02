@@ -24,12 +24,13 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
-import uk.gov.hmrc.individualsemploymentsapi.service.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesService}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsServiceV2, LiveEmploymentsServiceV2, SandboxEmploymentsServiceV2}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.ScopesService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 abstract class EmploymentsController(
-  employmentsService: EmploymentsService,
+  employmentsService: EmploymentsServiceV2,
   scopeService: ScopesService,
   cc: ControllerComponents)
     extends CommonController(cc) with PrivilegedAuthentication {
@@ -59,7 +60,7 @@ abstract class EmploymentsController(
 
 @Singleton
 class SandboxEmploymentsController @Inject()(
-  sandboxEmploymentsService: SandboxEmploymentsService,
+  sandboxEmploymentsService: SandboxEmploymentsServiceV2,
   scopeService: ScopesService,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
@@ -71,7 +72,7 @@ class SandboxEmploymentsController @Inject()(
 
 @Singleton
 class LiveEmploymentsController @Inject()(
-  liveEmploymentsService: LiveEmploymentsService,
+  liveEmploymentsService: LiveEmploymentsServiceV2,
   scopeService: ScopesService,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,

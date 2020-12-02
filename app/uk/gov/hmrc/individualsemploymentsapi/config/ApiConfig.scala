@@ -18,7 +18,7 @@ package uk.gov.hmrc.individualsemploymentsapi.config
 
 import com.typesafe.config.Config
 import play.api.ConfigLoader
-import uk.gov.hmrc.individualsemploymentsapi.service.PathTree
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.PathTree
 
 import scala.collection.JavaConverters._
 

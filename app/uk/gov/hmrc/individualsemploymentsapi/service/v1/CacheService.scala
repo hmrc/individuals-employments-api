@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.service
+package uk.gov.hmrc.individualsemploymentsapi.service.v1
 
 import javax.inject.Inject
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.cache.{CacheConfiguration, ShortLivedCache}
+import uk.gov.hmrc.individualsemploymentsapi.cache.v1.{CacheConfiguration, ShortLivedCache}
 
 import scala.concurrent.{ExecutionContext, Future}
 
