@@ -23,7 +23,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{Json, OFormat}
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheId, CacheIdV2, CacheServiceV2}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheIdBase, CacheServiceV2}
 
 import scala.concurrent.Future
 
@@ -77,7 +77,7 @@ class CacheServiceSpec
   }
 }
 
-case class TestCacheId(id: String) extends CacheId
+case class TestCacheId(id: String) extends CacheIdBase
 
 case class TestClass(param: String)
 

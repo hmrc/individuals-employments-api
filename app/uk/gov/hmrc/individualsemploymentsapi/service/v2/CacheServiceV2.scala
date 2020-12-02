@@ -29,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class CacheServiceV2 @Inject()(cachingClient: ShortLivedCacheV2, conf: CacheConfigurationV2)(
   implicit ec: ExecutionContext) {
 
-  def get[T: Format](cacheId: CacheId, functionToCache: => Future[T])(implicit hc: HeaderCarrier): Future[T] =
+  def get[T: Format](cacheId: CacheIdBase, functionToCache: => Future[T])(implicit hc: HeaderCarrier): Future[T] =
     if (conf.cacheEnabled) {
       cachingClient.fetchAndGetEntry[T](cacheId.id, conf.key) flatMap {
         case Some(value) => Future.successful(value)
@@ -53,13 +53,13 @@ class CacheServiceV2 @Inject()(cachingClient: ShortLivedCacheV2, conf: CacheConf
 // `id + from + to +  [A, B, C, D, E, F]` Or formatted to `id-from-to-ABCDEF`
 // The `fields` param is obtained with scopeService.getValidFieldsForCacheKey(scopes: List[String])
 
-trait CacheId {
+trait CacheIdBase {
   val id: String
 
   override def toString: String = id
 }
 
-case class CacheIdV2(matchId: UUID, interval: Interval, fields: String) extends CacheId {
+case class CacheIdV2(matchId: UUID, interval: Interval, fields: String) extends CacheIdBase {
 
   lazy val id: String =
     s"$matchId-${interval.getStart}-${interval.getEnd}-$fields"

@@ -16,9 +16,6 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import java.util.UUID
-
-import it.uk.gov.hmrc.individualsemploymentsapi.cache.v2.services.TestCacheId
 import org.mockito.BDDMockito.given
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions}
@@ -26,10 +23,8 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.cache.v1.{CacheConfiguration, ShortLivedCache}
 import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfigurationV2, ShortLivedCacheV2}
-import uk.gov.hmrc.individualsemploymentsapi.service.v1.CacheService
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheId, CacheServiceV2}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheIdBase, CacheServiceV2}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -85,7 +80,7 @@ class CacheServiceV2Spec extends SpecBase with MockitoSugar with ScalaFutures {
   }
 }
 
-case class TestCacheId(id: String) extends CacheId
+case class TestCacheId(id: String) extends CacheIdBase
 
 case class TestClass(value: String)
 
