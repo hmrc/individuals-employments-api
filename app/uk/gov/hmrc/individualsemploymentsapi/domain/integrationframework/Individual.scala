@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain.des
+package uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework
 
-object DesPayFrequency extends Enumeration {
-  type DesPayFrequency = Value
-  val W1, W2, W4, IO, IR, M1, M3, M6, MA = Value
-}
+import java.util.UUID
+
+case class Individual(matchId: UUID, nino: String, employments: Seq[IfEmployment])

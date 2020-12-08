@@ -22,8 +22,10 @@ import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.{Interval, LocalDate}
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
-import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, Individual, NinoMatch}
+import uk.gov.hmrc.individualsemploymentsapi.domain
+import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, Individual}
+import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
@@ -43,11 +45,11 @@ trait EmploymentsService {
 @Singleton
 class SandboxEmploymentsService extends EmploymentsService {
 
-  import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.Individuals.find
-  import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData._
+  import uk.gov.hmrc.individualsemploymentsapi.sandbox.v1.SandboxData.Individuals.find
+  import uk.gov.hmrc.individualsemploymentsapi.sandbox.v1.SandboxData._
 
   override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
-    if (matchId.equals(sandboxMatchId)) successful(NinoMatch(sandboxMatchId, sandboxNino))
+    if (matchId.equals(sandboxMatchId)) successful(domain.NinoMatch(sandboxMatchId, sandboxNino))
     else failed(new MatchNotFoundException)
 
   override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =

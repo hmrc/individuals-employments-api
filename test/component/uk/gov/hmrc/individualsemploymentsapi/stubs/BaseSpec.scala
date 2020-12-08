@@ -39,6 +39,7 @@ trait BaseSpec
       "microservice.services.auth.port"                        -> AuthStub.port,
       "microservice.services.individuals-matching-api.port"    -> IndividualsMatchingApiStub.port,
       "microservice.services.des.port"                         -> DesStub.port,
+      "microservice.services.integration-framework.port"       -> IfStub.port,
       "microservice.services.cacheable.short-lived-cache.port" -> Save4LaterStub.port,
       "run.mode"                                               -> "It"
     )
@@ -46,7 +47,7 @@ trait BaseSpec
 
   val timeout = Duration(5, TimeUnit.SECONDS)
   val serviceUrl = s"http://localhost:$port"
-  val mocks = Seq(AuthStub, IndividualsMatchingApiStub, DesStub, Save4LaterStub)
+  val mocks = Seq(AuthStub, IndividualsMatchingApiStub, DesStub, IfStub, Save4LaterStub)
   val authToken = "Bearer AUTH_TOKEN"
   val acceptHeaderVP1 = ACCEPT -> "application/vnd.hmrc.P1.0+json"
   val acceptHeaderVP2 = ACCEPT -> "application/vnd.hmrc.P2.0+json"

@@ -33,13 +33,11 @@ trait AuthHelper {
     )
   )
 
-  protected def fakeAuthConnector(stubbedRetrievalResult: Future[_]): AuthConnector =
-    new AuthConnector {
-
-      def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(
-        implicit hc: HeaderCarrier,
-        ec: ExecutionContext): Future[A] =
-        stubbedRetrievalResult.map(_.asInstanceOf[A])
-    }
+  protected def fakeAuthConnector(stubbedRetrievalResult: Future[_]): AuthConnector = new AuthConnector {
+    def authorise[A](predicate: Predicate, retrieval: Retrieval[A])(
+      implicit hc: HeaderCarrier,
+      ec: ExecutionContext): Future[A] =
+      stubbedRetrievalResult.map(_.asInstanceOf[A])
+  }
 
 }

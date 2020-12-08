@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package unit.uk.gov.hmrc.individualsemploymentsapi.service
+package unit.uk.gov.hmrc.individualsemploymentsapi.service.v1
 
 import java.util.UUID
 
@@ -29,12 +29,15 @@ import play.api.libs.json.Format
 import uk.gov.hmrc.domain.{EmpRef, Nino}
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
+import uk.gov.hmrc.individualsemploymentsapi.domain
 import uk.gov.hmrc.individualsemploymentsapi.domain._
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesPayFrequency.{DesPayFrequency, M1}
+import PayFrequencyCode.{DesPayFrequency, M1}
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.v1.{Address, Employer, Employment}
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.{CacheService, LiveEmploymentsService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.Intervals
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
@@ -56,7 +59,7 @@ class LiveEmploymentsServiceSpec extends SpecBase with Intervals with MockitoSug
 
   private val matchId = UUID.randomUUID()
   private val nino = Nino("AB123456C")
-  private val ninoMatch = NinoMatch(matchId, nino)
+  private val ninoMatch = domain.NinoMatch(matchId, nino)
   private val interval = toInterval("2016-01-01", "2017-03-01")
 
   implicit val hc: HeaderCarrier = new HeaderCarrier
@@ -120,7 +123,6 @@ class LiveEmploymentsServiceSpec extends SpecBase with Intervals with MockitoSug
       await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq(Employment.from(someEmployment).get)
       verify(desConnector, times(2)).fetchEmployments(any(), any())(any(), any())
     }
-
   }
 
   private def mockIndividualsMatchingApiConnectorToReturn(eventualNinoMatch: Future[NinoMatch]) =

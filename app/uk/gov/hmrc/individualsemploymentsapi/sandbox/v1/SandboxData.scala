@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.sandbox
+package uk.gov.hmrc.individualsemploymentsapi.sandbox.v1
 
 import java.util.UUID
 
 import org.joda.time.LocalDate
 import org.joda.time.LocalDate.parse
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.individualsemploymentsapi.domain._
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayFrequency, DesPayment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.{PayFrequencyCode, des}
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment, Individual}
 
 object SandboxData {
 
@@ -55,7 +55,7 @@ object SandboxData {
       Some("AI45678"),
       Some(new LocalDate(2016, 1, 1)),
       Some(new LocalDate(2016, 6, 30)),
-      Some(DesPayFrequency.W4),
+      Some(PayFrequencyCode.W4),
       Some(
         DesAddress(
           line1 = Some("Employee's House"),
@@ -86,7 +86,7 @@ object SandboxData {
       Some("DI45678"),
       Some(parse("2017-01-02")),
       Some(parse("2017-03-01")),
-      Some(DesPayFrequency.W2),
+      Some(PayFrequencyCode.W2),
       Some(
         DesAddress(
           line1 = None,
@@ -102,7 +102,7 @@ object SandboxData {
 
   object Individuals {
 
-    val amanda = Individual(
+    val amanda = des.Individual(
       sandboxMatchId,
       sandboxNinoString,
       Seq(Employments.acme, Employments.disney)

@@ -27,7 +27,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.DesConnector
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayFrequency, DesPayment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -91,7 +92,7 @@ class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSuga
     employerSchemeReference = Some("AI45678"),
     employmentStartDate = Some(LocalDate.parse("2016-01-01")),
     employmentLeavingDate = Some(LocalDate.parse("2016-06-30")),
-    employmentPayFrequency = Some(DesPayFrequency.M1),
+    employmentPayFrequency = Some(PayFrequencyCode.M1),
     payments = desPayments
   )
 

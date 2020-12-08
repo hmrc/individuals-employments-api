@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package unit.uk.gov.hmrc.individualsemploymentsapi.domain
+package unit.uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
 import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.domain.EmpRef
-import uk.gov.hmrc.individualsemploymentsapi.domain.{Address, Employer}
+import uk.gov.hmrc.individualsemploymentsapi.domain.v2.{Address, Employer}
 
 class EmployerSpec extends FlatSpec with Matchers {
 
@@ -35,7 +35,7 @@ class EmployerSpec extends FlatSpec with Matchers {
         postcode = Some("AB1 2CD")
       ))
     val employer = Employer(someEmpRef, someName, someAddress)
-    Employer.create(someEmpRef, someName, someAddress) shouldBe Some(employer)
+    Employer(someEmpRef, someName, someAddress) shouldBe employer
   }
 
   it should "handle the edge case where parameters are empty" in {

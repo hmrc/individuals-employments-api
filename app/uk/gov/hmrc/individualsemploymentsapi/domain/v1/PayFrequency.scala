@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain
+package uk.gov.hmrc.individualsemploymentsapi.domain.v1
 
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesPayFrequency._
+import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode._
 
 object PayFrequency extends Enumeration {
   type PayFrequency = Value

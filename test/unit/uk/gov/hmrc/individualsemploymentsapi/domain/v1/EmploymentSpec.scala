@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package unit.uk.gov.hmrc.individualsemploymentsapi.domain
+package unit.uk.gov.hmrc.individualsemploymentsapi.domain.v1
 
 import org.joda.time.LocalDate
 import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.domain.EmpRef
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayFrequency}
-import uk.gov.hmrc.individualsemploymentsapi.domain.{Address, Employer, Employment, PayFrequency}
+import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.v1.{Address, Employer, Employment, PayFrequency}
 
 class EmploymentSpec extends FlatSpec with Matchers {
 
@@ -33,7 +34,7 @@ class EmploymentSpec extends FlatSpec with Matchers {
       Some("AB12345"),
       Some(new LocalDate(2016, 1, 1)),
       Some(new LocalDate(2016, 12, 31)),
-      Some(DesPayFrequency.M1)
+      Some(PayFrequencyCode.M1)
     )
 
     val employment = Employment(

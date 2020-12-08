@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain.des
+package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
-import uk.gov.hmrc.individualsemploymentsapi.domain.v1
-import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Payment
+import org.joda.time.{Interval, LocalDate}
+import uk.gov.hmrc.domain.EmpRef
 
-case class DesEmployments(employments: Seq[DesEmployment])
+case class Payment(
+  taxablePayment: Double,
+  paymentDate: LocalDate,
+  employerPayeReference: Option[EmpRef] = None,
+  monthPayNumber: Option[Int] = None,
+  weekPayNumber: Option[Int] = None) {
 
-object DesEmployments {
-  def toPayments(desEmployment: DesEmployment): Seq[Payment] =
-    desEmployment.payments map { payment =>
-      v1.Payment(
-        payment.totalPayInPeriod,
-        payment.paymentDate,
-        desEmployment.employerPayeReference,
-        payment.monthPayNumber,
-        payment.weekPayNumber)
-    }
+  def isPaidWithin(interval: Interval): Boolean = interval.contains(paymentDate.toDateTimeAtStartOfDay)
+
 }

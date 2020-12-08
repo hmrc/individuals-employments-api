@@ -56,7 +56,9 @@ object AuthStub extends MockHost(22000) {
         .withHeader(AUTHORIZATION, equalTo(authBearerToken))
         .willReturn(aResponse()
           .withStatus(Status.OK)
-          .withBody("""{"internalId": "some-id", "allEnrolments": [ { "key": "key", "value": "hello-world" } ]}""")))
+          .withBody(s"""{"internalId": "some-id", "allEnrolments": [ ${scopes
+            .map(scope => s"""{ "key": "$scope", "value": ""}""")
+            .reduce((a, b) => s"$a, $b")} ]}""")))
 
   def willAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping =
     mock.register(
@@ -65,7 +67,7 @@ object AuthStub extends MockHost(22000) {
         .withHeader(AUTHORIZATION, equalTo(authBearerToken))
         .willReturn(aResponse()
           .withStatus(Status.OK)
-          .withBody("""{"internalId": "some-id", "allEnrolments": [ { "key": "key", "value": "hello-world" } ]}""")))
+          .withBody(s"""{"internalId": "some-id", "allEnrolments": [ { "key": "$scope", "value": "" } ]}""")))
 
   def willNotAuthorizePrivilegedAuthToken(authBearerToken: String, scopes: List[String]): StubMapping =
     mock.register(

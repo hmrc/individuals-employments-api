@@ -31,9 +31,10 @@ import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.controller.v1.{LiveEmploymentsController, SandboxEmploymentsController}
-import uk.gov.hmrc.individualsemploymentsapi.domain.{Employment, NinoMatch}
+import uk.gov.hmrc.individualsemploymentsapi.domain
+import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
-import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
+import uk.gov.hmrc.individualsemploymentsapi.sandbox.v1.SandboxData.{Employments, sandboxMatchId}
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.{LiveEmploymentsService, SandboxEmploymentsService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
@@ -83,7 +84,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     "return a 200 (ok) when a match id matches live data" in new Setup {
       when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
+        .thenReturn(Future.successful(domain.NinoMatch(randomMatchId, Nino("AB123456C"))))
       val eventualResult =
         liveEmploymentsController.root(randomMatchId)(FakeRequest())
       status(eventualResult) shouldBe OK
@@ -114,7 +115,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     "not require bearer token authentication for sandbox" in new Setup {
       when(mockSandboxEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
-        .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
+        .thenReturn(Future.successful(domain.NinoMatch(randomMatchId, Nino("AB123456C"))))
 
       val result =
         sandboxEmploymentsController.root(randomMatchId)(FakeRequest())

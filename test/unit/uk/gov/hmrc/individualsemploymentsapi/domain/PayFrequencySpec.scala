@@ -18,9 +18,9 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.domain
 
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FlatSpec, Matchers}
-import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequency
-import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequency._
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesPayFrequency._
+import uk.gov.hmrc.individualsemploymentsapi.domain.v1.PayFrequency
+import uk.gov.hmrc.individualsemploymentsapi.domain.v1.PayFrequency._
+import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode._
 
 class PayFrequencySpec extends FlatSpec with Matchers {
 

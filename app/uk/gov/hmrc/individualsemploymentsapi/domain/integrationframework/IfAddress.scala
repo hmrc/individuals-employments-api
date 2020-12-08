@@ -21,12 +21,12 @@ import play.api.libs.json.Reads.{maxLength, minLength}
 import play.api.libs.json.{Format, JsPath}
 
 case class IfAddress(
-  line1: Option[String],
-  line2: Option[String],
-  line3: Option[String],
-  line4: Option[String],
+  line1: Option[String] = None,
+  line2: Option[String] = None,
+  line3: Option[String] = None,
+  line4: Option[String] = None,
   line5: Option[String] = None,
-  postcode: Option[String]
+  postcode: Option[String] = None
 )
 
 object IfAddress {

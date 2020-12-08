@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain.des
+package uk.gov.hmrc.individualsemploymentsapi.domain.v1
 
-import uk.gov.hmrc.individualsemploymentsapi.domain.v1
-import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Payment
+import uk.gov.hmrc.domain.EmpRef
 
-case class DesEmployments(employments: Seq[DesEmployment])
+case class Employer(payeReference: Option[EmpRef], name: Option[String], address: Option[Address])
 
-object DesEmployments {
-  def toPayments(desEmployment: DesEmployment): Seq[Payment] =
-    desEmployment.payments map { payment =>
-      v1.Payment(
-        payment.totalPayInPeriod,
-        payment.paymentDate,
-        desEmployment.employerPayeReference,
-        payment.monthPayNumber,
-        payment.weekPayNumber)
+object Employer {
+  def create(payeReference: Option[EmpRef], name: Option[String], address: Option[Address]): Option[Employer] =
+    (payeReference, name, address) match {
+      case (None, None, None) => None
+      case _                  => Some(Employer(payeReference, name, address))
     }
 }

@@ -16,16 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain
 
-import org.joda.time.{Interval, LocalDate}
-import uk.gov.hmrc.domain.EmpRef
-
-case class Payment(
-  taxablePayment: Double,
-  paymentDate: LocalDate,
-  employerPayeReference: Option[EmpRef] = None,
-  monthPayNumber: Option[Int] = None,
-  weekPayNumber: Option[Int] = None) {
-
-  def isPaidWithin(interval: Interval): Boolean = interval.contains(paymentDate.toDateTimeAtStartOfDay)
-
+object PayFrequencyCode extends Enumeration {
+  type DesPayFrequency = Value
+  val W1, W2, W4, IO, IR, M1, M3, M6, MA = Value
 }
