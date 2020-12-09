@@ -26,7 +26,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfigurationV2, ShortLivedCache}
+import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfiguration, ShortLivedCache}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheId, CacheIdBase, CacheService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
@@ -41,7 +41,7 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
   trait Setup {
     val mockClient = mock[ShortLivedCache]
-    val mockCacheConfig = mock[CacheConfigurationV2]
+    val mockCacheConfig = mock[CacheConfiguration]
     val cacheService = new CacheService(mockClient, mockCacheConfig)
 
     implicit val hc: HeaderCarrier = HeaderCarrier()

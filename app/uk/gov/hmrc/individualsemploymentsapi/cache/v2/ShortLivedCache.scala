@@ -29,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ShortLivedCache @Inject()(
-  val cacheConfig: CacheConfigurationV2,
+  val cacheConfig: CacheConfiguration,
   configuration: Configuration,
   mongo: ReactiveMongoComponent
 )(implicit ec: ExecutionContext)
@@ -71,7 +71,7 @@ class ShortLivedCache @Inject()(
 }
 
 @Singleton
-class CacheConfigurationV2 @Inject()(configuration: Configuration) {
+class CacheConfiguration @Inject()(configuration: Configuration) {
 
   lazy val cacheEnabled = configuration
     .getOptional[Boolean](

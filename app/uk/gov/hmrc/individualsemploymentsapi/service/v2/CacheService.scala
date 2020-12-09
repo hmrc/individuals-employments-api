@@ -22,12 +22,11 @@ import javax.inject.{Inject}
 import org.joda.time.Interval
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfigurationV2, ShortLivedCache}
+import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfiguration, ShortLivedCache}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheConfigurationV2)(
-  implicit ec: ExecutionContext) {
+class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheConfiguration)(implicit ec: ExecutionContext) {
 
   def get[T: Format](cacheId: CacheIdBase, functionToCache: => Future[T])(implicit hc: HeaderCarrier): Future[T] =
     if (conf.cacheEnabled) {
