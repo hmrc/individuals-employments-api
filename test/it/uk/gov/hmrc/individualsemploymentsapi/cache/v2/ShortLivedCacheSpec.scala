@@ -21,13 +21,13 @@ import java.util.UUID
 import org.scalatest.BeforeAndAfterEach
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsString, Json, OFormat}
-import uk.gov.hmrc.individualsemploymentsapi.cache.v2.ShortLivedCacheV2
+import uk.gov.hmrc.individualsemploymentsapi.cache.v2.ShortLivedCache
 import uk.gov.hmrc.mongo.MongoSpecSupport
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ShortLivedCacheV2Spec extends SpecBase with MongoSpecSupport with BeforeAndAfterEach {
+class ShortLivedCacheSpec extends SpecBase with MongoSpecSupport with BeforeAndAfterEach {
 
   val cacheTtl = 60
   val id = UUID.randomUUID().toString
@@ -39,7 +39,7 @@ class ShortLivedCacheV2Spec extends SpecBase with MongoSpecSupport with BeforeAn
     .bindings(bindModules: _*)
     .build()
 
-  val shortLivedCache = fakeApplication.injector.instanceOf[ShortLivedCacheV2]
+  val shortLivedCache = fakeApplication.injector.instanceOf[ShortLivedCache]
 
   override def beforeEach() {
 

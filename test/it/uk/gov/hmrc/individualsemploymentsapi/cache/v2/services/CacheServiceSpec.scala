@@ -23,7 +23,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{Json, OFormat}
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.CacheServiceV2
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheIdBase, CacheService}
 
 import scala.concurrent.Future
 
@@ -38,12 +38,14 @@ class CacheServiceSpec
 
       val app = new GuiceApplicationBuilder().build()
 
+      val cacheId = TestCacheId("foo")
+
       running(app) {
 
-        val svc = app.injector.instanceOf[CacheServiceV2]
+        val svc = app.injector.instanceOf[CacheService]
 
         svc
-          .get("foo", Future.successful(TestClass("bar")))
+          .get(cacheId, Future.successful(TestClass("bar")))
           .futureValue mustEqual TestClass("bar")
 
       }
@@ -53,24 +55,29 @@ class CacheServiceSpec
 
       val app = new GuiceApplicationBuilder().build()
 
+      val cacheId1 = TestCacheId("foo")
+      val cacheId2 = TestCacheId("bar")
+
       running(app) {
 
-        val svc = app.injector.instanceOf[CacheServiceV2]
+        val svc = app.injector.instanceOf[CacheService]
 
         svc
-          .get("foo", Future.successful(TestClass("bar")))
+          .get(cacheId1, Future.successful(TestClass("bar")))
           .futureValue mustEqual TestClass("bar")
         svc
-          .get("foo", Future.successful(TestClass("miss")))
+          .get(cacheId1, Future.successful(TestClass("miss")))
           .futureValue mustEqual TestClass("bar")
         svc
-          .get("bar", Future.successful(TestClass("miss")))
+          .get(cacheId2, Future.successful(TestClass("miss")))
           .futureValue mustEqual TestClass("miss")
 
       }
     }
   }
 }
+
+case class TestCacheId(id: String) extends CacheIdBase
 
 case class TestClass(param: String)
 

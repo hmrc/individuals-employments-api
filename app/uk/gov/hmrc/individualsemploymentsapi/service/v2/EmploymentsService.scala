@@ -22,22 +22,22 @@ import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, Individual
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait EmploymentsServiceV2 {}
+trait EmploymentsService {}
 
 @Singleton
-class SandboxEmploymentsServiceV2 extends EmploymentsServiceV2 {
+class SandboxEmploymentsService extends EmploymentsService {
 
   // TODO - to implement when we wire up the endpoints (See V1 for reference)
 
 }
 
 @Singleton
-class LiveEmploymentsServiceV2 @Inject()(
+class LiveEmploymentsService @Inject()(
   individualsMatchingApiConnector: IndividualsMatchingApiConnector,
   ifConnector: DesConnector, // TODO - replace with IfConnector
   @Named("retryDelay") retryDelay: Int,
-  cacheService: CacheServiceV2)
-    extends EmploymentsServiceV2 {
+  cacheService: CacheService)
+    extends EmploymentsService {
 
   // TODO - to implement when we wire up the endpoints (See V1 for reference)
 

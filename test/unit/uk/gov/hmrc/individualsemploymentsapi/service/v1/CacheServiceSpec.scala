@@ -30,7 +30,6 @@ import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import org.mockito.Matchers.{any, eq => eqTo}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.Future
 
 class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
