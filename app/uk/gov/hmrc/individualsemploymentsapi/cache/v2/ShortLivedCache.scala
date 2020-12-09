@@ -28,7 +28,7 @@ import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ShortLivedCacheV2 @Inject()(
+class ShortLivedCache @Inject()(
   val cacheConfig: CacheConfigurationV2,
   configuration: Configuration,
   mongo: ReactiveMongoComponent

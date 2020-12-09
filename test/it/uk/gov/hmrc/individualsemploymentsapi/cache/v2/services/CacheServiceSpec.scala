@@ -23,7 +23,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{Json, OFormat}
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheIdBase, CacheServiceV2}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheIdBase, CacheService}
 
 import scala.concurrent.Future
 
@@ -42,7 +42,7 @@ class CacheServiceSpec
 
       running(app) {
 
-        val svc = app.injector.instanceOf[CacheServiceV2]
+        val svc = app.injector.instanceOf[CacheService]
 
         svc
           .get(cacheId, Future.successful(TestClass("bar")))
@@ -60,7 +60,7 @@ class CacheServiceSpec
 
       running(app) {
 
-        val svc = app.injector.instanceOf[CacheServiceV2]
+        val svc = app.injector.instanceOf[CacheService]
 
         svc
           .get(cacheId1, Future.successful(TestClass("bar")))

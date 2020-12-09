@@ -26,23 +26,23 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfigurationV2, ShortLivedCacheV2}
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheIdBase, CacheIdV2, CacheServiceV2}
+import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfigurationV2, ShortLivedCache}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheId, CacheIdBase, CacheService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class CacheServiceV2Spec extends SpecBase with MockitoSugar with ScalaFutures {
+class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
   val cacheId = TestCacheId("foo")
   val cachedValue = TestClass("cached value")
   val newValue = TestClass("new value")
 
   trait Setup {
-    val mockClient = mock[ShortLivedCacheV2]
+    val mockClient = mock[ShortLivedCache]
     val mockCacheConfig = mock[CacheConfigurationV2]
-    val cacheService = new CacheServiceV2(mockClient, mockCacheConfig)
+    val cacheService = new CacheService(mockClient, mockCacheConfig)
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -82,7 +82,7 @@ class CacheServiceV2Spec extends SpecBase with MockitoSugar with ScalaFutures {
     }
   }
 
-  "CacheIdV2" should {
+  "CacheId" should {
 
     "produce a cache id based on matchId and scopes" in {
 
@@ -96,7 +96,7 @@ class CacheServiceV2Spec extends SpecBase with MockitoSugar with ScalaFutures {
 
       val fields = "ABDFH"
 
-      CacheIdV2(matchId, interval, fields).id shouldBe
+      CacheId(matchId, interval, fields).id shouldBe
         s"$matchId-${interval.getStart}-${interval.getEnd}-ABDFH"
 
     }

@@ -29,7 +29,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.controller.v2.{LiveEmploymentsController, SandboxEmploymentsController}
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.{Employments, sandboxMatchId}
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{LiveEmploymentsServiceV2, SandboxEmploymentsServiceV2}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{LiveEmploymentsService, SandboxEmploymentsService}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.ScopesService
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.AuthHelper
@@ -42,8 +42,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
     fakeApplication.injector.instanceOf[ControllerComponents]
 
   trait Setup {
-    val mockSandboxEmploymentsService = mock[SandboxEmploymentsServiceV2]
-    val mockLiveEmploymentsService = mock[LiveEmploymentsServiceV2]
+    val mockSandboxEmploymentsService = mock[SandboxEmploymentsService]
+    val mockLiveEmploymentsService = mock[LiveEmploymentsService]
     lazy val scopeService: ScopesService = mock[ScopesService]
     val mockAuthConnector: AuthConnector = fakeAuthConnector(Future.successful(enrolments))
     val hmctsClientId = "hmctsClientId"

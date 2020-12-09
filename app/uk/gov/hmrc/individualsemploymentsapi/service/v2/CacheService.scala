@@ -22,11 +22,11 @@ import javax.inject.{Inject}
 import org.joda.time.Interval
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfigurationV2, ShortLivedCacheV2}
+import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfigurationV2, ShortLivedCache}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CacheServiceV2 @Inject()(cachingClient: ShortLivedCacheV2, conf: CacheConfigurationV2)(
+class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheConfigurationV2)(
   implicit ec: ExecutionContext) {
 
   def get[T: Format](cacheId: CacheIdBase, functionToCache: => Future[T])(implicit hc: HeaderCarrier): Future[T] =
@@ -59,7 +59,7 @@ trait CacheIdBase {
   override def toString: String = id
 }
 
-case class CacheIdV2(matchId: UUID, interval: Interval, fields: String) extends CacheIdBase {
+case class CacheId(matchId: UUID, interval: Interval, fields: String) extends CacheIdBase {
 
   lazy val id: String =
     s"$matchId-${interval.getStart}-${interval.getEnd}-$fields"
