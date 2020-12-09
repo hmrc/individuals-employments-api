@@ -31,7 +31,6 @@ uses:
       description: Use this endpoint to get a list of available endpoints for Individuals Employments.
       is: [headers.acceptHeader]
       (annotations.sandboxData): !include sandbox/root.md
-      (annotations.scope): "The scopes you have been assigned"
       headers:
         Authorization:
           description: An OAuth 2.0 Bearer Token with the scopes you have been assigned.
@@ -75,7 +74,6 @@ uses:
       description: !include docs/employments-endpoint-description.md
       is: [headers.acceptHeader]
       (annotations.sandboxData): !include sandbox/employments-request.md
-      (annotations.scope): "The scopes you have been assigned"
       headers:
         Authorization:
           description: OAuth 2.0 Bearer Token with the read:individuals-employments-paye scope.
