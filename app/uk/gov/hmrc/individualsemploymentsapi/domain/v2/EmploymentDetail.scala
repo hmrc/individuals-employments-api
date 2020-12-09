@@ -38,13 +38,13 @@ object EmploymentDetail {
   implicit val format: Format[EmploymentDetail] = Format(
     (
       (JsPath \ "startDate").readNullable[LocalDate] and
-        (JsPath \ "endDate").readNullable[LocalDate] and
-        (JsPath \ "payFrequency").readNullable[PayFrequency]
+      (JsPath \ "endDate").readNullable[LocalDate] and
+      (JsPath \ "payFrequency").readNullable[PayFrequency]
     )(EmploymentDetail.apply _),
     (
       (JsPath \ "startDate").writeNullable[LocalDate] and
-        (JsPath \ "endDate").writeNullable[LocalDate] and
-        (JsPath \ "payFrequency").writeNullable[PayFrequency]
+      (JsPath \ "endDate").writeNullable[LocalDate] and
+      (JsPath \ "payFrequency").writeNullable[PayFrequency]
     )(unlift(EmploymentDetail.unapply))
   )
 
@@ -61,12 +61,11 @@ object EmploymentDetail {
 
     val startDate = ifEmployment.employment.flatMap(d => d.startDate).map(s => LocalDate.parse(s))
     val endDate = ifEmployment.employment.flatMap(d => d.endDate).map(s => LocalDate.parse(s))
-    val payFrequency = ifEmployment.employment.flatMap(d => d.payFrequency).flatMap(PayFrequency.frowm)
+    val payFrequency = ifEmployment.employment.flatMap(d => d.payFrequency).flatMap(PayFrequency.from)
 
     (startDate, endDate, payFrequency) match {
       case (None, None, None) => None
       case _                  => EmploymentDetail.create(startDate, endDate, payFrequency)
     }
   }
-
 }

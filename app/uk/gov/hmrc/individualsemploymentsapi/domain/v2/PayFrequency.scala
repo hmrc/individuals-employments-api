@@ -17,6 +17,7 @@
 package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
 object PayFrequency extends Enumeration {
+
   type PayFrequency = Value
   val WEEKLY, FORTNIGHTLY, FOUR_WEEKLY, ONE_OFF, IRREGULAR, CALENDAR_MONTHLY, QUARTERLY, BI_ANNUALLY, ANNUALLY = Value
 
@@ -32,6 +33,6 @@ object PayFrequency extends Enumeration {
     "MA" -> ANNUALLY
   )
 
-  def frowm(ifValue: String): Option[Value] = ifConversionMap.get(ifValue)
+  def from(ifValue: String): Option[Value] = ifConversionMap.get(ifValue)
 
 }

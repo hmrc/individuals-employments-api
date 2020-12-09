@@ -55,7 +55,7 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
   val environment: String
 
   def authPredicate(scopes: Iterable[String]): Predicate =
-    scopes.map(Enrolment(_): Predicate).reduce(_ and _)
+    scopes.map(Enrolment(_): Predicate).reduce(_ or _)
 
   def requiresPrivilegedAuthentication(endpointScopes: Iterable[String])(f: Iterable[String] => Future[Result])(
     implicit hc: HeaderCarrier): Future[Result] = {
