@@ -24,7 +24,6 @@ import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{IfConnector, IndividualsMatchingApiConnector}
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.Individual
-import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployment
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.v2.SandboxData.Individuals.find
@@ -34,7 +33,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.{failed, successful}
 
-trait EmploymentsServiceV2 {
+trait EmploymentsService {
 
   implicit val localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ isBefore _)
 
@@ -45,7 +44,7 @@ trait EmploymentsServiceV2 {
 }
 
 @Singleton
-class SandboxEmploymentsServiceV2 extends EmploymentsServiceV2 {
+class SandboxEmploymentsService extends EmploymentsService {
 
   override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
     if (matchId.equals(sandboxMatchId)) successful(NinoMatch(sandboxMatchId, sandboxNino))
@@ -75,13 +74,13 @@ class SandboxEmploymentsServiceV2 extends EmploymentsServiceV2 {
 }
 
 @Singleton
-class LiveEmploymentsServiceV2 @Inject()(
+class LiveEmploymentsService @Inject()(
   individualsMatchingApiConnector: IndividualsMatchingApiConnector,
   ifConnector: IfConnector,
   scopesHelper: ScopesHelper,
   @Named("retryDelay") retryDelay: Int,
-  cacheService: CacheServiceV2)
-    extends EmploymentsServiceV2 {
+  cacheService: CacheService)
+    extends EmploymentsService {
 
   private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { e: Employment =>
     e.employment.flatMap(d => d.endDate).getOrElse(interval.getEnd.toLocalDate)
@@ -93,19 +92,19 @@ class LiveEmploymentsServiceV2 @Inject()(
   override def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])(
     implicit hc: HeaderCarrier): Future[Seq[Employment]] =
     resolve(matchId).flatMap { ninoMatch =>
-      cacheService
-        .get(
-          cacheId = s"$matchId-${interval.getStart}-${interval.getEnd}",
-          functionToCache = withRetry {
-            ifConnector
-              .fetchEmployments(
-                ninoMatch.nino,
-                interval,
-                Option(scopesHelper.getQueryStringFor(scopes, endpoint)).filter(_.nonEmpty))
-          }
-        )
-        .map { _.map(Employment.create).filter(_.isDefined).map(_.get) }
-        .map { _.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse }
+      {
+        val fieldsQuery = scopesHelper.getQueryStringFor(scopes, endpoint)
+        cacheService
+          .get(
+            cacheId = CacheId(matchId, interval, fieldsQuery),
+            functionToCache = withRetry {
+              ifConnector
+                .fetchEmployments(ninoMatch.nino, interval, Option(fieldsQuery).filter(_.nonEmpty))
+            }
+          )
+          .map { _.map(Employment.create).filter(_.isDefined).map(_.get) }
+          .map { _.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse }
+      }
     }
 
   private def withRetry[T](body: => Future[T]): Future[T] = body recoverWith {

@@ -119,7 +119,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       Json.parse(response.body) shouldBe Json.obj(
         "_links" -> Json.obj(
           "paye" -> Json.obj(
-            "href"  -> s"/individuals/employments/paye?matchId=$matchId{&startDate,endDate}",
+            "href"  -> s"/individuals/employments/paye?matchId=$matchId{&fromDate,toDate}",
             "title" -> "Get an individual's PAYE employment data"
           ),
           "self" -> Json.obj("href" -> s"/individuals/employments/?matchId=$matchId")

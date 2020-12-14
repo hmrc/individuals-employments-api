@@ -37,7 +37,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.v2.SandboxData._
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{LiveEmploymentsServiceV2, SandboxEmploymentsServiceV2, ScopesHelper, ScopesService}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.AuthHelper
 
@@ -48,8 +48,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
   trait Setup extends ScopesConfigHelper {
 
     val controllerComponent = fakeApplication.injector.instanceOf[ControllerComponents]
-    val mockSandboxEmploymentsService = mock[SandboxEmploymentsServiceV2]
-    val mockLiveEmploymentsService = mock[LiveEmploymentsServiceV2]
+    val mockSandboxEmploymentsService = mock[SandboxEmploymentsService]
+    val mockLiveEmploymentsService = mock[LiveEmploymentsService]
 
     implicit lazy val ec = fakeApplication.injector.instanceOf[ExecutionContext]
     lazy val scopeService: ScopesService = new ScopesService(mockScopesConfig)

@@ -86,7 +86,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
           {
              "_links":{
                "paye":{
-                 "href":"/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&startDate,endDate}",
+                 "href":"/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&fromDate,toDate}",
                  "title":"Get an individual's PAYE employment data"
                },
                "self":{

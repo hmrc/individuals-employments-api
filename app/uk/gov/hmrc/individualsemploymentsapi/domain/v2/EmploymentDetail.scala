@@ -38,13 +38,13 @@ object EmploymentDetail {
   implicit val format: Format[EmploymentDetail] = Format(
     (
       (JsPath \ "startDate").readNullable[LocalDate] and
-      (JsPath \ "endDate").readNullable[LocalDate] and
-      (JsPath \ "payFrequency").readNullable[PayFrequency]
+        (JsPath \ "endDate").readNullable[LocalDate] and
+        (JsPath \ "payFrequency").readNullable[PayFrequency]
     )(EmploymentDetail.apply _),
     (
       (JsPath \ "startDate").writeNullable[LocalDate] and
-      (JsPath \ "endDate").writeNullable[LocalDate] and
-      (JsPath \ "payFrequency").writeNullable[PayFrequency]
+        (JsPath \ "endDate").writeNullable[LocalDate] and
+        (JsPath \ "payFrequency").writeNullable[PayFrequency]
     )(unlift(EmploymentDetail.unapply))
   )
 
