@@ -16,7 +16,9 @@
               "example": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&startDate=2019-02-28&endDate=2020-03-01"
             }
           },
-          "required": ["href"]
+          "required": [
+            "href"
+          ]
         }
       },
       "required": [
@@ -31,83 +33,80 @@
         "type": "object",
         "properties": {
           "employer": {
-            "type": "object",
+            "type": "string",
+            "description": "Employer details.",
             "properties": {
               "name": {
-                "description": "Optional.",
+                "description": "Employer name",
                 "type": "string",
-                "minLength": 0,
-                "maxLength": 100
+                "example": "The Employer Name"
               },
               "address": {
                 "type": "object",
+                "description": "Employer address.",
                 "properties": {
                   "line1": {
                     "type": "string",
-                    "minLength": 0,
-                    "maxLength": 100
+                    "description": "Address line one."
                   },
                   "line2": {
                     "type": "string",
-                    "minLength": 0,
-                    "maxLength": 100
+                    "description": "Address line two."
                   },
                   "line3": {
                     "type": "string",
-                    "minLength": 0,
-                    "maxLength": 100
+                    "description": "Address line three."
                   },
                   "line4": {
                     "type": "string",
-                    "minLength": 0,
-                    "maxLength": 100
+                    "description": "Address line four."
                   },
                   "line5": {
                     "type": "string",
-                    "minLength": 0,
-                    "maxLength": 100
+                    "description": "Address line five."
                   },
                   "postcode": {
                     "type": "string",
-                    "minLength": 0,
-                    "maxLength": 10
+                    "description": "Postcode."
                   }
-                },
-                "payeReference": {
-                  "type": "string",
-                  "description": "Employer PAYE Reference",
-                  "example": "123/AI45678"
                 }
+              },
+              "payeReference": {
+                "type": "string",
+                "description": "Employer PAYE Reference",
+                "example": "123/AI45678"
               }
-            },
-            "employment": {
-              "type": "object",
-              "properties": {
-                "startDate": {
-                  "description": "Format YYYY-MM-DD e.g. 2020-08-18. Range 1900-01-01 to 2099-12-31.",
-                  "type": "string",
-                  "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
-                },
-                "endDate": {
-                  "description": "Format YYYY-MM-DD e.g. 2020-08-18. Range 1900-01-01 to 2099-12-31.",
-                  "type": "string",
-                  "pattern": "^(((19|20)([2468][048]|[13579][26]|0[48])|2000)[-]02[-]29|((19|20)[0-9]{2}[-](0[469]|11)[-](0[1-9]|1[0-9]|2[0-9]|30)|(19|20)[0-9]{2}[-](0[13578]|1[02])[-](0[1-9]|[12][0-9]|3[01])|(19|20)[0-9]{2}[-]02[-](0[1-9]|1[0-9]|2[0-8])))$"
-                },
-                "payFrequency": {
-                  "description": "A value representing the frequency of payment for an employment.",
-                  "type": "string",
-                  "enum": [
-                    "WEEKLY",
-                    "FORTNIGHTLY",
-                    "FOUR_WEEKLY",
-                    "CALENDAR_MONTHLY",
-                    "QUARTERLY",
-                    "BI_ANNUALLY",
-                    "ANNUALLY",
-                    "ONE_OFF",
-                    "IRREGULAR"
-                  ]
-                }
+            }
+          },
+          "employment": {
+            "type": "object",
+            "description": "Employment details.",
+            "properties": {
+              "startDate": {
+                "description": "Start date in the Format YYYY-MM-DD.",
+                "type": "string",
+                "example": "2020-08-18"
+              },
+              "endDate": {
+                "description": "End date in the Format YYYY-MM-DD.",
+                "type": "string",
+                "example": "2020-12-31"
+              },
+              "payFrequency": {
+                "description": "A value representing the frequency of payment for an employment.",
+                "type": "string",
+                "example": "WEEKLY, FORTNIGHTLY, FOUR_WEEKLY, CALENDAR_MONTHLY, QUARTERLY, BI_ANNUALLY, ANNUALLY, ONE_OFF, IRREGULAR",
+                "enum": [
+                  "WEEKLY",
+                  "FORTNIGHTLY",
+                  "FOUR_WEEKLY",
+                  "CALENDAR_MONTHLY",
+                  "QUARTERLY",
+                  "BI_ANNUALLY",
+                  "ANNUALLY",
+                  "ONE_OFF",
+                  "IRREGULAR"
+                ]
               }
             }
           }
@@ -115,5 +114,8 @@
       }
     }
   },
-  "required": ["_links", "employments"]
+  "required": [
+    "_links",
+    "employments"
+  ]
 }
