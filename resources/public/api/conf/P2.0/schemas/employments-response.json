@@ -33,7 +33,7 @@
         "type": "object",
         "properties": {
           "employer": {
-            "type": "string",
+            "type": "Object",
             "description": "Employer details.",
             "properties": {
               "name": {
