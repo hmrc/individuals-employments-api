@@ -5,20 +5,17 @@
   "properties": {
     "_links": {
       "type": "object",
-      "description": "A list of endpoint links that indicate possible actions related to the current resource.",
       "properties": {
         "self": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for this endpoint.",
+          "description": "HAL compliant. Refers to itself",
           "properties": {
             "href": {
               "type": "string",
-              "example": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&startDate=2019-02-28&endDate=2020-03-01"
+              "example": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2016-02-28&toDate=2017-03-01"
             }
           },
-          "required": [
-            "href"
-          ]
+          "required": ["href"]
         }
       },
       "required": [
@@ -26,87 +23,78 @@
       ]
     },
     "employments": {
-      "description": "The list of an individual’s PAYE employment data for the requested time period.",
       "type": "array",
-      "minItems": 0,
+      "description": "List of employments for the requested period",
       "items": {
         "type": "object",
         "properties": {
+          "payFrequency": {
+            "type": "string",
+            "description": "A value representing the frequency of payment for an employment",
+            "enum": [
+              "WEEKLY",
+              "FORTNIGHTLY",
+              "FOUR_WEEKLY",
+              "CALENDAR_MONTHLY",
+              "QUARTERLY",
+              "BI_ANNUALLY",
+              "ANNUALLY",
+              "ONE_OFF",
+              "IRREGULAR"
+            ]
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The start date for an employment. Date in the format: YYYY-MM-DD.",
+            "example": "2016-06-30"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The end date for an employment. Date in the format: YYYY-MM-DD.",
+            "example": "2017-06-30"
+          },
           "employer": {
-            "type": "Object",
-            "description": "Employer details.",
+            "type": "object",
+            "description": "Employer's details",
             "properties": {
-              "name": {
-                "description": "Employer name",
-                "type": "string",
-                "example": "The Employer Name"
-              },
-              "address": {
-                "type": "object",
-                "description": "Employer address.",
-                "properties": {
-                  "line1": {
-                    "type": "string",
-                    "description": "Address line one."
-                  },
-                  "line2": {
-                    "type": "string",
-                    "description": "Address line two."
-                  },
-                  "line3": {
-                    "type": "string",
-                    "description": "Address line three."
-                  },
-                  "line4": {
-                    "type": "string",
-                    "description": "Address line four."
-                  },
-                  "line5": {
-                    "type": "string",
-                    "description": "Address line five."
-                  },
-                  "postcode": {
-                    "type": "string",
-                    "description": "Postcode."
-                  }
-                }
-              },
               "payeReference": {
                 "type": "string",
                 "description": "Employer PAYE Reference",
                 "example": "123/AI45678"
-              }
-            }
-          },
-          "employment": {
-            "type": "object",
-            "description": "Employment details.",
-            "properties": {
-              "startDate": {
-                "description": "Start date in the Format YYYY-MM-DD.",
-                "type": "string",
-                "example": "2020-08-18"
               },
-              "endDate": {
-                "description": "End date in the Format YYYY-MM-DD.",
+              "name": {
                 "type": "string",
-                "example": "2020-12-31"
+                "description": "Employer's name"
               },
-              "payFrequency": {
-                "description": "A value representing the frequency of payment for an employment.",
-                "type": "string",
-                "example": "WEEKLY, FORTNIGHTLY, FOUR_WEEKLY, CALENDAR_MONTHLY, QUARTERLY, BI_ANNUALLY, ANNUALLY, ONE_OFF, IRREGULAR",
-                "enum": [
-                  "WEEKLY",
-                  "FORTNIGHTLY",
-                  "FOUR_WEEKLY",
-                  "CALENDAR_MONTHLY",
-                  "QUARTERLY",
-                  "BI_ANNUALLY",
-                  "ANNUALLY",
-                  "ONE_OFF",
-                  "IRREGULAR"
-                ]
+              "address": {
+                "type": "object",
+                "description": "Employer's address",
+                "properties": {
+                  "line1": {
+                    "type": "string",
+                    "description": "Address line 1"
+                  },
+                  "line2": {
+                    "type": "string",
+                    "description": "Address line 2"
+                  },
+                  "line3": {
+                    "type": "string",
+                    "description": "Address line 3"
+                  },
+                  "line4": {
+                    "type": "string",
+                    "description": "Address line 4"
+                  },
+                  "line5": {
+                    "type": "string",
+                    "description": "Address line 5"
+                  },
+                  "postcode": {
+                    "type": "string",
+                    "description": "Postcode"
+                  }
+                }
               }
             }
           }
@@ -114,8 +102,5 @@
       }
     }
   },
-  "required": [
-    "_links",
-    "employments"
-  ]
+  "required": ["_links", "employments"]
 }
