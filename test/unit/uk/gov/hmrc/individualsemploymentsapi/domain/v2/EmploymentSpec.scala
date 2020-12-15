@@ -21,7 +21,7 @@ import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.domain.EmpRef
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfAddress, IfEmployer, IfEmployment, IfEmploymentDetail}
-import uk.gov.hmrc.individualsemploymentsapi.domain.v2.{Address, Employer, Employment, EmploymentDetail, PayFrequency}
+import uk.gov.hmrc.individualsemploymentsapi.domain.v2.{Address, Employer, Employment, PayFrequency}
 
 class EmploymentSpec extends FlatSpec with Matchers {
 
@@ -50,6 +50,9 @@ class EmploymentSpec extends FlatSpec with Matchers {
     )
 
     val employment = Employment.create(
+      Some(new LocalDate(2016, 1, 1)),
+      Some(new LocalDate(2016, 12, 31)),
+      Some(PayFrequency.withName("CALENDAR_MONTHLY")),
       Employer.create(
         Some(EmpRef("123", "AB12345")),
         Some("Acme Inc"),
@@ -62,11 +65,6 @@ class EmploymentSpec extends FlatSpec with Matchers {
             line5 = None,
             postcode = Some("AB1 2CD")
           ))
-      ),
-      EmploymentDetail.create(
-        Some(new LocalDate(2016, 1, 1)),
-        Some(new LocalDate(2016, 12, 31)),
-        Some(PayFrequency.withName("CALENDAR_MONTHLY")),
       )
     )
 

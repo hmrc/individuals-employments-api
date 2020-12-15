@@ -166,6 +166,9 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
             }
           },
           "employments": [{
+            "startDate":"2017-01-02",
+            "endDate":"2017-03-01",
+            "payFrequency":"FORTNIGHTLY",
             "employer":{
               "payeReference":"123/DI45678",
               "name":"Disney",
@@ -176,11 +179,6 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
                 "line4":"Sometown",
                 "line5":"Old County",
                 "postcode":"TF22 3BC"}
-              },
-              "employment":{
-                "startDate":"2017-01-02",
-                "endDate":"2017-03-01",
-                "payFrequency":"FORTNIGHTLY"
               }
             }]
           }""".stripMargin

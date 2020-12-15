@@ -63,10 +63,10 @@ class SandboxEmploymentsService extends EmploymentsService {
           .filter(_.isDefined)
           .map(_.get)
           .filter { e =>
-            e.employment.exists(x => x.startDate.forall(d => d.toDateTimeAtStartOfDay.isBefore(interval.getEnd))) &&
-            e.employment.exists(x => x.endDate.forall(d => d.toDateTimeAtStartOfDay.isAfter(interval.getStart)))
+            e.startDate.exists(_.toDateTimeAtStartOfDay.isBefore(interval.getEnd)) &&
+            e.endDate.exists(_.toDateTimeAtStartOfDay.isAfter(interval.getStart))
           }
-          .sortBy(e => e.employment.flatMap(d => d.startDate).getOrElse(interval.getEnd.toLocalDate))
+          .sortBy(e => e.startDate.getOrElse(interval.getEnd.toLocalDate))
           .reverse
         Future.successful(filtered)
       case None => Future.failed(new MatchNotFoundException)
@@ -83,7 +83,7 @@ class LiveEmploymentsService @Inject()(
     extends EmploymentsService {
 
   private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { e: Employment =>
-    e.employment.flatMap(d => d.endDate).getOrElse(interval.getEnd.toLocalDate)
+    e.endDate.getOrElse(interval.getEnd.toLocalDate)
   }
 
   override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =

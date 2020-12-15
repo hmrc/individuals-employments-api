@@ -16,40 +16,60 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
+import org.joda.time.LocalDate
 import play.api.libs.json.{Format, JsPath}
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
+import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.EnumJson
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployment
 import play.api.libs.functional.syntax._
+import uk.gov.hmrc.individualsemploymentsapi.domain.v2.PayFrequency.PayFrequency
 
-case class Employment(employer: Option[Employer], employment: Option[EmploymentDetail])
+case class Employment(
+  startDate: Option[LocalDate],
+  endDate: Option[LocalDate],
+  payFrequency: Option[PayFrequency],
+  employer: Option[Employer])
 
 object Employment {
 
+  implicit val payFrequencyFormat: Format[PayFrequency] = EnumJson.enumFormat(PayFrequency)
+
   implicit val format: Format[Employment] = Format(
     (
-      (JsPath \ "employer").readNullable[Employer] and
-        (JsPath \ "employment").readNullable[EmploymentDetail]
+      (JsPath \ "startDate").readNullable[LocalDate] and
+        (JsPath \ "endDate").readNullable[LocalDate] and
+        (JsPath \ "payFrequency").readNullable[PayFrequency] and
+        (JsPath \ "employer").readNullable[Employer]
     )(Employment.apply _),
     (
-      (JsPath \ "employer").writeNullable[Employer] and
-        (JsPath \ "employment").writeNullable[EmploymentDetail]
+      (JsPath \ "startDate").writeNullable[LocalDate] and
+        (JsPath \ "endDate").writeNullable[LocalDate] and
+        (JsPath \ "payFrequency").writeNullable[PayFrequency] and
+        (JsPath \ "employer").writeNullable[Employer]
     )(unlift(Employment.unapply))
   )
 
-  def create(employer: Option[Employer], employment: Option[EmploymentDetail]): Option[Employment] =
-    (employer, employment) match {
-      case (None, None) => None
-      case _            => Some(new Employment(employer, employment))
+  def create(
+    startDate: Option[LocalDate],
+    endDate: Option[LocalDate],
+    payFrequency: Option[PayFrequency],
+    employer: Option[Employer]): Option[Employment] =
+    (startDate, endDate, payFrequency, employer) match {
+      case (None, None, None, None) => None
+      case _                        => Some(new Employment(startDate, endDate, payFrequency, employer))
     }
 
   def create(ifEmployment: IfEmployment): Option[Employment] = {
 
     val employer: Option[Employer] = Employer.create(ifEmployment)
+    val startDate = ifEmployment.employment.flatMap(d => d.startDate).map(s => LocalDate.parse(s))
+    val endDate = ifEmployment.employment.flatMap(d => d.endDate).map(s => LocalDate.parse(s))
+    val payFrequency = ifEmployment.employment.flatMap(d => d.payFrequency).flatMap(PayFrequency.from)
 
-    val employmentDetail: Option[EmploymentDetail] = EmploymentDetail.create(ifEmployment)
-
-    (employer, employmentDetail) match {
-      case (None, None) => None
-      case _            => Some(new Employment(employer, employmentDetail))
+    (startDate, endDate, payFrequency, employer) match {
+      case (None, None, None, None) => None
+      case _                        => Some(new Employment(startDate, endDate, payFrequency, employer))
     }
   }
 }

@@ -45,6 +45,9 @@ class EmploymentsSpec extends BaseSpec {
             },
             "employments":[
               {
+                "startDate":"2016-01-01",
+                "endDate":"2016-06-30",
+                "payFrequency":"FOUR_WEEKLY",
                 "employer":{
                   "payeReference":"123/AI45678",
                   "name":"Acme",
@@ -56,11 +59,6 @@ class EmploymentsSpec extends BaseSpec {
                     "line5":"Acme State",
                     "postcode":"AI22 9LL"
                   }
-                },
-                "employment":{
-                  "startDate":"2016-01-01",
-                  "endDate":"2016-06-30",
-                  "payFrequency":"FOUR_WEEKLY"
                 }
               }
             ]

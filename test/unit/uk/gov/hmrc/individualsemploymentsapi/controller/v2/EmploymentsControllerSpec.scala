@@ -183,6 +183,9 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         ),
         "employments" -> Json.arr(
           Json.obj(
+            "startDate"    -> "2016-01-01",
+            "endDate"      -> "2016-06-30",
+            "payFrequency" -> "FOUR_WEEKLY",
             "employer" -> Json.obj(
               "payeReference" -> "123/AI45678",
               "name"          -> "Acme",
@@ -194,11 +197,6 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
                 "line5"    -> "Acme State",
                 "postcode" -> "AI22 9LL"
               )
-            ),
-            "employment" -> Json.obj(
-              "startDate"    -> "2016-01-01",
-              "endDate"      -> "2016-06-30",
-              "payFrequency" -> "FOUR_WEEKLY"
             )
           )
         )
