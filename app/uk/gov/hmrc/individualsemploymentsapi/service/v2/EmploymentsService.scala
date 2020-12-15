@@ -29,8 +29,7 @@ import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundE
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.v2.SandboxData.Individuals.find
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.v2.SandboxData.{sandboxMatchId, sandboxNino}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future.{failed, successful}
 
 trait EmploymentsService {
@@ -79,7 +78,7 @@ class LiveEmploymentsService @Inject()(
   ifConnector: IfConnector,
   scopesHelper: ScopesHelper,
   @Named("retryDelay") retryDelay: Int,
-  cacheService: CacheService)
+  cacheService: CacheService)(implicit val ec: ExecutionContext)
     extends EmploymentsService {
 
   private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { e: Employment =>

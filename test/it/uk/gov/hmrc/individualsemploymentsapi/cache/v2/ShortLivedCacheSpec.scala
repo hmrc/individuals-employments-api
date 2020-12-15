@@ -25,7 +25,7 @@ import uk.gov.hmrc.individualsemploymentsapi.cache.v2.ShortLivedCache
 import uk.gov.hmrc.mongo.MongoSpecSupport
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 class ShortLivedCacheSpec extends SpecBase with MongoSpecSupport with BeforeAndAfterEach {
 
@@ -40,6 +40,7 @@ class ShortLivedCacheSpec extends SpecBase with MongoSpecSupport with BeforeAndA
     .build()
 
   val shortLivedCache = fakeApplication.injector.instanceOf[ShortLivedCache]
+  implicit val ec = fakeApplication.injector.instanceOf[ExecutionContext]
 
   override def beforeEach() {
 
