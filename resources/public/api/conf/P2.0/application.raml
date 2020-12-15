@@ -27,9 +27,11 @@ uses:
 /individuals/employments:
   /:
     get:
-      displayName: Entry point
+      displayName: Get a list of available endpoints for Individuals Employments.
       description: Use this endpoint to get a list of available endpoints for Individuals Employments.
       is: [headers.acceptHeader]
+      (annotations.scope): "read:the-scopes-you-have-been-assigned"
+      securedBy: [ sec.oauth_2_0: { scopes: [ "read:the-scopes-you-have-been-assigned" ] } ]
       (annotations.sandboxData): !include sandbox/root.md
       headers:
         Authorization:
@@ -70,9 +72,11 @@ uses:
                     code: NOT_FOUND
   /paye:
     get:
-      displayName: Retrieve Employments history
+      displayName: Get an individual’s employment details for the requested time period.
       description: !include docs/employments-endpoint-description.md
       is: [headers.acceptHeader]
+      (annotations.scope): "read:the-scopes-you-have-been-assigned"
+      securedBy: [ sec.oauth_2_0: { scopes: [ "read:the-scopes-you-have-been-assigned" ] } ]
       (annotations.sandboxData): !include sandbox/employments-request.md
       headers:
         Authorization:

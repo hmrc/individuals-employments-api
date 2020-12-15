@@ -6,6 +6,9 @@
   },
   "employments": [
     {
+      "startDate": "2019-01-01",
+      "endDate": "2019-03-31",
+      "payFrequency": "WEEKLY",
       "employer": {
         "name": "ACME Industries Limited",
         "address": {
@@ -17,30 +20,6 @@
           "postcode": "DH4 4YY"
         },
         "payeReference": "123/AI45678"
-      },
-      "employment": {
-        "startDate": "2019-01-01",
-        "endDate": "2019-03-31",
-        "payFrequency": "WEEKLY"
-      }
-    },
-    {
-      "employer": {
-        "name": "Robson & Robson and Sons",
-        "address": {
-          "line1": "Robson House",
-          "line2": "Fairfield Drive",
-          "line3": "Utilitown",
-          "line4": "County Durham",
-          "line5": "UK",
-          "postcode": "DH4 2CC"
-        },
-        "payeReference": "123/AI45679"
-      },
-      "employment": {
-        "startDate": "2019-05-10",
-        "endDate": "2019-07-12",
-        "payFrequency": "FOUR_WEEKLY"
       }
     }
   ]
