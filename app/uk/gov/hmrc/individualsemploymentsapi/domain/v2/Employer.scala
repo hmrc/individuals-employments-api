@@ -30,13 +30,13 @@ object Employer {
   implicit val format: Format[Employer] = Format(
     (
       (JsPath \ "payeReference").readNullable[EmpRef] and
-        (JsPath \ "name").readNullable[String] and
-        (JsPath \ "address").readNullable[Address]
+      (JsPath \ "name").readNullable[String] and
+      (JsPath \ "address").readNullable[Address]
     )(Employer.apply _),
     (
       (JsPath \ "payeReference").writeNullable[EmpRef] and
-        (JsPath \ "name").writeNullable[String] and
-        (JsPath \ "address").writeNullable[Address]
+      (JsPath \ "name").writeNullable[String] and
+      (JsPath \ "address").writeNullable[Address]
     )(unlift(Employer.unapply))
   )
 
