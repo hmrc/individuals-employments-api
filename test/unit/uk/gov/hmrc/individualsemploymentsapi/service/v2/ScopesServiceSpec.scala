@@ -56,6 +56,15 @@ class ScopesServiceSpec extends UnitSpec with ScopesConfig with BeforeAndAfterEa
       result shouldBe List("payments", "employer/employerName", "employer/employerDistrictNumber")
     }
 
+    "get valid data items for scope and multiple endpoints" in {
+      val result =
+        scopesService.getValidItemsFor(List(mockScope3), List(mockEndpoint1, mockEndpoint3))
+      result shouldBe Set(
+        "payments",
+        "field4"
+      )
+    }
+
     "get valid data items keys for single scope" in {
       val result =
         scopesService.getValidFieldsForCacheKey(List(mockScope1))

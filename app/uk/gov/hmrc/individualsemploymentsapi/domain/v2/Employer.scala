@@ -17,7 +17,7 @@
 package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
 import play.api.libs.functional.syntax._
-import play.api.libs.json.{Format, JsPath, Json}
+import play.api.libs.json.{Format, JsPath, Json, OFormat}
 import uk.gov.hmrc.domain.EmpRef
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployment
 
@@ -25,7 +25,7 @@ case class Employer(payeReference: Option[EmpRef], name: Option[String], address
 
 object Employer {
 
-  implicit val addressJsonFormat = Json.format[Address]
+  implicit val addressJsonFormat: OFormat[Address] = Json.format[Address]
 
   implicit val format: Format[Employer] = Format(
     (

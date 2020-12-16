@@ -26,52 +26,52 @@ class IfQueriesSpec extends BaseSpec {
     val helper: ScopesHelper = app.injector.instanceOf[ScopesHelper]
 
     scenario("For read:individuals-employments-laa-c1") {
-      val queryString  = helper.getQueryStringFor(Seq("read:individuals-employments-laa-c1"), "paye")
+      val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-laa-c1"), "paye")
       queryString shouldBe "employments(employment(endDate,startDate))"
     }
 
     scenario("For read:individuals-employments-laa-c2") {
-      val queryString  = helper.getQueryStringFor(Seq("read:individuals-employments-laa-c2"), "paye")
+      val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-laa-c2"), "paye")
       queryString shouldBe "employments(employment(endDate,startDate))"
     }
 
     scenario("For read:individuals-employments-laa-c3") {
-      val queryString  = helper.getQueryStringFor(Seq("read:individuals-employments-laa-c3"), "paye")
+      val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-laa-c3"), "paye")
       queryString shouldBe "employments(employer(name),employment(endDate,startDate))"
     }
 
     scenario("For read:individuals-employments-laa-c4") {
-      val queryString  = helper.getQueryStringFor(Seq("read:individuals-employments-laa-c4"), "paye")
+      val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-laa-c4"), "paye")
       queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employment(endDate,startDate))"
     }
 
     scenario("For read:individuals-employments-hmcts-c2") {
-      val queryString  = helper.getQueryStringFor(Seq("read:individuals-employments-hmcts-c2"), "paye")
+      val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-hmcts-c2"), "paye")
       queryString shouldBe "employments(employment(endDate))"
     }
 
     scenario("For read:individuals-employments-hmcts-c3") {
-      val queryString  = helper.getQueryStringFor(Seq("read:individuals-employments-hmcts-c3"), "paye")
+      val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-hmcts-c3"), "paye")
       queryString shouldBe "employments(employment(endDate))"
     }
 
     scenario("For read:individuals-employments-hmcts-c4") {
-      val queryString  = helper.getQueryStringFor(Seq("read:individuals-employments-hmcts-c4"), "paye")
+      val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-hmcts-c4"), "paye")
       queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employment(endDate,startDate))"
     }
 
     scenario("For read:individuals-employments-lsani-c1") {
-      val queryString  = helper.getQueryStringFor(Seq("read:individuals-employments-lsani-c1"), "paye")
+      val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-lsani-c1"), "paye")
       queryString shouldBe "employments(employer(name),employment(endDate,startDate))"
     }
 
     scenario("For read:individuals-employments-lsani-c3") {
-      val queryString  = helper.getQueryStringFor(Seq("read:individuals-employments-lsani-c3"), "paye")
+      val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-lsani-c3"), "paye")
       queryString shouldBe "employments(employer(name),employment(endDate,startDate))"
     }
 
     scenario("For read:individuals-employments-nictsejo-c4") {
-      val queryString  = helper.getQueryStringFor(Seq("read:individuals-employments-nictsejo-c4"), "paye")
+      val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-nictsejo-c4"), "paye")
       queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employment(startDate))"
     }
   }

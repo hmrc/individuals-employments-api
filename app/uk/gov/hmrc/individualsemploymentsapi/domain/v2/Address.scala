@@ -27,6 +27,7 @@ case class Address(
   postcode: Option[String])
 
 object Address {
+
   implicit def ifAddressToAddress(address: IfAddress): Address =
     Address(address.line1, address.line2, address.line3, address.line4, address.line5, address.postcode)
 

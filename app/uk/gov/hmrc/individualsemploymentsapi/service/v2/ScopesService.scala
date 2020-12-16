@@ -52,9 +52,15 @@ class ScopesService @Inject()(configuration: Configuration) {
   def getValidItemsFor(scopes: Iterable[String], endpoint: String): Iterable[String] = {
     val uniqueDataFields = scopes.flatMap(getScopeItemsKeys).toList.distinct
     val endpointDataItems = getEndpointFieldKeys(endpoint).toSet
-    val authorizedDataItemsOnEndpoint =
-      uniqueDataFields.filter(endpointDataItems.contains)
+    val authorizedDataItemsOnEndpoint = uniqueDataFields.filter(endpointDataItems.contains)
     getFieldNames(authorizedDataItemsOnEndpoint)
+  }
+
+  def getValidItemsFor(scopes: Iterable[String], endpoints: List[String]): Set[String] = {
+    val uniqueDataFields = scopes.flatMap(getScopeItemsKeys).toList.distinct
+    val endpointDataItems = endpoints.flatMap(e => getEndpointFieldKeys(e).toSet)
+    val authorizedDataItemsOnEndpoint = uniqueDataFields.filter(endpointDataItems.contains)
+    getFieldNames(authorizedDataItemsOnEndpoint).toSet
   }
 
   def getValidFieldsForCacheKey(scopes: List[String]): String =

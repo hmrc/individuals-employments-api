@@ -97,8 +97,7 @@ class LiveEmploymentsService @Inject()(
           .get(
             cacheId = CacheId(matchId, interval, fieldsQuery),
             functionToCache = withRetry {
-              ifConnector
-                .fetchEmployments(ninoMatch.nino, interval, Option(fieldsQuery).filter(_.nonEmpty))
+              ifConnector.fetchEmployments(ninoMatch.nino, interval, Option(fieldsQuery).filter(_.nonEmpty))
             }
           )
           .map { _.map(Employment.create).filter(_.isDefined).map(_.get) }
