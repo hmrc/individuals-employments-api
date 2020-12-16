@@ -1,0 +1,1 @@
+<p>Use this endpoint to get an individual’s employment details for the requested time period.</p>

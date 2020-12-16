@@ -1,0 +1,11 @@
+{
+  "_links": {
+    "paye": {
+      "href": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&startDate,endDate}",
+      "title": "Get an individual's PAYE employment data"
+    },
+    "self": {
+      "href": "/individuals/employments/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+    }
+  }
+}

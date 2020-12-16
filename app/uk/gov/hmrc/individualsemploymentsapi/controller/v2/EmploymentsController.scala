@@ -1,0 +1,83 @@
+/*
+ * Copyright 2020 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.individualsemploymentsapi.controller.v2
+
+import java.util.UUID
+
+import javax.inject.{Inject, Named, Singleton}
+import org.joda.time.Interval
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
+import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.ScopesService
+
+import scala.concurrent.ExecutionContext.Implicits.global
+
+abstract class EmploymentsController(
+  employmentsService: EmploymentsService,
+  scopeService: ScopesService,
+  cc: ControllerComponents)
+    extends CommonController(cc) with PrivilegedAuthentication {
+
+  def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
+    {
+      val scopes = scopeService.getAllScopes
+      requiresPrivilegedAuthentication(scopes)
+        .flatMap { authScopes =>
+          throw new Exception("NOT_IMPLEMENTED")
+        }
+        .recover(recovery)
+    }
+  }
+
+  def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
+    {
+      val scopes = scopeService.getEndPointScopes("employments")
+      requiresPrivilegedAuthentication(scopes)
+        .flatMap { authScopes =>
+          throw new Exception("NOT_IMPLEMENTED")
+        }
+        .recover(recovery)
+    }
+  }
+}
+
+@Singleton
+class SandboxEmploymentsController @Inject()(
+  sandboxEmploymentsService: SandboxEmploymentsService,
+  scopeService: ScopesService,
+  val authConnector: AuthConnector,
+  @Named("hmctsClientId") val hmctsClientId: String,
+  cc: ControllerComponents)
+    extends EmploymentsController(sandboxEmploymentsService, scopeService, cc) {
+
+  override val environment: String = SANDBOX
+}
+
+@Singleton
+class LiveEmploymentsController @Inject()(
+  liveEmploymentsService: LiveEmploymentsService,
+  scopeService: ScopesService,
+  val authConnector: AuthConnector,
+  @Named("hmctsClientId") val hmctsClientId: String,
+  cc: ControllerComponents)
+    extends EmploymentsController(liveEmploymentsService, scopeService, cc) {
+
+  override val environment: String = PRODUCTION
+}
