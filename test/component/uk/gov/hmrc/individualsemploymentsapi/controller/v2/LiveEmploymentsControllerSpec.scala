@@ -194,6 +194,81 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
+    scenario("missing fromDate") {
+      Given("a valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
+
+      When("the paye endpoint is invoked with an invalid match id")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&toDate=$toDate")
+
+      Then("the response status should be 400 (invalid request)")
+      response.code shouldBe BAD_REQUEST
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "fromDate is required"
+      )
+    }
+
+    scenario("toDate earlier than fromDate") {
+      Given("a valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
+
+      When("the paye endpoint is invoked with an invalid match id")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$toDate&toDate=$fromDate")
+
+      Then("the response status should be 400 (invalid request)")
+      response.code shouldBe BAD_REQUEST
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "Invalid time period requested"
+      )
+    }
+
+    scenario("From date requested is earlier than 31st March 2013") {
+      Given("a valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
+
+      When("the paye endpoint is invoked with an invalid match id")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=2012-01-01&toDate=$toDate")
+
+      Then("the response status should be 400 (invalid request)")
+      response.code shouldBe BAD_REQUEST
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "fromDate earlier than 31st March 2013"
+      )
+    }
+
+    scenario("Invalid fromDate") {
+      Given("a valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
+
+      When("the paye endpoint is invoked with an invalid match id")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=20xx-01-01&toDate=$toDate")
+
+      Then("the response status should be 400 (invalid request)")
+      response.code shouldBe BAD_REQUEST
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "fromDate: invalid date format"
+      )
+    }
+
+    scenario("Invalid toDate") {
+      Given("a valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
+
+      When("the paye endpoint is invoked with an invalid match id")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=2017-09-40")
+
+      Then("the response status should be 400 (invalid request)")
+      response.code shouldBe BAD_REQUEST
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "toDate: invalid date format"
+      )
+    }
+
     scenario("valid request to the live paye endpoint implementation") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)

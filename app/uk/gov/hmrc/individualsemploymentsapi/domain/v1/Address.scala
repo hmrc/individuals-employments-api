@@ -17,7 +17,6 @@
 package uk.gov.hmrc.individualsemploymentsapi.domain.v1
 
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesAddress
-import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfAddress
 
 case class Address(
   line1: Option[String],

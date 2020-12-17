@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package unit.uk.gov.hmrc.individualsemploymentsapi.domain
+package unit.uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.{FlatSpec, Matchers}
+import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode._
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.PayFrequency
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.PayFrequency._
-import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode._
 
 class PayFrequencySpec extends FlatSpec with Matchers {
 
-  "Pay frequency" should "derive itself from an instance of des pay frequency" in new TableDrivenPropertyChecks {
+  "Pay frequency" should "derive itself from an instance of IF pay frequency" in new TableDrivenPropertyChecks {
     val fixtures = Table(
       ("des pay frequency", "hmrc pay frequency"),
       (W1, WEEKLY),
@@ -39,8 +39,8 @@ class PayFrequencySpec extends FlatSpec with Matchers {
     )
 
     fixtures foreach {
-      case (desPayFrequency, hmrcPayFrequency) =>
-        PayFrequency.from(desPayFrequency) shouldBe Some(hmrcPayFrequency)
+      case (ifPayFrequency, hmrcPayFrequency) =>
+        PayFrequency.from(ifPayFrequency) shouldBe Some(hmrcPayFrequency)
     }
   }
 

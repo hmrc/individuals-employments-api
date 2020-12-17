@@ -18,7 +18,6 @@ package uk.gov.hmrc.individualsemploymentsapi.domain.v1
 
 import org.joda.time.LocalDate
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
-import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployment
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.PayFrequency.PayFrequency
 
 case class Employment(
