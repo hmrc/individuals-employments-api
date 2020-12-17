@@ -14,6 +14,26 @@
       "description":"Access employments information for all individuals"
     },
     {
+      "key":"read:individuals-employments-laa-c1",
+      "name":"access individuals employment information for LAA use case 1",
+      "description":"Scope for LAA use case 1 to access employments information on individuals"
+    },
+    {
+      "key":"read:individuals-employments-laa-c2",
+      "name":"access individuals employment information for LAA use case 2",
+      "description":"Scope for LAA use case 2 to access employments information on individuals"
+    },
+    {
+      "key":"read:individuals-employments-laa-c3",
+      "name":"access individuals employment information for LAA use case 3",
+      "description":"Scope for LAA use case 3 to access employments information on individuals"
+    },
+    {
+      "key":"read:individuals-employments-laa-c4",
+      "name":"access individuals employment information for LAA use case 4",
+      "description":"Scope for LAA use case 4 to access employments information on individuals"
+    },
+    {
       "key":"read:individuals-employments-paye",
       "name":"access all paye individuals employment information",
       "description":"Access paye employments history for all individuals"
