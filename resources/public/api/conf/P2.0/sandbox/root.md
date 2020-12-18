@@ -17,8 +17,8 @@
         <td><p>200 (OK)</p><p>Payload as per response example above</p></td>
     </tr>
     <tr>
-        <td>Missing matchId</td>
-        <td>matchId query parameter missing</td>
+        <td><p>Missing matchId</p></td>
+        <td><p>matchId query parameter missing</p></td>
         <td><p>400 (Bad Request)</p>
         <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;matchId is required&quot; }</p>
         </td>
@@ -29,5 +29,12 @@
         <td><p>404 (Not Found)</p>
         <p>{ &quot;code&quot; : &quot;NOT_FOUND&quot;,<br/>&quot;message&quot; : &quot;The resource cannot be found&quot; }</p></td>
     </tr>
+    <tr>
+        <td><p>Missing CorrelationId</p></td>
+        <td><p>CorrelationId header missing</p></td>
+        <td><p>400 (Bad Request)</p>
+        <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;CorrelationId is required&quot; }</p>
+        </td>
+    </tr>    
     </tbody>
 </table>
