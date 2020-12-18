@@ -34,6 +34,36 @@
       "description":"Scope for LAA use case 4 to access employments information on individuals"
     },
     {
+      "key":"read:individuals-employments-hmcts-c2",
+      "name":"access individuals employment information for HMCTS use case 2",
+      "description":"Scope for HMCTS use case 2 to access employments information on individuals"
+    },
+    {
+      "key":"read:individuals-employments-hmcts-c3",
+      "name":"access individuals employment information for HMCTS use case 3",
+      "description":"Scope for HMCTS use case 3 to access employments information on individuals"
+    },
+    {
+      "key":"read:individuals-employments-hmcts-c4",
+      "name":"access individuals employment information for HMCTS use case 4",
+      "description":"Scope for HMCTS use case 4 to access employments information on individuals"
+    },
+    {
+      "key":"read:individuals-employments-lsani-c1",
+      "name":"access individuals employment information for LSANI use case 1",
+      "description":"Scope for LSANI use case 1 to access employments information on individuals"
+    },
+    {
+      "key":"read:individuals-employments-lsani-c3",
+      "name":"access individuals employment information for LSANI use case 3",
+      "description":"Scope for LSANI use case 3 to access employments information on individuals"
+    },
+    {
+      "key":"read:individuals-employments-nictsejo-c4",
+      "name":"access individuals employment information for NICTSEJO use case 4",
+      "description":"Scope for NICTSEJO use case 4 to access employments information on individuals"
+    },
+    {
       "key":"read:individuals-employments-paye",
       "name":"access all paye individuals employment information",
       "description":"Access paye employments history for all individuals"
