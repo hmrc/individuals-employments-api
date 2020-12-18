@@ -5,13 +5,15 @@
   "properties": {
     "_links": {
       "type": "object",
+      "description": "A list of links for possible actions related to this endpoint.",
       "properties": {
         "self": {
           "type": "object",
-          "description": "HAL compliant. Refers to itself",
+          "description": "The Uniform Resource Identifier (URI) for this endpoint.",
           "properties": {
             "href": {
               "type": "string",
+              "description": "The URL of the endpoint.",
               "example": "/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2016-02-28&toDate=2017-03-01"
             }
           },
@@ -24,13 +26,13 @@
     },
     "employments": {
       "type": "array",
-      "description": "List of employments for the requested period",
+      "description": "The list of the individual’s PAYE employment data for the requested time period.",
       "items": {
         "type": "object",
         "properties": {
           "payFrequency": {
             "type": "string",
-            "description": "A value representing the frequency of payment for an employment",
+            "description": "How often the employee is paid.",
             "enum": [
               "WEEKLY",
               "FORTNIGHTLY",
@@ -45,17 +47,17 @@
           },
           "startDate": {
             "type": "string",
-            "description": "The start date for an employment. Date in the format: YYYY-MM-DD.",
-            "example": "2016-06-30"
+            "description": "The date the employment started. Date in the format: YYYY-MM-DD.",
+            "example": "2019-01-01"
           },
           "endDate": {
             "type": "string",
-            "description": "The end date for an employment. Date in the format: YYYY-MM-DD.",
-            "example": "2017-06-30"
+            "description": "The date the employment ended. Date in the format: YYYY-MM-DD.",
+            "example": "2019-03-01"
           },
           "employer": {
             "type": "object",
-            "description": "Employer's details",
+            "description": "The employer's details.",
             "properties": {
               "payeReference": {
                 "type": "string",
@@ -64,35 +66,36 @@
               },
               "name": {
                 "type": "string",
-                "description": "Employer's name"
+                "description": "The name of the employer."
               },
               "address": {
                 "type": "object",
-                "description": "Employer's address",
+                "description": "The address of the employer.",
                 "properties": {
                   "line1": {
                     "type": "string",
-                    "description": "Address line 1"
+                    "description": "Address line 1."
                   },
                   "line2": {
                     "type": "string",
-                    "description": "Address line 2"
+                    "description": "Address line 2."
                   },
                   "line3": {
                     "type": "string",
-                    "description": "Address line 3"
+                    "description": "Address line 3."
                   },
                   "line4": {
                     "type": "string",
-                    "description": "Address line 4"
+                    "description": "Address line 4."
                   },
                   "line5": {
                     "type": "string",
-                    "description": "Address line 5"
+                    "description": "Address line 5."
                   },
                   "postcode": {
                     "type": "string",
-                    "description": "Postcode"
+                    "description": "The postcode for the address.",
+                    "example": "123/AI45678"
                   }
                 }
               }
