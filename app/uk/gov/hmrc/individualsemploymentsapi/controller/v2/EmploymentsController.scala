@@ -20,40 +20,47 @@ import java.util.UUID
 
 import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.Interval
+import play.api.hal.Hal._
+import play.api.mvc.hal._
+import play.api.hal.HalLink
+import play.api.libs.json.Json
+import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService}
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.ScopesService
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
 
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
 abstract class EmploymentsController(
   employmentsService: EmploymentsService,
   scopeService: ScopesService,
-  cc: ControllerComponents)
+  scopesHelper: ScopesHelper,
+  cc: ControllerComponents)(implicit val ec: ExecutionContext)
     extends CommonController(cc) with PrivilegedAuthentication {
 
   def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
     {
-      val scopes = scopeService.getAllScopes
-      requiresPrivilegedAuthentication(scopes)
-        .flatMap { authScopes =>
-          throw new Exception("NOT_IMPLEMENTED")
+      requiresPrivilegedAuthentication(scopeService.getAllScopes) { authScopes =>
+        employmentsService.resolve(matchId) map { _ =>
+          val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
+          Ok(scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink)
         }
-        .recover(recovery)
+      } recover recovery
     }
   }
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
     {
-      val scopes = scopeService.getEndPointScopes("employments")
-      requiresPrivilegedAuthentication(scopes)
-        .flatMap { authScopes =>
-          throw new Exception("NOT_IMPLEMENTED")
+      requiresPrivilegedAuthentication(scopeService.getEndPointScopes("paye")) { authScopes =>
+        employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
+          val selfLink =
+            HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
+          val employmentsJsObject = Json.obj("employments" -> Json.toJson(employments))
+          Ok(state(employmentsJsObject) ++ selfLink)
         }
-        .recover(recovery)
+      } recover recovery
     }
   }
 }
@@ -62,10 +69,11 @@ abstract class EmploymentsController(
 class SandboxEmploymentsController @Inject()(
   sandboxEmploymentsService: SandboxEmploymentsService,
   scopeService: ScopesService,
+  scopesHelper: ScopesHelper,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
-  cc: ControllerComponents)
-    extends EmploymentsController(sandboxEmploymentsService, scopeService, cc) {
+  cc: ControllerComponents)(override implicit val ec: ExecutionContext)
+    extends EmploymentsController(sandboxEmploymentsService, scopeService, scopesHelper, cc) {
 
   override val environment: String = SANDBOX
 }
@@ -74,10 +82,11 @@ class SandboxEmploymentsController @Inject()(
 class LiveEmploymentsController @Inject()(
   liveEmploymentsService: LiveEmploymentsService,
   scopeService: ScopesService,
+  scopesHelper: ScopesHelper,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
-  cc: ControllerComponents)
-    extends EmploymentsController(liveEmploymentsService, scopeService, cc) {
+  cc: ControllerComponents)(override implicit val ec: ExecutionContext)
+    extends EmploymentsController(liveEmploymentsService, scopeService, scopesHelper, cc) {
 
   override val environment: String = PRODUCTION
 }

@@ -18,6 +18,7 @@ package uk.gov.hmrc.individualsemploymentsapi.domain.des
 
 import org.joda.time.LocalDate
 import uk.gov.hmrc.domain.EmpRef
+import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
 
 case class DesEmployment(
   payments: Seq[DesPayment],
@@ -27,7 +28,7 @@ case class DesEmployment(
   employerSchemeReference: Option[String] = None,
   employmentStartDate: Option[LocalDate] = None,
   employmentLeavingDate: Option[LocalDate] = None,
-  employmentPayFrequency: Option[DesPayFrequency.Value] = None,
+  employmentPayFrequency: Option[PayFrequencyCode.Value] = None,
   employeeAddress: Option[DesAddress] = None,
   payrollId: Option[String] = None) {
 

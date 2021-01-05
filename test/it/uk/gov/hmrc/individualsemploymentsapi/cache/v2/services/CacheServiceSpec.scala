@@ -25,7 +25,7 @@ import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheIdBase, CacheService}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class CacheServiceSpec
     extends FreeSpec with MustMatchers with ScalaFutures with OptionValues with MongoSuite with IntegrationPatience {

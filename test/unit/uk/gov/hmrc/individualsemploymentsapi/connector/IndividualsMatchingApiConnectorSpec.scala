@@ -26,7 +26,8 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.IndividualsMatchingApiConnector
-import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
+import uk.gov.hmrc.individualsemploymentsapi.domain
+import uk.gov.hmrc.individualsemploymentsapi.domain.{NinoMatch, v1}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
@@ -75,7 +76,7 @@ class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEa
             "nino":"AB123456C"
           }
         """)
-      await(individualsMatchingApiConnector.resolve(matchId)) shouldBe NinoMatch(matchId, Nino("AB123456C"))
+      await(individualsMatchingApiConnector.resolve(matchId)) shouldBe domain.NinoMatch(matchId, Nino("AB123456C"))
     }
 
   }

@@ -24,6 +24,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.des._
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorResponse}
 import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
+import uk.gov.hmrc.individualsemploymentsapi.domain.v1.{Address, Employer, Employment, PayFrequency}
 
 import scala.util.{Failure, Try}
 
@@ -56,7 +57,7 @@ object JsonFormatters {
 
   implicit val desAddressJsonFormat = Json.format[DesAddress]
   implicit val desPaymentJsonFormat = Json.format[DesPayment]
-  implicit val desEmploymentPayFrequencyJsonFormat = EnumJson.enumFormat(DesPayFrequency)
+  implicit val desEmploymentPayFrequencyJsonFormat = EnumJson.enumFormat(PayFrequencyCode)
   implicit val desEmploymentJsonFormat = Json.format[DesEmployment]
   implicit val desEmploymentsJsonFormat = Json.format[DesEmployments]
 

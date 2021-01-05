@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain.des
+package uk.gov.hmrc.individualsemploymentsapi.domain.v1
 
-object DesPayFrequency extends Enumeration {
-  type DesPayFrequency = Value
-  val W1, W2, W4, IO, IR, M1, M3, M6, MA = Value
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesAddress
+
+case class Address(
+  line1: Option[String],
+  line2: Option[String],
+  line3: Option[String],
+  line4: Option[String],
+  line5: Option[String],
+  postcode: Option[String])
+
+object Address {
+  def from(address: DesAddress): Address =
+    Address(address.line1, address.line2, address.line3, address.line4, address.line5, address.postalCode)
 }

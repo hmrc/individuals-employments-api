@@ -81,11 +81,24 @@ class VersioningSpec extends BaseSpec {
       val response =
         invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken, acceptHeaderVP2)
 
-      Then("The response status should be 500")
-      response.code shouldBe INTERNAL_SERVER_ERROR
+      Then("The response status should be 200")
+      response.code shouldBe OK
 
-      Then("And the response body should be NOT_IMPLEMENTED")
-      response.body shouldBe "{\"statusCode\":500,\"message\":\"NOT_IMPLEMENTED\"}"
+      Then("And the response body should be for api version P2.0")
+      parse(response.body) shouldBe parse(
+        """
+          {
+            "_links":{
+              "paye":{
+                "href":"/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&fromDate,toDate}",
+                "title":"Get an individual's PAYE employment data"
+              },
+              "self":{
+                "href":"/individuals/employments/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+              }
+            }
+          }
+        """)
     }
   }
 

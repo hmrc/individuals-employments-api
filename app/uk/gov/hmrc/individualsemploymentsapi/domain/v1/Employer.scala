@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain
+package uk.gov.hmrc.individualsemploymentsapi.domain.v1
 
-import org.joda.time.{Interval, LocalDate}
 import uk.gov.hmrc.domain.EmpRef
 
-case class Payment(
-  taxablePayment: Double,
-  paymentDate: LocalDate,
-  employerPayeReference: Option[EmpRef] = None,
-  monthPayNumber: Option[Int] = None,
-  weekPayNumber: Option[Int] = None) {
+case class Employer(payeReference: Option[EmpRef], name: Option[String], address: Option[Address])
 
-  def isPaidWithin(interval: Interval): Boolean = interval.contains(paymentDate.toDateTimeAtStartOfDay)
-
+object Employer {
+  def create(payeReference: Option[EmpRef], name: Option[String], address: Option[Address]): Option[Employer] =
+    (payeReference, name, address) match {
+      case (None, None, None) => None
+      case _                  => Some(Employer(payeReference, name, address))
+    }
 }

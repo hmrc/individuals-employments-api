@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain.des
+package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
-import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Payment
+object PayFrequency extends Enumeration {
 
-case class DesEmployments(employments: Seq[DesEmployment])
+  type PayFrequency = Value
+  val WEEKLY, FORTNIGHTLY, FOUR_WEEKLY, ONE_OFF, IRREGULAR, CALENDAR_MONTHLY, QUARTERLY, BI_ANNUALLY, ANNUALLY = Value
 
-object DesEmployments {
-  def toPayments(desEmployment: DesEmployment): Seq[Payment] =
-    desEmployment.payments map { payment =>
-      Payment(
-        payment.totalPayInPeriod,
-        payment.paymentDate,
-        desEmployment.employerPayeReference,
-        payment.monthPayNumber,
-        payment.weekPayNumber)
-    }
+  private val ifConversionMap = Map(
+    "W1" -> WEEKLY,
+    "W2" -> FORTNIGHTLY,
+    "W4" -> FOUR_WEEKLY,
+    "IO" -> ONE_OFF,
+    "IR" -> IRREGULAR,
+    "M1" -> CALENDAR_MONTHLY,
+    "M3" -> QUARTERLY,
+    "M6" -> BI_ANNUALLY,
+    "MA" -> ANNUALLY
+  )
+
+  def from(ifValue: String): Option[Value] = ifConversionMap.get(ifValue)
+
 }

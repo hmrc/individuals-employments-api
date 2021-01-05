@@ -20,7 +20,7 @@ import component.uk.gov.hmrc.individualsemploymentsapi.stubs.BaseSpec
 import play.api.http.Status._
 import play.api.libs.json.Json.parse
 import scalaj.http.Http
-import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.sandboxMatchId
+import uk.gov.hmrc.individualsemploymentsapi.sandbox.v1.SandboxData.sandboxMatchId
 
 class EmploymentsSpec extends BaseSpec {
   private val payeEmploymentsScope = "read:individuals-employments-paye"
@@ -35,8 +35,35 @@ class EmploymentsSpec extends BaseSpec {
         .asString
 
       Then("The response status should be 200 (OK)")
-      response.code shouldBe INTERNAL_SERVER_ERROR
-      response.body shouldBe "{\"statusCode\":500,\"message\":\"NOT_IMPLEMENTED\"}"
+      response.code shouldBe OK
+      parse(response.body) shouldBe parse(s"""
+          {
+            "_links":{
+              "self":{
+                "href":"/individuals/employments/paye?matchId=$sandboxMatchId&fromDate=2016-04-01&toDate=2017-01-01"
+              }
+            },
+            "employments":[
+              {
+                "startDate":"2016-01-01",
+                "endDate":"2016-06-30",
+                "payFrequency":"FOUR_WEEKLY",
+                "employer":{
+                  "payeReference":"123/AI45678",
+                  "name":"Acme",
+                  "address":{
+                    "line1":"Acme Inc Building",
+                    "line2":"Acme Inc Campus",
+                    "line3":"Acme Street",
+                    "line4":"AcmeVille",
+                    "line5":"Acme State",
+                    "postcode":"AI22 9LL"
+                  }
+                }
+              }
+            ]
+          }
+        """)
     }
 
   }

@@ -61,11 +61,16 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       When("the root entry point to the API is invoked with an invalid match id")
       val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366")
 
-      Then("the response status should be 500")
+      Then("the response status should be 404 (not found)")
       assertResponseIs(
         response,
-        INTERNAL_SERVER_ERROR,
-        "{\"statusCode\":500,\"message\":\"NOT_IMPLEMENTED\"}"
+        NOT_FOUND,
+        """
+          {
+             "code" : "NOT_FOUND",
+             "message" : "The resource can not be found"
+          }
+        """
       )
     }
 
@@ -73,11 +78,23 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       When("I request the root entry point to the API")
       val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430")
 
-      Then("The response status should be 500")
+      Then("The response status should be 200 (ok)")
       assertResponseIs(
         response,
-        INTERNAL_SERVER_ERROR,
-        "{\"statusCode\":500,\"message\":\"NOT_IMPLEMENTED\"}"
+        OK,
+        """
+          {
+             "_links":{
+               "paye":{
+                 "href":"/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&fromDate,toDate}",
+                 "title":"Get an individual's PAYE employment data"
+               },
+               "self":{
+                 "href":"/individuals/employments/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+               }
+             }
+           }
+        """
       )
     }
 
@@ -120,11 +137,16 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       val response =
         invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366&fromDate=2017-01-01")
 
-      Then("the response status should be 500")
+      Then("the response status should be 404 (not found)")
       assertResponseIs(
         response,
-        INTERNAL_SERVER_ERROR,
-        "{\"statusCode\":500,\"message\":\"NOT_IMPLEMENTED\"}"
+        NOT_FOUND,
+        """
+          {
+             "code" : "NOT_FOUND",
+             "message" : "The resource can not be found"
+          }
+        """
       )
     }
 
@@ -133,14 +155,35 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       val response =
         invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01")
 
-      Then("The response status should be 500")
+      Then("The response status should be 200 (ok)")
       assertResponseIs(
         response,
-        INTERNAL_SERVER_ERROR,
-        "{\"statusCode\":500,\"message\":\"NOT_IMPLEMENTED\"}"
+        OK,
+        """{
+          "_links":{
+            "self":{
+              "href":"/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01"
+            }
+          },
+          "employments": [{
+            "startDate":"2017-01-02",
+            "endDate":"2017-03-01",
+            "payFrequency":"FORTNIGHTLY",
+            "employer":{
+              "payeReference":"123/DI45678",
+              "name":"Disney",
+              "address":{
+                "line1":"Friars House",
+                "line2":"Campus Way",
+                "line3":"New Street",
+                "line4":"Sometown",
+                "line5":"Old County",
+                "postcode":"TF22 3BC"}
+              }
+            }]
+          }""".stripMargin
       )
     }
-
   }
 
   private def invokeEndpoint(endpoint: String) =

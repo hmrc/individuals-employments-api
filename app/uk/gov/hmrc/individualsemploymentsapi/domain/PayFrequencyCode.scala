@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain
 
-import java.util.UUID
-
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
-
-case class Individual(matchId: UUID, nino: String, employments: Seq[DesEmployment])
+object PayFrequencyCode extends Enumeration {
+  type DesPayFrequency = Value
+  val W1, W2, W4, IO, IR, M1, M3, M6, MA = Value
+}

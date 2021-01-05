@@ -17,6 +17,7 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
 import org.scalatest.BeforeAndAfterEach
+import uk.gov.hmrc.individualsemploymentsapi.config.EndpointConfig
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.ScopesService
 import unit.uk.gov.hmrc.individualsemploymentsapi.service.ScopesConfig
 import utils.UnitSpec
@@ -55,6 +56,15 @@ class ScopesServiceSpec extends UnitSpec with ScopesConfig with BeforeAndAfterEa
       result shouldBe List("payments", "employer/employerName", "employer/employerDistrictNumber")
     }
 
+    "get valid data items for scope and multiple endpoints" in {
+      val result =
+        scopesService.getValidItemsFor(List(mockScope3), List(mockEndpoint1, mockEndpoint3))
+      result shouldBe Set(
+        "payments",
+        "field4"
+      )
+    }
+
     "get valid data items keys for single scope" in {
       val result =
         scopesService.getValidFieldsForCacheKey(List(mockScope1))
@@ -81,11 +91,16 @@ class ScopesServiceSpec extends UnitSpec with ScopesConfig with BeforeAndAfterEa
     }
 
     "get links for valid endpoints" in {
-      val result = scopesService.getLinks(List(mockScope1))
-      result shouldBe Map(mockEndpoint1 -> "/a/b/c?matchId=<matchId>{&fromDate,toDate}")
+      val result = scopesService.getEndpoints(List(mockScope1))
+      result.size shouldBe 1
+      val config1 = result.head
+      config1.name shouldBe mockEndpoint1
+      config1.link shouldBe "/a/b/c?matchId=<matchId>{&fromDate,toDate}"
 
-      val result2 = scopesService.getLinks(List(mockScope4))
-      result2 shouldBe Map(mockEndpoint2 -> "/a/b/d?matchId=<matchId>{&fromDate,toDate}")
+      val result2 = scopesService.getEndpoints(List(mockScope4))
+      val config2 = result2.head
+      config2.name shouldBe mockEndpoint2
+      config2.link shouldBe "/a/b/d?matchId=<matchId>{&fromDate,toDate}"
     }
 
     "get the scopes associated to an endpoint" in {

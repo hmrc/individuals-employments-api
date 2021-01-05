@@ -30,8 +30,7 @@ import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfiguration, Short
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheId, CacheIdBase, CacheService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
@@ -42,9 +41,9 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
   trait Setup {
     val mockClient = mock[ShortLivedCache]
     val mockCacheConfig = mock[CacheConfiguration]
-    val cacheService = new CacheService(mockClient, mockCacheConfig)
-
+    implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
     implicit val hc: HeaderCarrier = HeaderCarrier()
+    lazy val cacheService = new CacheService(mockClient, mockCacheConfig)
 
     given(mockCacheConfig.cacheEnabled).willReturn(true)
   }

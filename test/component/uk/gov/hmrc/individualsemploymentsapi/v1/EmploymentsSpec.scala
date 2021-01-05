@@ -20,7 +20,7 @@ import component.uk.gov.hmrc.individualsemploymentsapi.stubs.BaseSpec
 import play.api.http.Status._
 import play.api.libs.json.Json.parse
 import scalaj.http.Http
-import uk.gov.hmrc.individualsemploymentsapi.sandbox.SandboxData.sandboxMatchId
+import uk.gov.hmrc.individualsemploymentsapi.sandbox.v1.SandboxData.sandboxMatchId
 
 class EmploymentsSpec extends BaseSpec {
   private val payeEmploymentsScope = "read:individuals-employments-paye"
