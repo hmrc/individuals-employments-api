@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
 import java.util.UUID
-
 import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.Interval
 import play.api.hal.Hal._
@@ -30,6 +29,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
+import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.extractCorrelationId
 
 import scala.concurrent.ExecutionContext
 
@@ -42,6 +42,7 @@ abstract class EmploymentsController(
 
   def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
     {
+      extractCorrelationId(request)
       requiresPrivilegedAuthentication(scopeService.getAllScopes) { authScopes =>
         employmentsService.resolve(matchId) map { _ =>
           val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
@@ -53,6 +54,7 @@ abstract class EmploymentsController(
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
     {
+      extractCorrelationId(request)
       requiresPrivilegedAuthentication(scopeService.getEndPointScopes("paye")) { authScopes =>
         employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
           val selfLink =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,19 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
-import java.util.UUID
-
 import org.joda.time.{Interval, LocalDate}
 import org.mockito.BDDMockito.`given`
-import play.api.test.Helpers._
 import org.mockito.Matchers.{any, refEq, eq => eqTo}
 import org.mockito.Mockito.{verifyZeroInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
+import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import uk.gov.hmrc.individualsemploymentsapi.controller.v2.{LiveEmploymentsController, SandboxEmploymentsController}
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
@@ -40,11 +38,15 @@ import uk.gov.hmrc.individualsemploymentsapi.service.v2.{LiveEmploymentsService,
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.AuthHelper
 
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSugar {
 
   trait Setup extends ScopesConfigHelper {
+
+    val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
+    val validCorrelationHeader = ("CorrelationId", sampleCorrelationId)
 
     val controllerComponent = fakeApplication.injector.instanceOf[ControllerComponents]
     val mockSandboxEmploymentsService = mock[SandboxEmploymentsService]
@@ -86,7 +88,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
-      val eventualResult = liveEmploymentsController.root(randomMatchId)(FakeRequest())
+      val eventualResult =
+        liveEmploymentsController.root(randomMatchId)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(eventualResult) shouldBe NOT_FOUND
       contentAsJson(eventualResult) shouldBe Json.obj(
@@ -95,12 +98,38 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       )
     }
 
+    "Throw an exception when missing a CorrelationId" in new Setup {
+
+      when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new MatchNotFoundException))
+
+      val exception =
+        intercept[BadRequestException](liveEmploymentsController.root(randomMatchId)(FakeRequest()))
+
+      exception.message shouldBe "CorrelationId is required"
+      exception.responseCode shouldBe BAD_REQUEST
+    }
+
+    "Throw an exception when invalid a CorrelationId" in new Setup {
+
+      when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
+        .thenReturn(Future.failed(new MatchNotFoundException))
+
+      val exception =
+        intercept[BadRequestException](
+          liveEmploymentsController.root(randomMatchId)(FakeRequest().withHeaders(("CorrelationId", "invalidId"))))
+
+      exception.message shouldBe "Malformed CorrelationId"
+      exception.responseCode shouldBe BAD_REQUEST
+    }
+
     "return a 200 (ok) when a match id matches live data" in new Setup {
 
       when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
         .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
 
-      val eventualResult = liveEmploymentsController.root(randomMatchId)(FakeRequest())
+      val eventualResult =
+        liveEmploymentsController.root(randomMatchId)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(eventualResult) shouldBe OK
       contentAsJson(eventualResult) shouldBe Json.obj(
@@ -121,7 +150,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       when(mockAuthConnector.authorise(any(), any())(any(), any()))
         .thenReturn(Future.failed(InsufficientEnrolments()))
 
-      val result = liveEmploymentsController.root(randomMatchId)(FakeRequest())
+      val result = liveEmploymentsController.root(randomMatchId)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(result) shouldBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
@@ -133,7 +162,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
 
       val result =
-        sandboxEmploymentsController.root(randomMatchId)(FakeRequest())
+        sandboxEmploymentsController.root(randomMatchId)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(result) shouldBe OK
       verifyZeroInteractions(mockAuthConnector)
@@ -153,7 +182,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval), any(), any())(any()))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
-      val eventualResult = liveEmploymentsController.paye(invalidMatchId, interval)(FakeRequest())
+      val eventualResult =
+        liveEmploymentsController.paye(invalidMatchId, interval)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(eventualResult) shouldBe NOT_FOUND
 
@@ -170,7 +200,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .thenReturn(Future.successful(Seq(Employment.create(Employments.acme).get)))
 
       val res =
-        liveEmploymentsController.paye(matchId, interval)(FakeRequest())
+        liveEmploymentsController.paye(matchId, interval)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(res) shouldBe OK
 
@@ -206,7 +236,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       when(mockAuthConnector.authorise(any(), any())(any(), any())).thenReturn(Future.failed(InsufficientEnrolments()))
 
-      val result = liveEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest())
+      val result =
+        liveEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(result) shouldBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
@@ -220,7 +251,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .thenReturn(Future.successful(Seq(Employments.acme, Employments.disney).map(Employment.create).map(_.get)))
 
       val eventualResult =
-        sandboxEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest())
+        sandboxEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(eventualResult) shouldBe OK
       verifyZeroInteractions(mockAuthConnector)
