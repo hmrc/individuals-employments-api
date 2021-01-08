@@ -35,7 +35,7 @@ uses:
       (annotations.sandboxData): !include sandbox/root.md
       headers:
         correlationId:
-          description: A universally unique identifier (UUID), used for traceability purposes.
+          description: A UUID, used for traceability purposes.
           type: string
           example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
       queryParameters:
@@ -71,7 +71,7 @@ uses:
                     code: NOT_FOUND
   /paye:
     get:
-      displayName: Get an individual’s employment details for the requested time period.
+      displayName: Get employment details
       description: !include docs/employments-endpoint-description.md
       is: [headers.acceptHeader]
       (annotations.scope): "assigned"
@@ -79,7 +79,7 @@ uses:
       (annotations.sandboxData): !include sandbox/employments-request.md
       headers:
         correlationId:
-          description: A universally unique identifier (UUID), used for traceability purposes.
+          description: A UUID, used for traceability purposes.
           type: string
           example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
       queryParameters:
