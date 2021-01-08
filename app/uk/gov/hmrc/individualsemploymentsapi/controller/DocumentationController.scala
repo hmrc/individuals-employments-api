@@ -46,12 +46,12 @@ class DocumentationController @Inject()(
 
   private lazy val v2EndpointsEnabled: Boolean =
     config
-      .getOptional[Boolean]("api.access.version-1.0.endpointsEnabled")
+      .getOptional[Boolean]("api.access.version-2.0.endpointsEnabled")
       .getOrElse(true)
 
   private lazy val v2Status: String =
     config
-      .getOptional[String]("api.access.version-1.0.status")
+      .getOptional[String]("api.access.version-2.0.status")
       .getOrElse("BETA")
 
   def definition(): Action[AnyContent] = Action { request =>
