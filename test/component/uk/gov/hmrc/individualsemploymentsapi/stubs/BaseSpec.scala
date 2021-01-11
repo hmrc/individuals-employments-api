@@ -50,7 +50,7 @@ trait BaseSpec
   val mocks = Seq(AuthStub, IndividualsMatchingApiStub, DesStub, IfStub, Save4LaterStub)
   val authToken = "Bearer AUTH_TOKEN"
   val acceptHeaderVP1 = ACCEPT -> "application/vnd.hmrc.P1.0+json"
-  val acceptHeaderVP2 = ACCEPT -> "application/vnd.hmrc.P2.0+json"
+  val acceptHeaderVP2 = ACCEPT -> "application/vnd.hmrc.2.0+json"
 
   protected def requestHeaders(acceptHeader: (String, String) = acceptHeaderVP1) =
     Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader)

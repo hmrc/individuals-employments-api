@@ -75,7 +75,7 @@ class VersioningSpec extends BaseSpec {
         """)
     }
 
-    scenario("Requests with an accept header version P2.0") {
+    scenario("Requests with an accept header version 2.0") {
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version P2")
       val response =
@@ -84,7 +84,7 @@ class VersioningSpec extends BaseSpec {
       Then("The response status should be 200")
       response.code shouldBe OK
 
-      Then("And the response body should be for api version P2.0")
+      Then("And the response body should be for api version 2.0")
       parse(response.body) shouldBe parse(
         """
           {
