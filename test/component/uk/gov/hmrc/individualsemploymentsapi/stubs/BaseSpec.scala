@@ -50,7 +50,7 @@ trait BaseSpec
   val mocks = Seq(AuthStub, IndividualsMatchingApiStub, DesStub, IfStub, Save4LaterStub)
   val authToken = "Bearer AUTH_TOKEN"
   val acceptHeaderVP1 = ACCEPT -> "application/vnd.hmrc.P1.0+json"
-  val acceptHeaderVP2 = ACCEPT -> "application/vnd.hmrc.P2.0+json"
+  val acceptHeaderVP2 = ACCEPT -> "application/vnd.hmrc.2.0+json"
   val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
   val validCorrelationHeader = ("CorrelationId", sampleCorrelationId)
 

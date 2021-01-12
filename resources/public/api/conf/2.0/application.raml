@@ -2,13 +2,17 @@
 ---
 
 title: Individuals Employments
-version: P2.0
+version: 2.0
 protocols: [ HTTPS ]
 baseUri: https://api.service.hmrc.gov.uk/
 
 documentation:
  - title: Overview
    content: !include docs/overview.md
+ - title: Data availability
+   content: !include docs/data-availability.md
+ - title: Data quality
+   content: !include docs/data-quality.md
  - title: Versioning
    content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/versioning.md
  - title: Errors
@@ -35,7 +39,7 @@ uses:
       (annotations.sandboxData): !include sandbox/root.md
       headers:
         correlationId:
-          description: A universally unique identifier (UUID), used for traceability purposes.
+          description: A UUID, used for traceability purposes.
           type: string
           example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
       queryParameters:
@@ -71,7 +75,7 @@ uses:
                     code: NOT_FOUND
   /paye:
     get:
-      displayName: Get an individual’s employment details for the requested time period.
+      displayName: Get employment details
       description: !include docs/employments-endpoint-description.md
       is: [headers.acceptHeader]
       (annotations.scope): "assigned"
@@ -79,7 +83,7 @@ uses:
       (annotations.sandboxData): !include sandbox/employments-request.md
       headers:
         correlationId:
-          description: A universally unique identifier (UUID), used for traceability purposes.
+          description: A UUID, used for traceability purposes.
           type: string
           example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
       queryParameters:

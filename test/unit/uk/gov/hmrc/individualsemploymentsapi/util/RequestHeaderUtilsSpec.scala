@@ -31,8 +31,8 @@ class RequestHeaderUtilsSpec extends UnitSpec {
 
     "return the versioned request for the root endpoint when the Accept header is set" in {
       val rootRequest = FakeRequest(GET, "/")
-      getVersionedRequest(rootRequest.withHeaders(ACCEPT -> "application/vnd.hmrc.P2.0+json")).uri shouldBe "/vP2.0"
-      getVersionedRequest(rootRequest.withHeaders(ACCEPT -> "application/vnd.hmrc.P2.0+json")).path shouldBe "/vP2.0"
+      getVersionedRequest(rootRequest.withHeaders(ACCEPT -> "application/vnd.hmrc.2.0+json")).uri shouldBe "/v2.0"
+      getVersionedRequest(rootRequest.withHeaders(ACCEPT -> "application/vnd.hmrc.2.0+json")).path shouldBe "/v2.0"
     }
 
     "Default to 1.0 when the Accept header is not set" in {
