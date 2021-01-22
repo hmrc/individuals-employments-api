@@ -20,6 +20,7 @@ import java.util.UUID
 
 import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.{Interval, LocalDate}
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{IfConnector, IndividualsMatchingApiConnector}
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
@@ -39,7 +40,8 @@ trait EmploymentsService {
   def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch]
 
   def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])(
-    implicit hc: HeaderCarrier): Future[Seq[Employment]]
+    implicit hc: HeaderCarrier,
+    request: RequestHeader): Future[Seq[Employment]]
 }
 
 @Singleton
@@ -50,7 +52,8 @@ class SandboxEmploymentsService extends EmploymentsService {
     else failed(new MatchNotFoundException)
 
   override def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])(
-    implicit hc: HeaderCarrier): Future[Seq[Employment]] =
+    implicit hc: HeaderCarrier,
+    request: RequestHeader): Future[Seq[Employment]] =
     paye(find(matchId), interval)
 
   private def paye(maybeIndividual: Option[Individual], interval: Interval)(
@@ -89,7 +92,8 @@ class LiveEmploymentsService @Inject()(
     individualsMatchingApiConnector.resolve(matchId)
 
   override def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])(
-    implicit hc: HeaderCarrier): Future[Seq[Employment]] =
+    implicit hc: HeaderCarrier,
+    request: RequestHeader): Future[Seq[Employment]] =
     resolve(matchId).flatMap { ninoMatch =>
       {
         val fieldsQuery = scopesHelper.getQueryStringFor(scopes, endpoint)
@@ -97,7 +101,12 @@ class LiveEmploymentsService @Inject()(
           .get(
             cacheId = CacheId(matchId, interval, fieldsQuery),
             functionToCache = withRetry {
-              ifConnector.fetchEmployments(ninoMatch.nino, interval, Option(fieldsQuery).filter(_.nonEmpty))
+              ifConnector.fetchEmployments(
+                ninoMatch.nino,
+                interval,
+                Option(fieldsQuery).filter(_.nonEmpty),
+                matchId.toString
+              )
             }
           )
           .map { _.map(Employment.create).filter(_.isDefined).map(_.get) }

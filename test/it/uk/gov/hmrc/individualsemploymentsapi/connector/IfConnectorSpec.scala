@@ -19,20 +19,28 @@ package it.uk.gov.hmrc.individualsemploymentsapi.connector
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import org.mockito.Matchers.any
+import org.mockito.Mockito
+import org.mockito.Mockito.{times, verify}
 import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
+import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, Upstream5xxResponse}
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HttpClient, Upstream5xxResponse}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.connector.IfConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.{EmploymentsHelper, Intervals}
 
 import scala.concurrent.ExecutionContext
 
-class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals with EmploymentsHelper {
+class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals with EmploymentsHelper with MockitoSugar {
 
+  val matchId = "80a6bb14-d888-436e-a541-4000674c60aa"
   val stubPort = sys.env.getOrElse("WIREMOCK", "11122").toInt
   val stubHost = "localhost"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
@@ -55,9 +63,17 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
   implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
 
   trait Setup {
+
+    val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
+    val sampleCorrelationIdHeader = ("CorrelationId" -> sampleCorrelationId)
+
     implicit val hc = HeaderCarrier()
 
-    val underTest = fakeApplication.injector.instanceOf[IfConnector]
+    val config = fakeApplication.injector.instanceOf[ServicesConfig]
+    val httpClient = fakeApplication.injector.instanceOf[HttpClient]
+    val auditHelper = mock[AuditHelper]
+    val underTest = new IfConnector(config, httpClient, auditHelper)
+
   }
 
   override def beforeEach() {
@@ -80,23 +96,52 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
     val interval = toInterval(startDate, endDate)
 
     "Fail when IF returns an error" in new Setup {
+
+      Mockito.reset(underTest.auditHelper)
+
       stubFor(
         get(urlPathMatching(s"/individuals/employment/nino/$nino"))
           .willReturn(aResponse().withStatus(500)))
 
-      intercept[Upstream5xxResponse] { await(underTest.fetchEmployments(nino, interval, None)) }
+      intercept[Upstream5xxResponse] {
+        await(
+          underTest.fetchEmployments(nino, interval, None, matchId)(
+            hc,
+            FakeRequest().withHeaders(sampleCorrelationIdHeader),
+            ec
+          )
+        )
+      }
+
+      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any())(any())
     }
 
     "Fail when IF returns a bad request" in new Setup {
+
+      Mockito.reset(underTest.auditHelper)
+
       stubFor(
         get(urlPathMatching(s"/individuals/employment/nino/$nino"))
           .willReturn(aResponse().withStatus(400)))
 
-      intercept[BadRequestException] { await(underTest.fetchEmployments(nino, interval, None)) }
+      intercept[BadRequestException] {
+        await(
+          underTest.fetchEmployments(nino, interval, None, matchId)(
+            hc,
+            FakeRequest().withHeaders(sampleCorrelationIdHeader),
+            ec
+          )
+        )
+      }
+
+      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any())(any())
     }
 
     "for no employment data" should {
       "return empty collection" in new Setup {
+
+        Mockito.reset(underTest.auditHelper)
+
         stubFor(
           get(urlPathMatching(s"/individuals/employment/nino/$nino"))
             .withQueryParam("startDate", equalTo(startDate))
@@ -107,7 +152,15 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
               .withStatus(200)
               .withBody(Json.toJson(noEmploymentData).toString())))
 
-        val result = await(underTest.fetchEmployments(nino, interval, None))
+        val result = await(
+          underTest.fetchEmployments(nino, interval, None, matchId)(
+            hc,
+            FakeRequest().withHeaders(sampleCorrelationIdHeader),
+            ec
+          )
+        )
+
+        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any())(any())
 
         result shouldBe noEmploymentData.employments
       }
@@ -115,6 +168,9 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
     "for single employment data response" should {
       "return collection with only one result" in new Setup {
+
+        Mockito.reset(underTest.auditHelper)
+
         stubFor(
           get(urlPathMatching(s"/individuals/employment/nino/$nino"))
             .withQueryParam("startDate", equalTo(startDate))
@@ -125,7 +181,15 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
               .withStatus(200)
               .withBody(Json.toJson(singleEmploymentData).toString())))
 
-        val result = await(underTest.fetchEmployments(nino, interval, None))
+        val result = await(
+          underTest.fetchEmployments(nino, interval, None, matchId)(
+            hc,
+            FakeRequest().withHeaders(sampleCorrelationIdHeader),
+            ec
+          )
+        )
+
+        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any())(any())
 
         result shouldBe singleEmploymentData.employments
       }
@@ -133,6 +197,9 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
     "for multiple employment data" should {
       "return collection with multiple entries" in new Setup {
+
+        Mockito.reset(underTest.auditHelper)
+
         stubFor(
           get(urlPathMatching(s"/individuals/employment/nino/$nino"))
             .withQueryParam("startDate", equalTo(startDate))
@@ -143,7 +210,15 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
               .withStatus(200)
               .withBody(Json.toJson(multiEmploymentData).toString())))
 
-        val result = await(underTest.fetchEmployments(nino, interval, None))
+        val result = await(
+          underTest.fetchEmployments(nino, interval, None, matchId)(
+            hc,
+            FakeRequest().withHeaders(sampleCorrelationIdHeader),
+            ec
+          )
+        )
+
+        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any())(any())
 
         result shouldBe multiEmploymentData.employments
       }
