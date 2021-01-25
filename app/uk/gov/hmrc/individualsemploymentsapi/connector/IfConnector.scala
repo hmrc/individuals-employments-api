@@ -126,8 +126,6 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
     }
     case badRequest: Upstream4xxResponse => {
 
-      Logger.warn(s"Bad Request: ${badRequest.getMessage}")
-
       auditHelper.auditIfApiFailure(apiIfFailedAuditRequest, badRequest.getMessage)
 
       Future.failed(new IllegalArgumentException(s"Integration Framework returned INVALID_REQUEST"))
