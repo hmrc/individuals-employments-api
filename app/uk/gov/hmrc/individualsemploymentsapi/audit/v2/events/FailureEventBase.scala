@@ -45,6 +45,7 @@ abstract case class FailureEventBase @Inject()(httpAuditEvent: HttpExtendedAudit
     msg: String)(
     implicit hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers)
   ): ExtendedDataEvent = {
+
     val event = extendedDataEvent(
       auditType,
       transactionName,

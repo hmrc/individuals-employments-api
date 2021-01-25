@@ -53,5 +53,6 @@ abstract case class ResponseEventBase @Inject()(httpAuditEvent: HttpExtendedAudi
     Logger.debug(s"$auditType - AuditEvent: $event")
 
     event
+
   }
 }
