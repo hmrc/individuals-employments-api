@@ -21,6 +21,7 @@ import java.util.UUID
 import javax.inject.Inject
 import org.joda.time.{Interval, LocalDate}
 import play.api.Logger
+import play.api.http.Status.BAD_REQUEST
 import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.domain.Nino
@@ -29,6 +30,8 @@ import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HttpClient, NotFoun
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiIfAuditRequest, ApiIfFailureAuditRequest}
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfEmployment, IfEmployments}
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorResponse}
+import uk.gov.hmrc.play.bootstrap.backend.http.ErrorResponse
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -115,11 +118,20 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
     }
     case Upstream4xxResponse(msg, 429, _, _) => {
 
-      Logger.warn(s"IF Rate limited: $msg")
+      Logger.warn(s"Integration Framework Rate limited: $msg")
 
       auditHelper.auditIfApiFailure(apiIfFailedAuditRequest, s"IF Rate limited: $msg")
 
       Future.failed(new TooManyRequestException(msg))
+    }
+    case badRequest: Upstream4xxResponse => {
+
+      Logger.warn(s"Bad Request: ${badRequest.getMessage}")
+
+      auditHelper.auditIfApiFailure(apiIfFailedAuditRequest, badRequest.getMessage)
+
+      Future.failed(new IllegalArgumentException(s"Integration Framework returned INVALID_REQUEST"))
+
     }
     case e: Exception => {
 
