@@ -51,9 +51,13 @@ trait BaseSpec
   val authToken = "Bearer AUTH_TOKEN"
   val acceptHeaderVP1 = ACCEPT -> "application/vnd.hmrc.P1.0+json"
   val acceptHeaderVP2 = ACCEPT -> "application/vnd.hmrc.2.0+json"
+  val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
+  val validCorrelationHeader = ("CorrelationId", sampleCorrelationId)
 
-  protected def requestHeaders(acceptHeader: (String, String) = acceptHeaderVP1) =
-    Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader)
+  protected def requestHeaders(
+    acceptHeader: (String, String) = acceptHeaderVP1,
+    correlationHeader: (String, String) = validCorrelationHeader) =
+    Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader, correlationHeader)
 
   override protected def beforeEach(): Unit =
     mocks.foreach(m => if (!m.server.isRunning) m.server.start())
