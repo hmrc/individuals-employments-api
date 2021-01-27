@@ -37,8 +37,10 @@ import uk.gov.hmrc.individualsemploymentsapi.sandbox.v2.SandboxData._
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.AuthHelper
-
 import java.util.UUID
+
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSugar {
@@ -56,6 +58,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
     lazy val scopeService: ScopesService = new ScopesService(mockScopesConfig)
     lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val auditHelper: AuditHelper = mock[AuditHelper]
     val hmctsClientId = "hmctsClientId"
 
     val sandboxEmploymentsController = new SandboxEmploymentsController(
@@ -64,6 +67,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       scopesHelper,
       mockAuthConnector,
       hmctsClientId,
+      auditHelper,
       controllerComponent)
 
     val liveEmploymentsController = new LiveEmploymentsController(
@@ -72,6 +76,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       scopesHelper,
       mockAuthConnector,
       hmctsClientId,
+      auditHelper,
       controllerComponent)
 
     implicit val hc: HeaderCarrier = HeaderCarrier()

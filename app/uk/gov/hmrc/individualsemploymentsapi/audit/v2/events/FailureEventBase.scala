@@ -24,7 +24,7 @@ import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.HttpExtendedAuditEvent
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.ApiFailureEventModel
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureAuditRequest, ApiResponseEventModel}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
@@ -39,7 +39,7 @@ abstract case class FailureEventBase @Inject()(httpAuditEvent: HttpExtendedAudit
   def apply(
     correlationId: String,
     scopes: Option[String],
-    matchId: Option[UUID],
+    matchId: Option[String],
     request: RequestHeader,
     requestUrl: Option[String],
     msg: String)(
@@ -50,7 +50,7 @@ abstract case class FailureEventBase @Inject()(httpAuditEvent: HttpExtendedAudit
       auditType,
       transactionName,
       request,
-      Json.toJson(ApiFailureEventModel(apiVersion, matchId, correlationId, scopes, requestUrl, msg))
+      Json.toJson(ApiResponseEventModel(apiVersion, matchId, correlationId, scopes, requestUrl, msg))
     )
 
     Logger.debug(s"$auditType - AuditEvent: $event")

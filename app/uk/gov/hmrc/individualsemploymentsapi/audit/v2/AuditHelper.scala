@@ -18,8 +18,8 @@ package uk.gov.hmrc.individualsemploymentsapi.audit.v2
 
 import javax.inject.Inject
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent}
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiAuditRequest, ApiIfAuditRequest, ApiIfFailureAuditRequest}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{ApiFailureEvent, ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiAuditRequest, ApiFailureAuditRequest, ApiIfAuditRequest, ApiIfFailureAuditRequest}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext
@@ -38,6 +38,20 @@ case class AuditHelper @Inject()(auditConnector: AuditConnector, httpExtendedAud
         apiAuditRequest.request,
         None,
         apiAuditRequest.response.toString
+      )
+    )
+
+  def auditApiFailure(apiFailedAuditRequest: ApiFailureAuditRequest, msg: String)(implicit hc: HeaderCarrier) =
+    auditConnector.sendExtendedEvent(
+      new ApiFailureEvent(
+        httpExtendedAuditEvent
+      ).apply(
+        apiFailedAuditRequest.correlationId,
+        apiFailedAuditRequest.scopes,
+        apiFailedAuditRequest.matchId,
+        apiFailedAuditRequest.request,
+        Some(apiFailedAuditRequest.requestUrl),
+        msg
       )
     )
 

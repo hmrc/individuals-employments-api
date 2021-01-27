@@ -18,10 +18,8 @@ package uk.gov.hmrc.individualsemploymentsapi.audit.v2.models
 
 import play.api.mvc.RequestHeader
 
-case class ApiIfFailureAuditRequest(
-  correlationId: String,
-  scopes: Option[String],
-  matchId: Option[String],
-  request: RequestHeader,
-  requestUrl: String
-)
+case class ApiIfFailureAuditRequest(correlationId: String,
+                                    scopes: Option[String],
+                                    matchId: Option[String],
+                                    request: RequestHeader,
+                                    requestUrl: String)

@@ -18,11 +18,13 @@ package uk.gov.hmrc.individualsemploymentsapi.controller
 
 import javax.inject.Inject
 import org.joda.time.DateTime
-import play.api.mvc.{ControllerComponents, Request, Result}
+import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment}
 import uk.gov.hmrc.http.{HeaderCarrier, TooManyRequestException}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureAuditRequest, ApiIfFailureAuditRequest}
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.SANDBOX
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses._
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates._
@@ -41,11 +43,47 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
     getQueryParam("toDate") map (toDate => s"$urlWithFromDate&toDate=$toDate") getOrElse urlWithFromDate
   }
 
+  private[controller] def auditAndRecover(correlationId: String, matchId: String, url: String, auditHelper: AuditHelper)
+  (implicit request: RequestHeader): PartialFunction[Throwable, Result] = {
+    case _: MatchNotFoundException   => {
+      auditHelper.auditApiFailure(
+        ApiFailureAuditRequest(correlationId, None, Some(matchId), request, url), "Not Found"
+      )
+      ErrorNotFound.toHttpResponse
+    }
+    case e: AuthorisationException   => {
+      auditHelper.auditApiFailure(
+        ApiFailureAuditRequest(correlationId, None, Some(matchId), request, url), e.getMessage
+      )
+      ErrorUnauthorized(e.getMessage).toHttpResponse
+    }
+    case tmr: TooManyRequestException  => {
+      auditHelper.auditApiFailure(
+        ApiFailureAuditRequest(correlationId, None, Some(matchId), request, url), tmr.getMessage
+      )
+      ErrorTooManyRequests.toHttpResponse
+    }
+    case e: IllegalArgumentException => {
+      auditHelper.auditApiFailure(
+        ApiFailureAuditRequest(correlationId, None, Some(matchId), request, url), e.getMessage
+      )
+      ErrorInvalidRequest(e.getMessage).toHttpResponse
+    }
+  }
+
   private[controller] def recovery: PartialFunction[Throwable, Result] = {
-    case _: MatchNotFoundException   => ErrorNotFound.toHttpResponse
-    case e: AuthorisationException   => ErrorUnauthorized(e.getMessage).toHttpResponse
-    case _: TooManyRequestException  => ErrorTooManyRequests.toHttpResponse
-    case e: IllegalArgumentException => ErrorInvalidRequest(e.getMessage).toHttpResponse
+    case _: MatchNotFoundException   => {
+      ErrorNotFound.toHttpResponse
+    }
+    case e: AuthorisationException   => {
+      ErrorUnauthorized(e.getMessage).toHttpResponse
+    }
+    case tmr: TooManyRequestException  => {
+      ErrorTooManyRequests.toHttpResponse
+    }
+    case e: IllegalArgumentException => {
+      ErrorInvalidRequest(e.getMessage).toHttpResponse
+    }
   }
 
 }

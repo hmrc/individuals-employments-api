@@ -17,6 +17,7 @@
 package uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
 import java.util.UUID
+
 import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.Interval
 import play.api.hal.Hal._
@@ -26,6 +27,8 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.ApiAuditRequest
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
@@ -36,24 +39,32 @@ import scala.concurrent.ExecutionContext
 abstract class EmploymentsController(employmentsService: EmploymentsService,
                                      scopeService: ScopesService,
                                      scopesHelper: ScopesHelper,
+                                     auditHelper: AuditHelper,
                                      cc: ControllerComponents)
                                     (implicit val ec: ExecutionContext)
   extends CommonController(cc) with PrivilegedAuthentication {
 
   def root(matchId: UUID): Action[AnyContent] = Action.async {
     implicit request =>
-      extractCorrelationId(request)
+      val correlationId = extractCorrelationId(request)
       requiresPrivilegedAuthentication(scopeService.getAllScopes) { authScopes =>
         employmentsService.resolve(matchId) map { _ =>
           val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
-          Ok(scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink)
+          val response = scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink
+          val scopes = authScopes.mkString(",")
+
+          auditHelper.auditApiResponse(
+            ApiAuditRequest(correlationId.toString, Some(scopes), Some(matchId.toString), request, Json.toJson(response))
+          )
+
+          Ok(response)
         }
-      } recover recovery
+      } recover auditAndRecover(correlationId.toString, matchId.toString, "/individuals/employments/", auditHelper)
   }
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async {
     implicit request =>
-      extractCorrelationId(request)
+      val correlationId = extractCorrelationId(request)
       requiresPrivilegedAuthentication(scopeService.getEndPointScopes("paye")) { authScopes =>
         employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
           val selfLink =
@@ -61,7 +72,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
           val employmentsJsObject = Json.obj("employments" -> Json.toJson(employments))
           Ok(state(employmentsJsObject) ++ selfLink)
         }
-      } recover recovery
+      } recover auditAndRecover(correlationId.toString, matchId.toString, "/individuals/employments/paye", auditHelper)
   }
 }
 
@@ -72,8 +83,9 @@ class SandboxEmploymentsController @Inject()(
   scopesHelper: ScopesHelper,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
+  auditHelper: AuditHelper,
   cc: ControllerComponents)(override implicit val ec: ExecutionContext)
-    extends EmploymentsController(sandboxEmploymentsService, scopeService, scopesHelper, cc) {
+    extends EmploymentsController(sandboxEmploymentsService, scopeService, scopesHelper, auditHelper, cc) {
 
   override val environment: String = SANDBOX
 }
@@ -85,8 +97,9 @@ class LiveEmploymentsController @Inject()(
   scopesHelper: ScopesHelper,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
+  auditHelper: AuditHelper,
   cc: ControllerComponents)(override implicit val ec: ExecutionContext)
-    extends EmploymentsController(liveEmploymentsService, scopeService, scopesHelper, cc) {
+    extends EmploymentsController(liveEmploymentsService, scopeService, scopesHelper, auditHelper, cc) {
 
   override val environment: String = PRODUCTION
 }
