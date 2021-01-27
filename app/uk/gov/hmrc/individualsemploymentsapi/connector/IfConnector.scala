@@ -96,7 +96,7 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
       auditHelper.auditIfApiFailure(apiIfFailedAuditRequest, s"IF Rate limited: $msg")
       Future.failed(new TooManyRequestException(msg))
     }
-    case Upstream4xxResponse(msg, _, _, _)e => {
+    case Upstream4xxResponse(msg, _, _, _) => {
       auditHelper.auditIfApiFailure(apiIfFailedAuditRequest, msg)
       Future.failed(new IllegalArgumentException(s"Integration Framework returned INVALID_REQUEST"))
     }

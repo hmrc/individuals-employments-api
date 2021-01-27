@@ -31,7 +31,8 @@ class VersioningSpec extends BaseSpec {
     scenario("Requests without an accept header default to version 1.0") {
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made without an accept header")
-      val response = invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken)
+      val response =
+        invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken, validCorrelationHeader)
 
       Then("The response status should be 404")
       response.code shouldBe NOT_FOUND
@@ -43,7 +44,8 @@ class VersioningSpec extends BaseSpec {
       val response = invokeWithHeaders(
         sandboxMatchEndpointWithSandboxMatchId,
         AUTHORIZATION -> authToken,
-        ACCEPT        -> "application/vnd.hmrc.10.0+json")
+        ACCEPT        -> "application/vnd.hmrc.10.0+json",
+        validCorrelationHeader)
 
       Then("The response status should be 404")
       response.code shouldBe NOT_FOUND
@@ -53,7 +55,11 @@ class VersioningSpec extends BaseSpec {
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version P1")
       val response =
-        invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken, acceptHeaderVP1)
+        invokeWithHeaders(
+          sandboxMatchEndpointWithSandboxMatchId,
+          AUTHORIZATION -> authToken,
+          acceptHeaderVP1,
+          validCorrelationHeader)
 
       Then("The response status should be 200")
       response.code shouldBe OK
@@ -79,7 +85,11 @@ class VersioningSpec extends BaseSpec {
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version P2")
       val response =
-        invokeWithHeaders(sandboxMatchEndpointWithSandboxMatchId, AUTHORIZATION -> authToken, acceptHeaderVP2)
+        invokeWithHeaders(
+          sandboxMatchEndpointWithSandboxMatchId,
+          AUTHORIZATION -> authToken,
+          acceptHeaderVP2,
+          validCorrelationHeader)
 
       Then("The response status should be 200")
       response.code shouldBe OK
