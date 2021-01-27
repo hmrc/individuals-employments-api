@@ -18,4 +18,3 @@ addSbtPlugin("uk.gov.hmrc" % "sbt-artifactory" % "1.5.0")
 
 addSbtPlugin("uk.gov.hmrc" % "sbt-service-manager" % "0.8.0")
 
-addSbtPlugin("com.lucidchart" % "sbt-scalafmt" % "1.16")
