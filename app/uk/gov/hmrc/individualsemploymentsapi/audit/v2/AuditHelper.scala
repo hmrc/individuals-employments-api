@@ -24,7 +24,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext
 
-case class AuditHelper @Inject()(auditConnector: AuditConnector,
+class AuditHelper @Inject()(auditConnector: AuditConnector,
                                  apiResponseEvent: ApiResponseEvent,
                                  ifApiResponseEvent: IfApiResponseEvent,
                                  ifApiFailureEvent: IfApiFailureEvent)
