@@ -44,14 +44,19 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
     servicesConfig.getString("microservice.services.integration-framework.environment")
 
   def fetchEmployments(nino: Nino, interval: Interval, filter: Option[String], matchId: String)
-                      (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext): Future[Seq[IfEmployment]] = {
+                      (implicit hc: HeaderCarrier,
+                       request: RequestHeader,
+                       ec: ExecutionContext): Future[Seq[IfEmployment]] = {
 
     val endpoint = "IfConnector::fetchEmployments"
 
     val startDate: LocalDate = interval.getStart.toLocalDate
     val endDate: LocalDate = interval.getEnd.toLocalDate
+
     val employmentsUrl =
-      s"$baseUrl/individuals/employment/nino/$nino?startDate=$startDate&endDate=$endDate${filter.map(f => s"&fields=$f").getOrElse("")}"
+      s"$baseUrl/individuals/employment/nino/$nino?startDate=$startDate&endDate=$endDate${
+        filter.map(f => s"&fields=$f").getOrElse("")
+      }"
 
     callPaye(employmentsUrl, endpoint, matchId)
 
