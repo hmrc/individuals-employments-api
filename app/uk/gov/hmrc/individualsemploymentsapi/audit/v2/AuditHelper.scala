@@ -24,14 +24,15 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext
 
-case class AuditHelper @Inject()(auditConnector: AuditConnector, httpExtendedAuditEvent: HttpExtendedAuditEvent)(
-  implicit ec: ExecutionContext) {
+case class AuditHelper @Inject()(auditConnector: AuditConnector,
+                                 apiResponseEvent: ApiResponseEvent,
+                                 ifApiResponseEvent: IfApiResponseEvent,
+                                 ifApiFailureEvent: IfApiFailureEvent)
+                                (implicit ec: ExecutionContext) {
 
   def auditApiResponse(apiAuditRequest: ApiAuditRequest)(implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
-      new ApiResponseEvent(
-        httpExtendedAuditEvent
-      ).apply(
+      apiResponseEvent(
         apiAuditRequest.correlationId,
         apiAuditRequest.scopes,
         apiAuditRequest.matchId,
@@ -43,9 +44,7 @@ case class AuditHelper @Inject()(auditConnector: AuditConnector, httpExtendedAud
 
   def auditIfApiResponse(apiIfAuditRequest: ApiIfAuditRequest)(implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
-      new IfApiResponseEvent(
-        httpExtendedAuditEvent
-      ).apply(
+      ifApiResponseEvent(
         apiIfAuditRequest.correlationId,
         apiIfAuditRequest.scopes,
         apiIfAuditRequest.matchId,
@@ -57,9 +56,7 @@ case class AuditHelper @Inject()(auditConnector: AuditConnector, httpExtendedAud
 
   def auditIfApiFailure(apiIfFailedAuditRequest: ApiIfFailureAuditRequest, msg: String)(implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
-      new IfApiFailureEvent(
-        httpExtendedAuditEvent
-      ).apply(
+      ifApiFailureEvent(
         apiIfFailedAuditRequest.correlationId,
         apiIfFailedAuditRequest.scopes,
         apiIfFailedAuditRequest.matchId,

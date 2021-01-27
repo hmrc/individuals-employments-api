@@ -26,7 +26,7 @@ import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.ApiResponseEventMod
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 
-abstract case class ResponseEventBase @Inject()(httpAuditEvent: HttpExtendedAuditEvent) {
+abstract class ResponseEventBase @Inject()(httpAuditEvent: HttpExtendedAuditEvent) {
 
   import httpAuditEvent.extendedDataEvent
 
