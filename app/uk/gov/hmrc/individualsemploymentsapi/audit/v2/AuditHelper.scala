@@ -26,6 +26,7 @@ import scala.concurrent.ExecutionContext
 
 class AuditHelper @Inject()(auditConnector: AuditConnector,
                                  apiResponseEvent: ApiResponseEvent,
+                                 apiFailureEvent: ApiFailureEvent,
                                  ifApiResponseEvent: IfApiResponseEvent,
                                  ifApiFailureEvent: IfApiFailureEvent)
                                 (implicit ec: ExecutionContext) {
@@ -44,9 +45,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
 
   def auditApiFailure(apiFailedAuditRequest: ApiFailureAuditRequest, msg: String)(implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
-      new ApiFailureEvent(
-        httpExtendedAuditEvent
-      ).apply(
+      apiFailureEvent(
         apiFailedAuditRequest.correlationId,
         apiFailedAuditRequest.scopes,
         apiFailedAuditRequest.matchId,

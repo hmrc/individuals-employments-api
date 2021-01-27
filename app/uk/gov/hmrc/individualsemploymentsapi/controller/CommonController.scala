@@ -43,8 +43,24 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
     getQueryParam("toDate") map (toDate => s"$urlWithFromDate&toDate=$toDate") getOrElse urlWithFromDate
   }
 
-  private[controller] def auditAndRecover(correlationId: String, matchId: String, url: String, auditHelper: AuditHelper)
-  (implicit request: RequestHeader): PartialFunction[Throwable, Result] = {
+  private[controller] def recovery: PartialFunction[Throwable, Result] = {
+    case _: MatchNotFoundException   => {
+      ErrorNotFound.toHttpResponse
+    }
+    case e: AuthorisationException   => {
+      ErrorUnauthorized(e.getMessage).toHttpResponse
+    }
+    case tmr: TooManyRequestException  => {
+      ErrorTooManyRequests.toHttpResponse
+    }
+    case e: IllegalArgumentException => {
+      ErrorInvalidRequest(e.getMessage).toHttpResponse
+    }
+  }
+
+  private[controller] def recovery(correlationId: String, matchId: String, url: String)
+                                  (implicit request: RequestHeader,
+                                   auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
     case _: MatchNotFoundException   => {
       auditHelper.auditApiFailure(
         ApiFailureAuditRequest(correlationId, None, Some(matchId), request, url), "Not Found"
@@ -71,21 +87,6 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
     }
   }
 
-  private[controller] def recovery: PartialFunction[Throwable, Result] = {
-    case _: MatchNotFoundException   => {
-      ErrorNotFound.toHttpResponse
-    }
-    case e: AuthorisationException   => {
-      ErrorUnauthorized(e.getMessage).toHttpResponse
-    }
-    case tmr: TooManyRequestException  => {
-      ErrorTooManyRequests.toHttpResponse
-    }
-    case e: IllegalArgumentException => {
-      ErrorInvalidRequest(e.getMessage).toHttpResponse
-    }
-  }
-
 }
 
 trait PrivilegedAuthentication extends AuthorisedFunctions {
@@ -95,8 +96,8 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
   def authPredicate(scopes: Iterable[String]): Predicate =
     scopes.map(Enrolment(_): Predicate).reduce(_ or _)
 
-  def requiresPrivilegedAuthentication(endpointScopes: Iterable[String])(f: Iterable[String] => Future[Result])(
-    implicit hc: HeaderCarrier): Future[Result] = {
+  def requiresPrivilegedAuthentication(endpointScopes: Iterable[String])(f: Iterable[String] => Future[Result])
+                                      (implicit hc: HeaderCarrier): Future[Result] = {
 
     if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
 
