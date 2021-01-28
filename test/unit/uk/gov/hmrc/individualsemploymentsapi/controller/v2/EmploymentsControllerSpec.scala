@@ -179,7 +179,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       val invalidMatchId = UUID.randomUUID()
 
-      when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval), any(), any())(any()))
+      when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval), any(), any())(any(), any()))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
@@ -196,7 +196,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
     "return 200 OK" in new Setup {
       val matchId = UUID.randomUUID()
 
-      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval), any(), any())(any()))
+      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval), any(), any())(any(), any()))
         .thenReturn(Future.successful(Seq(Employment.create(Employments.acme).get)))
 
       val res =
@@ -246,9 +246,14 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
     "not require bearer token authentication" in new Setup {
 
       when(
-        mockSandboxEmploymentsService.paye(eqTo(sandboxMatchId), eqTo(interval), eqTo("paye"), eqTo(Seq("test-scope")))(
-          any()))
-        .thenReturn(Future.successful(Seq(Employments.acme, Employments.disney).map(Employment.create).map(_.get)))
+        mockSandboxEmploymentsService.paye(
+          eqTo(sandboxMatchId),
+          eqTo(interval),
+          eqTo("paye"),
+          eqTo(Seq("test-scope"))
+        )(any(), any())).thenReturn(
+        Future.successful(Seq(Employments.acme, Employments.disney).map(Employment.create).map(_.get))
+      )
 
       val eventualResult =
         sandboxEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest().withHeaders(validCorrelationHeader))

@@ -33,15 +33,15 @@ import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.extractCorr
 
 import scala.concurrent.ExecutionContext
 
-abstract class EmploymentsController(
-  employmentsService: EmploymentsService,
-  scopeService: ScopesService,
-  scopesHelper: ScopesHelper,
-  cc: ControllerComponents)(implicit val ec: ExecutionContext)
-    extends CommonController(cc) with PrivilegedAuthentication {
+abstract class EmploymentsController(employmentsService: EmploymentsService,
+                                     scopeService: ScopesService,
+                                     scopesHelper: ScopesHelper,
+                                     cc: ControllerComponents)
+                                    (implicit val ec: ExecutionContext)
+  extends CommonController(cc) with PrivilegedAuthentication {
 
-  def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
-    {
+  def root(matchId: UUID): Action[AnyContent] = Action.async {
+    implicit request =>
       extractCorrelationId(request)
       requiresPrivilegedAuthentication(scopeService.getAllScopes) { authScopes =>
         employmentsService.resolve(matchId) map { _ =>
@@ -49,11 +49,10 @@ abstract class EmploymentsController(
           Ok(scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink)
         }
       } recover recovery
-    }
   }
 
-  def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
-    {
+  def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async {
+    implicit request =>
       extractCorrelationId(request)
       requiresPrivilegedAuthentication(scopeService.getEndPointScopes("paye")) { authScopes =>
         employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
@@ -63,7 +62,6 @@ abstract class EmploymentsController(
           Ok(state(employmentsJsObject) ++ selfLink)
         }
       } recover recovery
-    }
   }
 }
 

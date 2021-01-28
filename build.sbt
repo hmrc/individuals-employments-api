@@ -75,7 +75,6 @@ lazy val microservice =
     .settings(publishingSettings: _*)
     .settings(scalaVersion := "2.12.11")
     .settings(defaultSettings(): _*)
-    .settings(scalafmtOnCompile := true)
     .settings(
       libraryDependencies ++= appDependencies,
       testOptions in Test := Seq(Tests.Filter(unitFilter)),

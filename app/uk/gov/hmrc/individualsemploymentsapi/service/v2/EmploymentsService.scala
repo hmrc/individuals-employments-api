@@ -20,6 +20,7 @@ import java.util.UUID
 
 import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.{Interval, LocalDate}
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{IfConnector, IndividualsMatchingApiConnector}
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
@@ -38,23 +39,24 @@ trait EmploymentsService {
 
   def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch]
 
-  def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])(
-    implicit hc: HeaderCarrier): Future[Seq[Employment]]
+  def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])
+          (implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]]
 }
 
 @Singleton
 class SandboxEmploymentsService extends EmploymentsService {
 
-  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
+  override def resolve(matchId: UUID)
+                      (implicit hc: HeaderCarrier): Future[NinoMatch] =
     if (matchId.equals(sandboxMatchId)) successful(NinoMatch(sandboxMatchId, sandboxNino))
     else failed(new MatchNotFoundException)
 
-  override def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])(
-    implicit hc: HeaderCarrier): Future[Seq[Employment]] =
+  override def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])
+                   (implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]] =
     paye(find(matchId), interval)
 
-  private def paye(maybeIndividual: Option[Individual], interval: Interval)(
-    implicit hc: HeaderCarrier): Future[Seq[Employment]] =
+  private def paye(maybeIndividual: Option[Individual], interval: Interval)
+                  (implicit hc: HeaderCarrier): Future[Seq[Employment]] =
     maybeIndividual match {
       case Some(i) =>
         val employments: Seq[Option[Employment]] = i.employments.map(Employment.create)
@@ -88,21 +90,29 @@ class LiveEmploymentsService @Inject()(
   override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
     individualsMatchingApiConnector.resolve(matchId)
 
-  override def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])(
-    implicit hc: HeaderCarrier): Future[Seq[Employment]] =
-    resolve(matchId).flatMap { ninoMatch =>
-      {
+  override def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])
+                   (implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]] =
+    resolve(matchId).flatMap {
+      ninoMatch =>
         val fieldsQuery = scopesHelper.getQueryStringFor(scopes, endpoint)
         cacheService
           .get(
             cacheId = CacheId(matchId, interval, fieldsQuery),
             functionToCache = withRetry {
-              ifConnector.fetchEmployments(ninoMatch.nino, interval, Option(fieldsQuery).filter(_.nonEmpty))
+              ifConnector.fetchEmployments(
+                ninoMatch.nino,
+                interval,
+                Option(fieldsQuery).filter(_.nonEmpty),
+                matchId.toString
+              )
             }
           )
-          .map { _.map(Employment.create).filter(_.isDefined).map(_.get) }
-          .map { _.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse }
-      }
+          .map {
+            _.map(Employment.create).filter(_.isDefined).map(_.get)
+          }
+          .map {
+            _.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse
+          }
     }
 
   private def withRetry[T](body: => Future[T]): Future[T] = body recoverWith {
