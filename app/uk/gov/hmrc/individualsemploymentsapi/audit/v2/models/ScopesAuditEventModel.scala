@@ -20,7 +20,7 @@ import play.api.libs.json.Json
 
 case class ScopesAuditEventModel(
   apiVersion: String,
-  matchId: String,
+  matchId: Option[String],
   correlationId: String,
   scopes: String)
 

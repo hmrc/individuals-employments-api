@@ -24,7 +24,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment}
 import uk.gov.hmrc.http.{HeaderCarrier, TooManyRequestException}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureAuditRequest, ApiIfFailureAuditRequest}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureAuditRequest, ApiIfFailureAuditRequest, ScopesAuditRequest}
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.SANDBOX
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses._
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates._
@@ -96,17 +96,27 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
   def authPredicate(scopes: Iterable[String]): Predicate =
     scopes.map(Enrolment(_): Predicate).reduce(_ or _)
 
-  def requiresPrivilegedAuthentication(endpointScopes: Iterable[String])(f: Iterable[String] => Future[Result])
-                                      (implicit hc: HeaderCarrier): Future[Result] = {
+  def Authenticate(endpointScopes: Iterable[String],
+                   correlationId: String,
+                   matchId: Option[String])(f: Iterable[String] => Future[Result])
+                  (implicit hc: HeaderCarrier,
+                   request: RequestHeader,
+                   auditHelper: AuditHelper): Future[Result] = {
 
     if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
 
     if (environment == Environment.SANDBOX)
       f(endpointScopes.toList)
     else {
-      authorised(authPredicate(endpointScopes))
-        .retrieve(Retrievals.allEnrolments) {
-          case scopes => f(scopes.enrolments.map(e => e.key).toList)
+      authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) {
+          case scopes => {
+            val authScopes  = scopes.enrolments.map(e => e.key)
+            val auditScopes = authScopes.toList.mkString(",")
+
+            auditHelper.auditAuthScopes(ScopesAuditRequest(correlationId, matchId, auditScopes, request))
+
+            f(authScopes)
+          }
         }
     }
   }

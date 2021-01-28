@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import utils.UnitSpec
 import org.mockito.Matchers.any
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{ApiFailureEvent, ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{ApiFailureEvent, ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent, ScopesAuditEvent}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -52,9 +52,10 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
   val apiFailureEvent    = new ApiFailureEvent(httpExtendedAuditEvent)
   val ifApiResponseEvent = new IfApiResponseEvent(httpExtendedAuditEvent)
   val ifApiFailureEvent  =  new IfApiFailureEvent(httpExtendedAuditEvent)
+  val scopesAuditEvent   = new ScopesAuditEvent(httpExtendedAuditEvent)
 
   val auditHelper = new AuditHelper(
-    auditConnector, apiResponseEvent, apiFailureEvent, ifApiResponseEvent, ifApiFailureEvent
+    auditConnector, apiResponseEvent, apiFailureEvent, ifApiResponseEvent, ifApiFailureEvent, scopesAuditEvent
   )
 
   "Auth helper" should {
