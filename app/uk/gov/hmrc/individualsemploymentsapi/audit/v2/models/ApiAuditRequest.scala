@@ -21,8 +21,9 @@ import play.api.mvc.RequestHeader
 
 case class ApiAuditRequest(
   correlationId: String,
+  matchId: String,
   scopes: Option[String],
-  matchId: Option[String],
   request: RequestHeader,
+  endpoint: String,
   response: JsValue
 )

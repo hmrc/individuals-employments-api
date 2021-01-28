@@ -18,9 +18,9 @@ package uk.gov.hmrc.individualsemploymentsapi.audit.v2.models
 
 import java.util.UUID
 
-case class Id(matchId: UUID, correlationId: UUID, endpoint: String) {
+case class Identifiers(matchId: UUID, correlationId: UUID, endpoint: String) {
 
-  val matchIdVal       = Some(matchId.toString)
+  val matchIdVal       = matchId.toString
   val correlationIdVal = correlationId.toString
 
 }

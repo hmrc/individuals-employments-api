@@ -83,12 +83,12 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
         Logger.debug(s"$endpoint - Response: $response")
 
         auditHelper.auditIfApiResponse(
-          ApiIfAuditRequest(extractCorrelationId(request), None, Some(matchId), request, url, Json.toJson(response))
+          ApiIfAuditRequest(extractCorrelationId(request), None, matchId, request, url, Json.toJson(response))
         )
 
         response.employments
       },
-      ApiIfFailureAuditRequest(extractCorrelationId(request), None, Some(matchId), request, url))
+      ApiIfFailureAuditRequest(extractCorrelationId(request), None, matchId, request, url))
 
   private def recover[A](x: Future[Seq[A]], apiIfFailedAuditRequest: ApiIfFailureAuditRequest)
                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[A]] = x.recoverWith {

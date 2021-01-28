@@ -19,7 +19,7 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 import org.joda.time.{Interval, LocalDate}
 import org.mockito.BDDMockito.`given`
 import org.mockito.Matchers.{any, refEq, eq => eqTo}
-import org.mockito.Mockito.{verifyZeroInteractions, when}
+import org.mockito.Mockito.{times, verify, verifyZeroInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
@@ -104,6 +104,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         "code"    -> "NOT_FOUND",
         "message" -> "The resource can not be found"
       )
+
+      verify(liveEmploymentsController.auditHelper, times(1)).auditApiFailure(any(), any())(any())
     }
 
     "Throw an exception when missing a CorrelationId" in new Setup {
@@ -118,6 +120,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       exception.message shouldBe "CorrelationId is required"
       exception.responseCode shouldBe BAD_REQUEST
+
     }
 
     "Throw an exception when invalid a CorrelationId" in new Setup {
@@ -133,6 +136,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       exception.message shouldBe "Malformed CorrelationId"
       exception.responseCode shouldBe BAD_REQUEST
+
     }
 
     "return a 200 (ok) when a match id matches live data" in new Setup {
@@ -157,6 +161,9 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
           )
         )
       )
+
+      verify(liveEmploymentsController.auditHelper, times(1)).auditApiResponse(any())(any())
+      verify(liveEmploymentsController.auditHelper, times(1)).auditAuthScopes(any())(any())
     }
 
     "fail with status 401 when the bearer token does not have enrolment test-scope" in new Setup {
@@ -170,6 +177,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       status(result) shouldBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
+
+      verify(liveEmploymentsController.auditHelper, times(1)).auditApiFailure(any(), any())(any())
     }
 
     "not require bearer token authentication for sandbox" in new Setup {
@@ -209,6 +218,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         "code"    -> "NOT_FOUND",
         "message" -> "The resource can not be found"
       )
+
+      verify(liveEmploymentsController.auditHelper, times(1)).auditApiFailure(any(), any())(any())
     }
 
     "return 200 OK" in new Setup {
@@ -251,6 +262,9 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
           )
         )
       )
+
+      verify(liveEmploymentsController.auditHelper, times(1)).auditApiResponse(any())(any())
+      verify(liveEmploymentsController.auditHelper, times(1)).auditAuthScopes(any())(any())
     }
 
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
@@ -264,6 +278,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       status(result) shouldBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
+
+      verify(liveEmploymentsController.auditHelper, times(1)).auditApiFailure(any(), any())(any())
     }
 
     "not require bearer token authentication in sandbox" in new Setup {
@@ -283,6 +299,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       status(eventualResult) shouldBe OK
       verifyZeroInteractions(mockAuthConnector)
+
     }
   }
 }

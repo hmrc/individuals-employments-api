@@ -39,7 +39,7 @@ abstract class FailureEventBase @Inject()(httpAuditEvent: HttpExtendedAuditEvent
   def apply(
     correlationId: String,
     scopes: Option[String],
-    matchId: Option[String],
+    matchId: String,
     request: RequestHeader,
     requestUrl: Option[String],
     msg: String)(

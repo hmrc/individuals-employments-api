@@ -20,6 +20,6 @@ import play.api.mvc.RequestHeader
 
 case class ApiIfFailureAuditRequest(correlationId: String,
                                     scopes: Option[String],
-                                    matchId: Option[String],
+                                    matchId: String,
                                     request: RequestHeader,
                                     requestUrl: String)

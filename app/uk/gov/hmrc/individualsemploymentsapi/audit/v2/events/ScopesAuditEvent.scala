@@ -36,7 +36,7 @@ class ScopesAuditEvent @Inject()(httpAuditEvent: HttpExtendedAuditEvent) {
 
   def apply(
              correlationId: String,
-             matchId : Option[String],
+             matchId : String,
              scopes : String,
              request: RequestHeader)(
              implicit hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers)

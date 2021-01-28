@@ -43,11 +43,12 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
   val nino = "CS700100A"
   val correlationId = "test"
   val scopes = Some("test")
-  val matchId = Some("80a6bb14-d888-436e-a541-4000674c60aa")
+  val matchId = "80a6bb14-d888-436e-a541-4000674c60aa"
   val request = FakeRequest()
   val response = Json.toJson("some" -> "json")
   val ifUrl =
     s"host/individuals/employments/paye/nino/$nino?startDate=2019-01-01&endDate=2020-01-01&fields=some(vals(val1),val2)"
+  val endpoint = "/test"
 
   val auditConnector = mock[AuditConnector]
   val httpExtendedAuditEvent = new DefaultHttpExtendedAuditEvent("individuals-employments-api")
@@ -106,7 +107,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      val req = ApiAuditRequest(correlationId, scopes, matchId, request, response)
+      val req = ApiAuditRequest(correlationId, matchId, scopes, request, endpoint, response)
 
       auditHelper.auditApiResponse(req)
 
@@ -118,6 +119,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
                                 |  "matchId": "80a6bb14-d888-436e-a541-4000674c60aa",
                                 |  "correlationId": "test",
                                 |  "scopes": "test",
+                                |  "requestUrl":"/test",
                                 |  "response": "[\"some\",\"json\"]",
                                 |  "method": "GET",
                                 |  "deviceID": "-",

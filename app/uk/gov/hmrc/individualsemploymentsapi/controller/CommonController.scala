@@ -58,7 +58,7 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
     }
   }
 
-  private[controller] def withAudit(correlationId: String, matchId: Option[String], url: String)
+  private[controller] def withAudit(correlationId: String, matchId: String, url: String)
                                    (implicit request: RequestHeader,
                                    auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
     case _: MatchNotFoundException   => {
@@ -98,7 +98,7 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
 
   def Authenticate(endpointScopes: Iterable[String],
                    correlationId: String,
-                   matchId: Option[String])(f: Iterable[String] => Future[Result])
+                   matchId: String)(f: Iterable[String] => Future[Result])
                   (implicit hc: HeaderCarrier,
                    request: RequestHeader,
                    auditHelper: AuditHelper): Future[Result] = {

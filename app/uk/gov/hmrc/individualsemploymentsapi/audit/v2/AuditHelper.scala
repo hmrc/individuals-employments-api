@@ -40,7 +40,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
         apiAuditRequest.scopes,
         apiAuditRequest.matchId,
         apiAuditRequest.request,
-        None,
+        Some(apiAuditRequest.endpoint),
         apiAuditRequest.response.toString
       )
     )
