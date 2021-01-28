@@ -16,9 +16,14 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.audit.v2.models
 
-import play.api.mvc.RequestHeader
+import play.api.libs.json.Json
 
-case class ApiFailureAuditRequest(correlationId: String,
-                                  matchId: Option[String],
-                                  request: RequestHeader,
-                                  requestUrl: String)
+case class ScopesAuditEventModel(
+  apiVersion: String,
+  matchId: String,
+  correlationId: String,
+  scopes: String)
+
+object ScopesAuditEventModel {
+  implicit val formatScopesAuditEventModel = Json.format[ScopesAuditEventModel]
+}

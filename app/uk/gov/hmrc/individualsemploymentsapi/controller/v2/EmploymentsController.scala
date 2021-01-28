@@ -24,14 +24,12 @@ import play.api.hal.Hal._
 import play.api.mvc.hal._
 import play.api.hal.HalLink
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, ControllerComponents, RequestHeader, Result}
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException}
-import uk.gov.hmrc.http.TooManyRequestException
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiAuditRequest, ApiFailureAuditRequest}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiAuditRequest, Id}
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorNotFound, ErrorTooManyRequests, ErrorUnauthorized, MatchNotFoundException}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
 import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.extractCorrelationId
 
@@ -47,41 +45,45 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
 
   def root(matchId: UUID): Action[AnyContent] = Action.async {
     implicit request =>
-      val correlationId = extractCorrelationId(request)
+      val id = Id(extractCorrelationId(request), matchId, "/individuals/employments/")
+
       requiresPrivilegedAuthentication(scopeService.getAllScopes) { authScopes =>
         employmentsService.resolve(matchId) map { _ =>
+
+          val scopes   = Some(authScopes.mkString(","))
           val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
           val response = scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink
 
           auditHelper.auditApiResponse(
-            ApiAuditRequest(correlationId.toString, Some(authScopes.mkString(",")), Some(matchId.toString), request, Json.toJson(response))
+            ApiAuditRequest(id.correlationIdVal, scopes, id.matchIdVal, request, Json.toJson(response))
           )
 
           Ok(response)
         }
-      } recover recovery(correlationId.toString, matchId.toString, "/individuals/employments/")
+      } recover withAudit(id.correlationIdVal, id.matchIdVal, "/individuals/employments/")
   }
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async {
     implicit request =>
-      val correlationId = extractCorrelationId(request)
+      val id = Id(extractCorrelationId(request), matchId, "/individuals/employments/paye")
+
       requiresPrivilegedAuthentication(scopeService.getEndPointScopes("paye")) { authScopes =>
         employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
+
+          val scopes   = Some(authScopes.mkString(","))
           val selfLink =
             HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
           val employmentsJsObject = Json.obj("employments" -> Json.toJson(employments))
-          val scopes = authScopes.mkString(",")
 
           val response = state(employmentsJsObject) ++ selfLink
 
           auditHelper.auditApiResponse(
-            ApiAuditRequest(correlationId.toString, Some(scopes), Some(matchId.toString), request, Json.toJson(response))
+            ApiAuditRequest(id.correlationIdVal, scopes, id.matchIdVal, request, Json.toJson(response))
           )
 
           Ok(response)
-
         }
-      } recover recovery(correlationId.toString, matchId.toString, "/individuals/employments/paye")
+      } recover withAudit(id.correlationIdVal, id.matchIdVal, "/individuals/employments/paye")
   }
 }
 

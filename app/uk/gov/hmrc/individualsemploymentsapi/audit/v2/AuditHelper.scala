@@ -18,8 +18,8 @@ package uk.gov.hmrc.individualsemploymentsapi.audit.v2
 
 import javax.inject.Inject
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{ApiFailureEvent, ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent}
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiAuditRequest, ApiFailureAuditRequest, ApiIfAuditRequest, ApiIfFailureAuditRequest}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{ApiFailureEvent, ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent, ScopesAuditEvent}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiAuditRequest, ApiFailureAuditRequest, ApiIfAuditRequest, ApiIfFailureAuditRequest, ScopesAuditRequest}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext
@@ -28,10 +28,12 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
                                  apiResponseEvent: ApiResponseEvent,
                                  apiFailureEvent: ApiFailureEvent,
                                  ifApiResponseEvent: IfApiResponseEvent,
-                                 ifApiFailureEvent: IfApiFailureEvent)
+                                 ifApiFailureEvent: IfApiFailureEvent,
+                                 scopesAuditEvent: ScopesAuditEvent)
                                 (implicit ec: ExecutionContext) {
 
-  def auditApiResponse(apiAuditRequest: ApiAuditRequest)(implicit hc: HeaderCarrier) =
+  def auditApiResponse(apiAuditRequest: ApiAuditRequest)
+                      (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       apiResponseEvent(
         apiAuditRequest.correlationId,
@@ -43,11 +45,12 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
       )
     )
 
-  def auditApiFailure(apiFailedAuditRequest: ApiFailureAuditRequest, msg: String)(implicit hc: HeaderCarrier) =
+  def auditApiFailure(apiFailedAuditRequest: ApiFailureAuditRequest, msg: String)
+                     (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       apiFailureEvent(
         apiFailedAuditRequest.correlationId,
-        apiFailedAuditRequest.scopes,
+        None,
         apiFailedAuditRequest.matchId,
         apiFailedAuditRequest.request,
         Some(apiFailedAuditRequest.requestUrl),
@@ -55,7 +58,8 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
       )
     )
 
-  def auditIfApiResponse(apiIfAuditRequest: ApiIfAuditRequest)(implicit hc: HeaderCarrier) =
+  def auditIfApiResponse(apiIfAuditRequest: ApiIfAuditRequest)
+                        (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       ifApiResponseEvent(
         apiIfAuditRequest.correlationId,
@@ -67,7 +71,8 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
       )
     )
 
-  def auditIfApiFailure(apiIfFailedAuditRequest: ApiIfFailureAuditRequest, msg: String)(implicit hc: HeaderCarrier) =
+  def auditIfApiFailure(apiIfFailedAuditRequest: ApiIfFailureAuditRequest, msg: String)
+                       (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       ifApiFailureEvent(
         apiIfFailedAuditRequest.correlationId,
@@ -76,6 +81,17 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
         apiIfFailedAuditRequest.request,
         Some(apiIfFailedAuditRequest.requestUrl),
         msg
+      )
+    )
+
+  def auditAuthScopes(scopesAuditRequest: ScopesAuditRequest)
+                     (implicit hc: HeaderCarrier) =
+    auditConnector.sendExtendedEvent(
+      scopesAuditEvent(
+        scopesAuditRequest.correlationId,
+        scopesAuditRequest.matchId,
+        scopesAuditRequest.scopes,
+        scopesAuditRequest.request
       )
     )
 }

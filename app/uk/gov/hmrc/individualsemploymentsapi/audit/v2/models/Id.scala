@@ -16,9 +16,11 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.audit.v2.models
 
-import play.api.mvc.RequestHeader
+import java.util.UUID
 
-case class ApiFailureAuditRequest(correlationId: String,
-                                  matchId: Option[String],
-                                  request: RequestHeader,
-                                  requestUrl: String)
+case class Id(matchId: UUID, correlationId: UUID, endpoint: String) {
+
+  val matchIdVal       = Some(matchId.toString)
+  val correlationIdVal = correlationId.toString
+
+}

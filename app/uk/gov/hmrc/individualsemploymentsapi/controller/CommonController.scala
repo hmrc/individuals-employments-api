@@ -58,30 +58,30 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
     }
   }
 
-  private[controller] def recovery(correlationId: String, matchId: String, url: String)
-                                  (implicit request: RequestHeader,
+  private[controller] def withAudit(correlationId: String, matchId: Option[String], url: String)
+                                   (implicit request: RequestHeader,
                                    auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
     case _: MatchNotFoundException   => {
       auditHelper.auditApiFailure(
-        ApiFailureAuditRequest(correlationId, None, Some(matchId), request, url), "Not Found"
+        ApiFailureAuditRequest(correlationId, matchId, request, url), "Not Found"
       )
       ErrorNotFound.toHttpResponse
     }
     case e: AuthorisationException   => {
       auditHelper.auditApiFailure(
-        ApiFailureAuditRequest(correlationId, None, Some(matchId), request, url), e.getMessage
+        ApiFailureAuditRequest(correlationId, matchId, request, url), e.getMessage
       )
       ErrorUnauthorized(e.getMessage).toHttpResponse
     }
     case tmr: TooManyRequestException  => {
       auditHelper.auditApiFailure(
-        ApiFailureAuditRequest(correlationId, None, Some(matchId), request, url), tmr.getMessage
+        ApiFailureAuditRequest(correlationId, matchId, request, url), tmr.getMessage
       )
       ErrorTooManyRequests.toHttpResponse
     }
     case e: IllegalArgumentException => {
       auditHelper.auditApiFailure(
-        ApiFailureAuditRequest(correlationId, None, Some(matchId), request, url), e.getMessage
+        ApiFailureAuditRequest(correlationId, matchId, request, url), e.getMessage
       )
       ErrorInvalidRequest(e.getMessage).toHttpResponse
     }
