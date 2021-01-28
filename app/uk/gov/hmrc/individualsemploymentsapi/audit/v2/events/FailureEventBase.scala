@@ -16,15 +16,13 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.audit.v2.events
 
-import java.util.UUID
-
 import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.HttpExtendedAuditEvent
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureAuditRequest, ApiResponseEventModel}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiResponseEventModel}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 

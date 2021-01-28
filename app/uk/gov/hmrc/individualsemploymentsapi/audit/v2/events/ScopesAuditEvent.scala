@@ -22,7 +22,7 @@ import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.HttpExtendedAuditEvent
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiResponseEventModel, ScopesAuditEventModel, ScopesAuditRequest}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiResponseEventModel, ScopesAuditEventModel}
 import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 

@@ -27,7 +27,6 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HttpClient, NotFoundException, TooManyRequestException, Upstream4xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiIfAuditRequest, ApiIfFailureAuditRequest}
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfEmployment, IfEmployments}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -80,33 +79,37 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
   private def callPaye(url: String, endpoint: String, matchId: String)
                       (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
     recover[IfEmployment](http.GET[IfEmployments](url)(implicitly, header(), ec) map { response =>
+
         Logger.debug(s"$endpoint - Response: $response")
 
-        auditHelper.auditIfApiResponse(
-          ApiIfAuditRequest(extractCorrelationId(request), None, matchId, request, url, Json.toJson(response))
-        )
+        auditHelper.auditIfApiResponse(extractCorrelationId(request), None,
+          matchId, request, url, Json.toJson(response))
 
         response.employments
       },
-      ApiIfFailureAuditRequest(extractCorrelationId(request), None, matchId, request, url))
+      extractCorrelationId(request), matchId, request, url)
 
-  private def recover[A](x: Future[Seq[A]], apiIfFailedAuditRequest: ApiIfFailureAuditRequest)
+  private def recover[A](x: Future[Seq[A]],
+                         correlationId: String,
+                         matchId: String,
+                         request: RequestHeader,
+                         requestUrl: String)
                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[A]] = x.recoverWith {
     case notFound: NotFoundException => {
-      auditHelper.auditIfApiFailure(apiIfFailedAuditRequest, notFound.getMessage)
+      auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, notFound.getMessage)
       Future.successful(Seq.empty)
     }
     case Upstream4xxResponse(msg, 429, _, _) => {
       Logger.warn(s"Integration Framework Rate limited: $msg")
-      auditHelper.auditIfApiFailure(apiIfFailedAuditRequest, s"IF Rate limited: $msg")
+      auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, s"IF Rate limited: $msg")
       Future.failed(new TooManyRequestException(msg))
     }
     case Upstream4xxResponse(msg, _, _, _) => {
-      auditHelper.auditIfApiFailure(apiIfFailedAuditRequest, msg)
+      auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, msg)
       Future.failed(new IllegalArgumentException(s"Integration Framework returned INVALID_REQUEST"))
     }
     case e: Exception => {
-      auditHelper.auditIfApiFailure(apiIfFailedAuditRequest, e.getMessage)
+      auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, e.getMessage)
       Future.failed(e)
     }
   }

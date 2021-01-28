@@ -17,9 +17,12 @@
 package uk.gov.hmrc.individualsemploymentsapi.audit.v2
 
 import javax.inject.Inject
+import play.api.libs.json.JsValue
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{ApiFailureEvent, ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent, ScopesAuditEvent}
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiAuditRequest, ApiFailureAuditRequest, ApiIfAuditRequest, ApiIfFailureAuditRequest, ScopesAuditRequest}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{
+  ApiFailureEvent, ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent, ScopesAuditEvent
+}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext
@@ -32,66 +35,88 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
                                  scopesAuditEvent: ScopesAuditEvent)
                                 (implicit ec: ExecutionContext) {
 
-  def auditApiResponse(apiAuditRequest: ApiAuditRequest)
+  def auditApiResponse(correlationId: String,
+                       matchId: String,
+                       scopes: Option[String],
+                       request: RequestHeader,
+                       endpoint: String,
+                       response: JsValue)
                       (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       apiResponseEvent(
-        apiAuditRequest.correlationId,
-        apiAuditRequest.scopes,
-        apiAuditRequest.matchId,
-        apiAuditRequest.request,
-        Some(apiAuditRequest.endpoint),
-        apiAuditRequest.response.toString
+        correlationId,
+        scopes,
+        matchId,
+        request,
+        Some(endpoint),
+        response.toString
       )
     )
 
-  def auditApiFailure(apiFailedAuditRequest: ApiFailureAuditRequest, msg: String)
+  def auditApiFailure(correlationId: String,
+                      matchId: String,
+                      request: RequestHeader,
+                      requestUrl: String,
+                      msg: String)
                      (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       apiFailureEvent(
-        apiFailedAuditRequest.correlationId,
+        correlationId,
         None,
-        apiFailedAuditRequest.matchId,
-        apiFailedAuditRequest.request,
-        Some(apiFailedAuditRequest.requestUrl),
+        matchId,
+        request,
+        Some(requestUrl),
         msg
       )
     )
 
-  def auditIfApiResponse(apiIfAuditRequest: ApiIfAuditRequest)
+  def auditIfApiResponse(correlationId: String,
+                         scopes: Option[String],
+                         matchId: String,
+                         request: RequestHeader,
+                         requestUrl: String,
+                         response: JsValue)
                         (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       ifApiResponseEvent(
-        apiIfAuditRequest.correlationId,
-        apiIfAuditRequest.scopes,
-        apiIfAuditRequest.matchId,
-        apiIfAuditRequest.request,
-        Some(apiIfAuditRequest.requestUrl),
-        apiIfAuditRequest.response.toString
+        correlationId,
+        scopes,
+        matchId,
+        request,
+        Some(requestUrl),
+        response.toString
       )
     )
 
-  def auditIfApiFailure(apiIfFailedAuditRequest: ApiIfFailureAuditRequest, msg: String)
+  def auditIfApiFailure(correlationId: String,
+                        scopes: Option[String],
+                        matchId: String,
+                        request: RequestHeader,
+                        requestUrl: String,
+                        msg: String)
                        (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       ifApiFailureEvent(
-        apiIfFailedAuditRequest.correlationId,
-        apiIfFailedAuditRequest.scopes,
-        apiIfFailedAuditRequest.matchId,
-        apiIfFailedAuditRequest.request,
-        Some(apiIfFailedAuditRequest.requestUrl),
+        correlationId,
+        scopes,
+        matchId,
+        request,
+        Some(requestUrl),
         msg
       )
     )
 
-  def auditAuthScopes(scopesAuditRequest: ScopesAuditRequest)
+  def auditAuthScopes(correlationId: String,
+                      matchId: String,
+                      scopes:  String,
+                      request: RequestHeader)
                      (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       scopesAuditEvent(
-        scopesAuditRequest.correlationId,
-        scopesAuditRequest.matchId,
-        scopesAuditRequest.scopes,
-        scopesAuditRequest.request
+        correlationId,
+        matchId,
+        scopes,
+        request
       )
     )
 }

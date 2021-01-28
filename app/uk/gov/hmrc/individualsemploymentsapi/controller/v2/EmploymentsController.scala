@@ -27,7 +27,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiAuditRequest, Identifiers}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.Identifiers
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
@@ -53,11 +53,8 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
             val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
             val response = scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink
 
-            auditHelper.auditApiResponse(
-              ApiAuditRequest(
-                identifiers.correlationIdVal, identifiers.matchIdVal, scopes, request, selfLink.toString, Json.toJson(response)
-              )
-            )
+            auditHelper.auditApiResponse(identifiers.correlationIdVal, identifiers.matchIdVal,
+              scopes, request, selfLink.toString, Json.toJson(response))
 
             Ok(response)
           }
@@ -77,9 +74,8 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
 
             val response = state(employmentsJsObject) ++ selfLink
 
-            auditHelper.auditApiResponse(
-              ApiAuditRequest(id.correlationIdVal, id.matchIdVal, scopes, request, selfLink.toString, Json.toJson(response))
-            )
+            auditHelper.auditApiResponse(id.correlationIdVal, id.matchIdVal, scopes,
+              request, selfLink.toString, Json.toJson(response))
 
             Ok(response)
           }

@@ -105,7 +105,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         "message" -> "The resource can not be found"
       )
 
-      verify(liveEmploymentsController.auditHelper, times(1)).auditApiFailure(any(), any())(any())
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "Throw an exception when missing a CorrelationId" in new Setup {
@@ -162,8 +163,11 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         )
       )
 
-      verify(liveEmploymentsController.auditHelper, times(1)).auditApiResponse(any())(any())
-      verify(liveEmploymentsController.auditHelper, times(1)).auditAuthScopes(any())(any())
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditApiResponse(any(), any(), any(), any(), any(), any())(any())
+
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditAuthScopes(any(), any(), any(), any())(any())
     }
 
     "fail with status 401 when the bearer token does not have enrolment test-scope" in new Setup {
@@ -178,7 +182,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       status(result) shouldBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
 
-      verify(liveEmploymentsController.auditHelper, times(1)).auditApiFailure(any(), any())(any())
+      verify(liveEmploymentsController.auditHelper, times(1))
+        .auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "not require bearer token authentication for sandbox" in new Setup {
@@ -219,7 +224,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         "message" -> "The resource can not be found"
       )
 
-      verify(liveEmploymentsController.auditHelper, times(1)).auditApiFailure(any(), any())(any())
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "return 200 OK" in new Setup {
@@ -263,8 +269,11 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         )
       )
 
-      verify(liveEmploymentsController.auditHelper, times(1)).auditApiResponse(any())(any())
-      verify(liveEmploymentsController.auditHelper, times(1)).auditAuthScopes(any())(any())
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditApiResponse(any(), any(), any(), any(), any(), any())(any())
+
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditAuthScopes(any(), any(), any(), any())(any())
     }
 
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
@@ -279,7 +288,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       status(result) shouldBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
 
-      verify(liveEmploymentsController.auditHelper, times(1)).auditApiFailure(any(), any())(any())
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "not require bearer token authentication in sandbox" in new Setup {

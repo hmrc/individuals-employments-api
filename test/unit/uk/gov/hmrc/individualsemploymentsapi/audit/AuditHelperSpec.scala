@@ -22,9 +22,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{
-  ApiAuditRequest, ApiFailureAuditRequest, ApiIfAuditRequest, ApiIfFailureAuditRequest, ScopesAuditRequest
-}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.{AuditHelper, DefaultHttpExtendedAuditEvent}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
@@ -71,9 +68,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      val req = ScopesAuditRequest(correlationId, matchId, scopes.getOrElse(""), request)
-
-      auditHelper.auditAuthScopes(req)
+      auditHelper.auditAuthScopes(correlationId, matchId, scopes.getOrElse(""), request)
 
       verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
 
@@ -107,9 +102,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      val req = ApiAuditRequest(correlationId, matchId, scopes, request, endpoint, response)
-
-      auditHelper.auditApiResponse(req)
+      auditHelper.auditApiResponse(correlationId, matchId, scopes, request, endpoint, response)
 
       verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
 
@@ -147,9 +140,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      val req = ApiFailureAuditRequest(correlationId, matchId, request, "/test")
-
-      auditHelper.auditApiFailure(req, msg)
+      auditHelper.auditApiFailure(correlationId, matchId, request, "/test", msg)
 
       verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
 
@@ -184,9 +175,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      val req = ApiIfAuditRequest(correlationId, scopes, matchId, request, ifUrl, response)
-
-      auditHelper.auditIfApiResponse(req)
+      auditHelper.auditIfApiResponse(correlationId, scopes, matchId, request, ifUrl, response)
 
       verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
 
@@ -225,9 +214,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      val req = ApiIfFailureAuditRequest(correlationId, scopes, matchId, request, ifUrl)
-
-      auditHelper.auditIfApiFailure(req, msg)
+      auditHelper.auditIfApiFailure(correlationId, scopes, matchId, request, ifUrl, msg)
 
       verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
 

@@ -24,7 +24,6 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment}
 import uk.gov.hmrc.http.{HeaderCarrier, TooManyRequestException}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureAuditRequest, ApiIfFailureAuditRequest, ScopesAuditRequest}
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.SANDBOX
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses._
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates._
@@ -62,27 +61,19 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
                                    (implicit request: RequestHeader,
                                    auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
     case _: MatchNotFoundException   => {
-      auditHelper.auditApiFailure(
-        ApiFailureAuditRequest(correlationId, matchId, request, url), "Not Found"
-      )
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, "Not Found")
       ErrorNotFound.toHttpResponse
     }
     case e: AuthorisationException   => {
-      auditHelper.auditApiFailure(
-        ApiFailureAuditRequest(correlationId, matchId, request, url), e.getMessage
-      )
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorUnauthorized(e.getMessage).toHttpResponse
     }
     case tmr: TooManyRequestException  => {
-      auditHelper.auditApiFailure(
-        ApiFailureAuditRequest(correlationId, matchId, request, url), tmr.getMessage
-      )
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, tmr.getMessage)
       ErrorTooManyRequests.toHttpResponse
     }
     case e: IllegalArgumentException => {
-      auditHelper.auditApiFailure(
-        ApiFailureAuditRequest(correlationId, matchId, request, url), e.getMessage
-      )
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInvalidRequest(e.getMessage).toHttpResponse
     }
   }
@@ -113,7 +104,7 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
             val authScopes  = scopes.enrolments.map(e => e.key)
             val auditScopes = authScopes.toList.mkString(",")
 
-            auditHelper.auditAuthScopes(ScopesAuditRequest(correlationId, matchId, auditScopes, request))
+            auditHelper.auditAuthScopes(correlationId, matchId, auditScopes, request)
 
             f(authScopes)
           }
