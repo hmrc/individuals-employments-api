@@ -22,13 +22,17 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiAuditRequest, ApiIfAuditRequest, ApiIfFailureAuditRequest}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{
+  ApiAuditRequest, ApiFailureAuditRequest, ApiIfAuditRequest, ApiIfFailureAuditRequest, ScopesAuditRequest
+}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.{AuditHelper, DefaultHttpExtendedAuditEvent}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import utils.UnitSpec
 import org.mockito.Matchers.any
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{ApiFailureEvent, ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent, ScopesAuditEvent}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{
+  ApiFailureEvent, ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent, ScopesAuditEvent
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -59,6 +63,42 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
   )
 
   "Auth helper" should {
+
+    "auditAuthScopes" in {
+
+      Mockito.reset(auditConnector)
+
+      val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+      val req = ScopesAuditRequest(correlationId, matchId, scopes.getOrElse(""), request)
+
+      auditHelper.auditAuthScopes(req)
+
+      verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
+
+      val result = Json.parse("""
+                                |{
+                                |  "apiVersion": "2.0",
+                                |  "matchId": "80a6bb14-d888-436e-a541-4000674c60aa",
+                                |  "correlationId": "test",
+                                |  "scopes": "test",
+                                |  "method": "GET",
+                                |  "deviceID": "-",
+                                |  "ipAddress": "-",
+                                |  "token": "-",
+                                |  "referrer": "-",
+                                |  "Authorization": "-",
+                                |  "input": "Request to /",
+                                |  "userAgentString": "-"
+                                |}
+                                |""".stripMargin)
+
+      val capturedEvent = captor.getValue
+      capturedEvent.asInstanceOf[ExtendedDataEvent].auditSource shouldEqual "individuals-employments-api"
+      capturedEvent.asInstanceOf[ExtendedDataEvent].auditType shouldEqual "AuthScopesAuditEvent"
+      capturedEvent.asInstanceOf[ExtendedDataEvent].detail shouldBe result
+
+    }
 
     "auditApiResponse" in {
 
@@ -93,6 +133,45 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
       val capturedEvent = captor.getValue
       capturedEvent.asInstanceOf[ExtendedDataEvent].auditSource shouldEqual "individuals-employments-api"
       capturedEvent.asInstanceOf[ExtendedDataEvent].auditType shouldEqual "ApiResponseEvent"
+      capturedEvent.asInstanceOf[ExtendedDataEvent].detail shouldBe result
+
+    }
+
+    "auditApiFailure" in {
+
+      Mockito.reset(auditConnector)
+
+      val msg = "Something went wrong"
+
+      val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+
+      val req = ApiFailureAuditRequest(correlationId, matchId, request, "/test")
+
+      auditHelper.auditApiFailure(req, msg)
+
+      verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
+
+      val result = Json.parse("""
+                                |{
+                                |  "apiVersion": "2.0",
+                                |  "matchId": "80a6bb14-d888-436e-a541-4000674c60aa",
+                                |  "correlationId": "test",
+                                |  "requestUrl":"/test",
+                                |  "response": "Something went wrong",
+                                |  "method": "GET",
+                                |  "deviceID": "-",
+                                |  "ipAddress": "-",
+                                |  "token": "-",
+                                |  "referrer": "-",
+                                |  "Authorization": "-",
+                                |  "input": "Request to /",
+                                |  "userAgentString": "-"
+                                |}
+                                |""".stripMargin)
+
+      val capturedEvent = captor.getValue
+      capturedEvent.asInstanceOf[ExtendedDataEvent].auditSource shouldEqual "individuals-employments-api"
+      capturedEvent.asInstanceOf[ExtendedDataEvent].auditType shouldEqual "ApiFailureEvent"
       capturedEvent.asInstanceOf[ExtendedDataEvent].detail shouldBe result
 
     }
