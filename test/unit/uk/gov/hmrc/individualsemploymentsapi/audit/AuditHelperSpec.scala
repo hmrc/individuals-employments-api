@@ -68,7 +68,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      auditHelper.auditAuthScopes(correlationId, matchId, scopes.getOrElse(""), request)
+      auditHelper.auditAuthScopes(matchId, scopes.get, request)
 
       verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
 
@@ -77,7 +77,6 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
           |{
           |  "apiVersion": "2.0",
           |  "matchId": "80a6bb14-d888-436e-a541-4000674c60aa",
-          |  "correlationId": "test",
           |  "scopes": "test",
           |  "method": "GET",
           |  "deviceID": "-",

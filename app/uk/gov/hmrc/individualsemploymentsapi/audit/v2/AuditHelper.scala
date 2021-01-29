@@ -106,14 +106,12 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
       )
     )
 
-  def auditAuthScopes(correlationId: String,
-                      matchId: String,
+  def auditAuthScopes(matchId: String,
                       scopes:  String,
                       request: RequestHeader)
                      (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       scopesAuditEvent(
-        correlationId,
         matchId,
         scopes,
         request

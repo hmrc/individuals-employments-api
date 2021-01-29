@@ -28,7 +28,7 @@ import play.api.test._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.controller.v2.{LiveEmploymentsController, SandboxEmploymentsController}
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
@@ -109,34 +109,45 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
-    "Throw an exception when missing a CorrelationId" in new Setup {
+    "Return an invalid request when missing a CorrelationId" in new Setup {
 
       Mockito.reset(liveEmploymentsController.auditHelper)
 
       when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
-      val exception =
-        intercept[BadRequestException](liveEmploymentsController.root(randomMatchId)(FakeRequest()))
+      val eventualResult =
+        liveEmploymentsController.root(randomMatchId)(FakeRequest())
 
-      exception.message shouldBe "CorrelationId is required"
-      exception.responseCode shouldBe BAD_REQUEST
+      status(eventualResult) shouldBe BAD_REQUEST
+      contentAsJson(eventualResult) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message"     -> "CorrelationId is required"
+      )
+
+      verify(liveEmploymentsController.auditHelper, times(1))
+        .auditApiFailure(any(), any(), any(), any(), any())(any())
 
     }
 
-    "Throw an exception when invalid a CorrelationId" in new Setup {
+    "Return an invalid request when invalid a CorrelationId" in new Setup {
 
       Mockito.reset(liveEmploymentsController.auditHelper)
 
       when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
-      val exception =
-        intercept[BadRequestException](
-          liveEmploymentsController.root(randomMatchId)(FakeRequest().withHeaders(("CorrelationId", "invalidId"))))
+      val eventualResult =
+        liveEmploymentsController.root(randomMatchId)(FakeRequest().withHeaders("CorrelationId" -> "FOO"))
 
-      exception.message shouldBe "Malformed CorrelationId"
-      exception.responseCode shouldBe BAD_REQUEST
+      status(eventualResult) shouldBe BAD_REQUEST
+      contentAsJson(eventualResult) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message"     -> "Malformed CorrelationId"
+      )
+
+      verify(liveEmploymentsController.auditHelper, times(1))
+        .auditApiFailure(any(), any(), any(), any(), any())(any())
 
     }
 
@@ -167,7 +178,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         auditApiResponse(any(), any(), any(), any(), any(), any())(any())
 
       verify(liveEmploymentsController.auditHelper, times(1)).
-        auditAuthScopes(any(), any(), any(), any())(any())
+        auditAuthScopes(any(), any(), any())(any())
     }
 
     "fail with status 401 when the bearer token does not have enrolment test-scope" in new Setup {
@@ -273,7 +284,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         auditApiResponse(any(), any(), any(), any(), any(), any())(any())
 
       verify(liveEmploymentsController.auditHelper, times(1)).
-        auditAuthScopes(any(), any(), any(), any())(any())
+        auditAuthScopes(any(), any(), any())(any())
     }
 
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {

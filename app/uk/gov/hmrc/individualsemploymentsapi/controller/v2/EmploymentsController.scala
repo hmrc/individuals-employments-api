@@ -44,42 +44,43 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
   extends CommonController(cc) with PrivilegedAuthentication {
 
   def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
-      val identifiers = Identifiers(extractCorrelationId(request), matchId, "/individuals/employments/")
+    authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
 
-      authenticate(scopeService.getAllScopes, identifiers.correlationIdVal, identifiers.matchIdVal) { authScopes =>
-          employmentsService.resolve(matchId) map { _ =>
+      val id = Identifiers(extractCorrelationId(request), matchId, "/individuals/employments")
 
-            val scopes = Some(authScopes.mkString(","))
-            val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
-            val response = scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink
+      employmentsService.resolve(matchId) map { _ =>
 
-            auditHelper.auditApiResponse(identifiers.correlationIdVal, identifiers.matchIdVal,
-              scopes, request, selfLink.toString, Json.toJson(response))
+        val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
+        val response = scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink
 
-            Ok(response)
-          }
-      } recover withAudit(identifiers.correlationIdVal, identifiers.matchIdVal, identifiers.endpoint)
+        auditHelper.auditApiResponse(id.correlationIdVal, id.matchIdVal,
+          Some(authScopes.mkString(",")), request, selfLink.toString, Json.toJson(response))
+
+        Ok(response)
+
+      } recover withAudit(Some(id.correlationIdVal), id.matchIdVal, id.endpoint)
+
+    } recover withAudit(None, matchId.toString, "/individuals/employments")
   }
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
+    authenticate(scopeService.getEndPointScopes("paye"), matchId.toString) { authScopes =>
+
       val id = Identifiers(extractCorrelationId(request), matchId, "/individuals/employments/paye")
 
-      authenticate(scopeService.getEndPointScopes("paye"), id.correlationIdVal, id.matchIdVal) { authScopes =>
-          employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
+      employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
 
-            val scopes = Some(authScopes.mkString(","))
-            val selfLink =
-              HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
-            val employmentsJsObject = Json.obj("employments" -> Json.toJson(employments))
+        val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
+        val response = state(Json.obj("employments" -> Json.toJson(employments))) ++ selfLink
 
-            val response = state(employmentsJsObject) ++ selfLink
+        auditHelper.auditApiResponse(id.correlationIdVal, id.matchIdVal, Some(authScopes.mkString(",")),
+          request, selfLink.toString, Json.toJson(response))
 
-            auditHelper.auditApiResponse(id.correlationIdVal, id.matchIdVal, scopes,
-              request, selfLink.toString, Json.toJson(response))
+        Ok(response)
 
-            Ok(response)
-          }
-      } recover withAudit(id.correlationIdVal, id.matchIdVal, id.endpoint)
+      } recover withAudit(Some(id.correlationIdVal), id.matchIdVal, id.endpoint)
+
+    } recover withAudit(None, matchId.toString, "/individuals/employments/paye")
   }
 }
 

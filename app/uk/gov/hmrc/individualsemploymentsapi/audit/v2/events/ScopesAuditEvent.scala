@@ -34,8 +34,7 @@ class ScopesAuditEvent @Inject()(httpAuditEvent: HttpExtendedAuditEvent) {
   def transactionName = "AuditCall"
   def apiVersion = "2.0"
 
-  def apply(correlationId: String,
-            matchId : String,
+  def apply(matchId : String,
             scopes : String,
             request: RequestHeader)
            (implicit hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers)
@@ -45,7 +44,7 @@ class ScopesAuditEvent @Inject()(httpAuditEvent: HttpExtendedAuditEvent) {
       auditType,
       transactionName,
       request,
-      Json.toJson(ScopesAuditEventModel(apiVersion, matchId, correlationId, scopes)))
+      Json.toJson(ScopesAuditEventModel(apiVersion, matchId, scopes)))
 
     Logger.debug(s"$auditType - AuditEvent: $event")
 
