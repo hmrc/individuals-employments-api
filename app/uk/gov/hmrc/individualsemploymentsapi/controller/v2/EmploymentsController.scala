@@ -27,7 +27,6 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.Identifiers
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
@@ -46,19 +45,19 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
   def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
 
-      val id = Identifiers(extractCorrelationId(request), matchId, "/individuals/employments")
+      val correlationId = extractCorrelationId(request)
 
       employmentsService.resolve(matchId) map { _ =>
 
         val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
         val response = scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink
 
-        auditHelper.auditApiResponse(id.correlationIdVal, id.matchIdVal,
+        auditHelper.auditApiResponse(correlationId.toString, matchId.toString,
           Some(authScopes.mkString(",")), request, selfLink.toString, Json.toJson(response))
 
         Ok(response)
 
-      } recover withAudit(Some(id.correlationIdVal), id.matchIdVal, id.endpoint)
+      } recover withAudit(Some(correlationId.toString), matchId.toString, "/individuals/employments")
 
     } recover withAudit(None, matchId.toString, "/individuals/employments")
   }
@@ -66,19 +65,19 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getEndPointScopes("paye"), matchId.toString) { authScopes =>
 
-      val id = Identifiers(extractCorrelationId(request), matchId, "/individuals/employments/paye")
+      val correlationId = extractCorrelationId(request)
 
       employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
 
         val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
         val response = state(Json.obj("employments" -> Json.toJson(employments))) ++ selfLink
 
-        auditHelper.auditApiResponse(id.correlationIdVal, id.matchIdVal, Some(authScopes.mkString(",")),
+        auditHelper.auditApiResponse(correlationId.toString, matchId.toString, Some(authScopes.mkString(",")),
           request, selfLink.toString, Json.toJson(response))
 
         Ok(response)
 
-      } recover withAudit(Some(id.correlationIdVal), id.matchIdVal, id.endpoint)
+      } recover withAudit(Some(correlationId.toString), matchId.toString, "/individuals/employments/paye")
 
     } recover withAudit(None, matchId.toString, "/individuals/employments/paye")
   }
