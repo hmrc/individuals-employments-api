@@ -17,7 +17,7 @@
 package uk.gov.hmrc.individualsemploymentsapi.handlers
 
 import javax.inject.Inject
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND}
 import play.api.libs.json.Json
 import play.api.mvc.Results.Status
@@ -45,13 +45,19 @@ class CustomErrorHandler @Inject()(
 
     statusCode match {
       case NOT_FOUND =>
-        auditConnector.sendEvent(dataEvent("ResourceNotFound", "Resource Endpoint Not Found", request))
+        val event = dataEvent("ResourceNotFound", "Resource Endpoint Not Found", request)
+        auditConnector.sendEvent(event)
+        Logger.debug(s"ResourceNotFound - AuditEvent: $event")
         Future.successful(ErrorNotFound.toHttpResponse)
       case BAD_REQUEST =>
-        auditConnector.sendEvent(dataEvent("ServerValidationError", "Request bad format exception", request))
+        val event = dataEvent("ServerValidationError", "Request bad format exception", request)
+        auditConnector.sendEvent(event)
+        Logger.debug(s"ServerValidationError - AuditEvent: $event")
         Future.successful(ErrorInvalidRequest(message).toHttpResponse)
       case _ =>
-        auditConnector.sendEvent(dataEvent("ClientError", s"A client error occurred, status: $statusCode", request))
+        val event = dataEvent("ClientError", s"A client error occurred, status: $statusCode", request)
+        auditConnector.sendEvent(event)
+        Logger.debug(s"ClientError - AuditEvent: $event")
         Future.successful(Status(statusCode)(Json.toJson(ErrorResponse(statusCode, message))))
     }
   }
