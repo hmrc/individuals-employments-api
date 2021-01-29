@@ -46,7 +46,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
   def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
       val identifiers = Identifiers(extractCorrelationId(request), matchId, "/individuals/employments/")
 
-      Authenticate(scopeService.getAllScopes, identifiers.correlationIdVal, identifiers.matchIdVal) { authScopes =>
+      authenticate(scopeService.getAllScopes, identifiers.correlationIdVal, identifiers.matchIdVal) { authScopes =>
           employmentsService.resolve(matchId) map { _ =>
 
             val scopes = Some(authScopes.mkString(","))
@@ -64,7 +64,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
       val id = Identifiers(extractCorrelationId(request), matchId, "/individuals/employments/paye")
 
-      Authenticate(scopeService.getEndPointScopes("paye"), id.correlationIdVal, id.matchIdVal) { authScopes =>
+      authenticate(scopeService.getEndPointScopes("paye"), id.correlationIdVal, id.matchIdVal) { authScopes =>
           employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
 
             val scopes = Some(authScopes.mkString(","))

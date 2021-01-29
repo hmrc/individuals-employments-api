@@ -79,7 +79,7 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
   def authPredicate(scopes: Iterable[String]): Predicate =
     scopes.map(Enrolment(_): Predicate).reduce(_ or _)
 
-  def Authenticate(endpointScopes: Iterable[String],
+  def authenticate(endpointScopes: Iterable[String],
                    correlationId: String,
                    matchId: String)(f: Iterable[String] => Future[Result])
                   (implicit hc: HeaderCarrier,
