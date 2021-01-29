@@ -34,7 +34,7 @@ abstract class FailureEventBase @Inject()(httpAuditEvent: HttpExtendedAuditEvent
   def transactionName = "AuditFail"
   def apiVersion = "2.0"
 
-  def apply(correlationId: String,
+  def apply(correlationId: Option[String],
             scopes: Option[String],
             matchId: String,
             request: RequestHeader,

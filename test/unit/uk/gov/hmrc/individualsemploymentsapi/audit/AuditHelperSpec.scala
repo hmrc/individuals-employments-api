@@ -141,7 +141,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
 
-      auditHelper.auditApiFailure(correlationId, matchId, request, "/test", msg)
+      auditHelper.auditApiFailure(matchId, request, "/test", msg)
 
       verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
 
@@ -150,7 +150,6 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
           |{
           |  "apiVersion": "2.0",
           |  "matchId": "80a6bb14-d888-436e-a541-4000674c60aa",
-          |  "correlationId": "test",
           |  "requestUrl":"/test",
           |  "response": "Something went wrong",
           |  "method": "GET",

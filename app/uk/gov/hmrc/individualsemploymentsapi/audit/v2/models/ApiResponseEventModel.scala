@@ -20,7 +20,7 @@ import play.api.libs.json.Json
 
 case class ApiResponseEventModel(apiVersion: String,
                                  matchId: String,
-                                 correlationId: String,
+                                 correlationId: Option[String],
                                  scopes: Option[String],
                                  requestUrl: Option[String],
                                  response: String)

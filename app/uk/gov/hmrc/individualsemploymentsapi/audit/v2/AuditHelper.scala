@@ -44,7 +44,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
                       (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       apiResponseEvent(
-        correlationId,
+        Some(correlationId),
         scopes,
         matchId,
         request,
@@ -53,15 +53,14 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
       )
     )
 
-  def auditApiFailure(correlationId: String,
-                      matchId: String,
+  def auditApiFailure(matchId: String,
                       request: RequestHeader,
                       requestUrl: String,
                       msg: String)
                      (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       apiFailureEvent(
-        correlationId,
+        None,
         None,
         matchId,
         request,
@@ -79,7 +78,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
                         (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       ifApiResponseEvent(
-        correlationId,
+        Some(correlationId),
         scopes,
         matchId,
         request,
@@ -97,7 +96,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
                        (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       ifApiFailureEvent(
-        correlationId,
+        Some(correlationId),
         scopes,
         matchId,
         request,

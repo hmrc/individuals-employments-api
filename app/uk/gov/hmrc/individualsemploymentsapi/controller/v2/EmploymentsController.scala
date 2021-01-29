@@ -57,9 +57,9 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
 
         Ok(response)
 
-      } recover withAudit(Some(correlationId.toString), matchId.toString, "/individuals/employments")
+      }
 
-    } recover withAudit(None, matchId.toString, "/individuals/employments")
+    } recover withAudit(matchId.toString, "/individuals/employments")
   }
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
@@ -77,9 +77,9 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
 
         Ok(response)
 
-      } recover withAudit(Some(correlationId.toString), matchId.toString, "/individuals/employments/paye")
+      }
 
-    } recover withAudit(None, matchId.toString, "/individuals/employments/paye")
+    } recover withAudit(matchId.toString, "/individuals/employments/paye")
   }
 }
 
