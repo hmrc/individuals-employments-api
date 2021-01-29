@@ -34,14 +34,13 @@ abstract class FailureEventBase @Inject()(httpAuditEvent: HttpExtendedAuditEvent
   def transactionName = "AuditFail"
   def apiVersion = "2.0"
 
-  def apply(
-    correlationId: String,
-    scopes: Option[String],
-    matchId: String,
-    request: RequestHeader,
-    requestUrl: Option[String],
-    msg: String)(
-    implicit hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers)
+  def apply(correlationId: String,
+            scopes: Option[String],
+            matchId: String,
+            request: RequestHeader,
+            requestUrl: Option[String],
+            msg: String)
+           (implicit hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers)
   ): ExtendedDataEvent = {
 
     val event = extendedDataEvent(

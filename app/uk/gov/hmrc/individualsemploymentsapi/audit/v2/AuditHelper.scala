@@ -28,12 +28,12 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import scala.concurrent.ExecutionContext
 
 class AuditHelper @Inject()(auditConnector: AuditConnector,
-                                 apiResponseEvent: ApiResponseEvent,
-                                 apiFailureEvent: ApiFailureEvent,
-                                 ifApiResponseEvent: IfApiResponseEvent,
-                                 ifApiFailureEvent: IfApiFailureEvent,
-                                 scopesAuditEvent: ScopesAuditEvent)
-                                (implicit ec: ExecutionContext) {
+                            apiResponseEvent: ApiResponseEvent,
+                            apiFailureEvent: ApiFailureEvent,
+                            ifApiResponseEvent: IfApiResponseEvent,
+                            ifApiFailureEvent: IfApiFailureEvent,
+                            scopesAuditEvent: ScopesAuditEvent)
+                           (implicit ec: ExecutionContext) {
 
   def auditApiResponse(correlationId: String,
                        matchId: String,

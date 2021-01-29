@@ -34,12 +34,11 @@ class ScopesAuditEvent @Inject()(httpAuditEvent: HttpExtendedAuditEvent) {
   def transactionName = "AuditCall"
   def apiVersion = "2.0"
 
-  def apply(
-             correlationId: String,
-             matchId : String,
-             scopes : String,
-             request: RequestHeader)(
-             implicit hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers)
+  def apply(correlationId: String,
+            matchId : String,
+            scopes : String,
+            request: RequestHeader)
+           (implicit hc: HeaderCarrier = HeaderCarrierConverter.fromHeadersAndSession(request.headers)
            ): ExtendedDataEvent = {
 
     val event = extendedDataEvent(

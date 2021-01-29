@@ -18,11 +18,10 @@ package uk.gov.hmrc.individualsemploymentsapi.audit.v2.models
 
 import play.api.libs.json.Json
 
-case class ScopesAuditEventModel(
-  apiVersion: String,
-  matchId: String,
-  correlationId: String,
-  scopes: String)
+case class ScopesAuditEventModel(apiVersion: String,
+                                 matchId: String,
+                                 correlationId: String,
+                                 scopes: String)
 
 object ScopesAuditEventModel {
   implicit val formatScopesAuditEventModel = Json.format[ScopesAuditEventModel]

@@ -18,13 +18,12 @@ package uk.gov.hmrc.individualsemploymentsapi.audit.v2.models
 
 import play.api.libs.json.Json
 
-case class ApiResponseEventModel(
-  apiVersion: String,
-  matchId: String,
-  correlationId: String,
-  scopes: Option[String],
-  requestUrl: Option[String],
-  response: String)
+case class ApiResponseEventModel(apiVersion: String,
+                                 matchId: String,
+                                 correlationId: String,
+                                 scopes: Option[String],
+                                 requestUrl: Option[String],
+                                 response: String)
 
 object ApiResponseEventModel {
   implicit val formatApiResponseEventModel = Json.format[ApiResponseEventModel]
