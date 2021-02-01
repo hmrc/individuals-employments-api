@@ -30,7 +30,8 @@ import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
-import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.extractCorrelationId
+import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.validateCorrelationId
+import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.maybeCorrelationId
 
 import scala.concurrent.ExecutionContext
 
@@ -45,7 +46,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
   def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
 
-      val correlationId = extractCorrelationId(request)
+      val correlationId = validateCorrelationId(request)
 
       employmentsService.resolve(matchId) map { _ =>
 
@@ -59,13 +60,13 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
 
       }
 
-    } recover withAudit(matchId.toString, "/individuals/employments")
+    } recover withAudit(maybeCorrelationId(request), matchId.toString, "/individuals/employments")
   }
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getEndPointScopes("paye"), matchId.toString) { authScopes =>
 
-      val correlationId = extractCorrelationId(request)
+      val correlationId = validateCorrelationId(request)
 
       employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
 
@@ -79,7 +80,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
 
       }
 
-    } recover withAudit(matchId.toString, "/individuals/employments/paye")
+    } recover withAudit(maybeCorrelationId(request), matchId.toString, "/individuals/employments/paye")
   }
 }
 

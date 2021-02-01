@@ -53,14 +53,15 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
       )
     )
 
-  def auditApiFailure(matchId: String,
+  def auditApiFailure(correlationId: Option[String],
+                      matchId: String,
                       request: RequestHeader,
                       requestUrl: String,
                       msg: String)
                      (implicit hc: HeaderCarrier) =
     auditConnector.sendExtendedEvent(
       apiFailureEvent(
-        None,
+        correlationId,
         None,
         matchId,
         request,

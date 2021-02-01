@@ -106,7 +106,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       )
 
       verify(liveEmploymentsController.auditHelper, times(1)).
-        auditApiFailure(any(), any(), any(), any())(any())
+        auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "Return an invalid request when missing a CorrelationId" in new Setup {
@@ -126,7 +126,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       )
 
       verify(liveEmploymentsController.auditHelper, times(1))
-        .auditApiFailure(any(), any(), any(), any())(any())
+        .auditApiFailure(any(), any(), any(), any(), any())(any())
 
     }
 
@@ -147,7 +147,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       )
 
       verify(liveEmploymentsController.auditHelper, times(1))
-        .auditApiFailure(any(), any(), any(), any())(any())
+        .auditApiFailure(any(), any(), any(), any(), any())(any())
 
     }
 
@@ -194,7 +194,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       verifyZeroInteractions(mockLiveEmploymentsService)
 
       verify(liveEmploymentsController.auditHelper, times(1))
-        .auditApiFailure(any(), any(), any(), any())(any())
+        .auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "not require bearer token authentication for sandbox" in new Setup {
@@ -236,7 +236,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       )
 
       verify(liveEmploymentsController.auditHelper, times(1)).
-        auditApiFailure(any(), any(), any(), any())(any())
+        auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "return 200 OK" in new Setup {
@@ -300,7 +300,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       verifyZeroInteractions(mockLiveEmploymentsService)
 
       verify(liveEmploymentsController.auditHelper, times(1)).
-        auditApiFailure(any(), any(), any(), any())(any())
+        auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "not require bearer token authentication in sandbox" in new Setup {
