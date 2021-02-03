@@ -130,7 +130,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
     }
 
-    "Return an invalid request when invalid a CorrelationId" in new Setup {
+    "Return an invalid request with an invalid CorrelationId" in new Setup {
 
       Mockito.reset(liveEmploymentsController.auditHelper)
 
