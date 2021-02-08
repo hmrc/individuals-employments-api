@@ -19,7 +19,7 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 import org.joda.time.{Interval, LocalDate}
 import org.mockito.BDDMockito.`given`
 import org.mockito.Matchers.{any, refEq, eq => eqTo}
-import org.mockito.Mockito.{verifyZeroInteractions, when}
+import org.mockito.Mockito.{times, verify, verifyZeroInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
@@ -28,7 +28,7 @@ import play.api.test._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.controller.v2.{LiveEmploymentsController, SandboxEmploymentsController}
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
@@ -37,8 +37,11 @@ import uk.gov.hmrc.individualsemploymentsapi.sandbox.v2.SandboxData._
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.AuthHelper
-
 import java.util.UUID
+
+import org.mockito.Mockito
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSugar {
@@ -56,6 +59,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
     lazy val scopeService: ScopesService = new ScopesService(mockScopesConfig)
     lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val auditHelper: AuditHelper = mock[AuditHelper]
     val hmctsClientId = "hmctsClientId"
 
     val sandboxEmploymentsController = new SandboxEmploymentsController(
@@ -64,6 +68,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       scopesHelper,
       mockAuthConnector,
       hmctsClientId,
+      auditHelper,
       controllerComponent)
 
     val liveEmploymentsController = new LiveEmploymentsController(
@@ -72,6 +77,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       scopesHelper,
       mockAuthConnector,
       hmctsClientId,
+      auditHelper,
       controllerComponent)
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -85,6 +91,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
     "return a 404 (not found) when a match id does not match live data" in new Setup {
 
+      Mockito.reset(liveEmploymentsController.auditHelper)
+
       when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
@@ -96,34 +104,56 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         "code"    -> "NOT_FOUND",
         "message" -> "The resource can not be found"
       )
+
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
-    "Throw an exception when missing a CorrelationId" in new Setup {
+    "Return an invalid request when missing a CorrelationId" in new Setup {
+
+      Mockito.reset(liveEmploymentsController.auditHelper)
 
       when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
-      val exception =
-        intercept[BadRequestException](liveEmploymentsController.root(randomMatchId)(FakeRequest()))
+      val eventualResult =
+        liveEmploymentsController.root(randomMatchId)(FakeRequest())
 
-      exception.message shouldBe "CorrelationId is required"
-      exception.responseCode shouldBe BAD_REQUEST
+      status(eventualResult) shouldBe BAD_REQUEST
+      contentAsJson(eventualResult) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message"     -> "CorrelationId is required"
+      )
+
+      verify(liveEmploymentsController.auditHelper, times(1))
+        .auditApiFailure(any(), any(), any(), any(), any())(any())
+
     }
 
-    "Throw an exception when invalid a CorrelationId" in new Setup {
+    "Return an invalid request with an invalid CorrelationId" in new Setup {
+
+      Mockito.reset(liveEmploymentsController.auditHelper)
 
       when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
-      val exception =
-        intercept[BadRequestException](
-          liveEmploymentsController.root(randomMatchId)(FakeRequest().withHeaders(("CorrelationId", "invalidId"))))
+      val eventualResult =
+        liveEmploymentsController.root(randomMatchId)(FakeRequest().withHeaders("CorrelationId" -> "FOO"))
 
-      exception.message shouldBe "Malformed CorrelationId"
-      exception.responseCode shouldBe BAD_REQUEST
+      status(eventualResult) shouldBe BAD_REQUEST
+      contentAsJson(eventualResult) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message"     -> "Malformed CorrelationId"
+      )
+
+      verify(liveEmploymentsController.auditHelper, times(1))
+        .auditApiFailure(any(), any(), any(), any(), any())(any())
+
     }
 
     "return a 200 (ok) when a match id matches live data" in new Setup {
+
+      Mockito.reset(liveEmploymentsController.auditHelper)
 
       when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
         .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
@@ -143,9 +173,17 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
           )
         )
       )
+
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditApiResponse(any(), any(), any(), any(), any(), any())(any())
+
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditAuthScopes(any(), any(), any())(any())
     }
 
     "fail with status 401 when the bearer token does not have enrolment test-scope" in new Setup {
+
+      Mockito.reset(liveEmploymentsController.auditHelper)
 
       when(mockAuthConnector.authorise(any(), any())(any(), any()))
         .thenReturn(Future.failed(InsufficientEnrolments()))
@@ -154,6 +192,9 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       status(result) shouldBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
+
+      verify(liveEmploymentsController.auditHelper, times(1))
+        .auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "not require bearer token authentication for sandbox" in new Setup {
@@ -177,6 +218,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
     "return 404 (not found) for an invalid matchId" in new Setup {
 
+      Mockito.reset(liveEmploymentsController.auditHelper)
+
       val invalidMatchId = UUID.randomUUID()
 
       when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval), any(), any())(any(), any()))
@@ -191,9 +234,15 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         "code"    -> "NOT_FOUND",
         "message" -> "The resource can not be found"
       )
+
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "return 200 OK" in new Setup {
+
+      Mockito.reset(liveEmploymentsController.auditHelper)
+
       val matchId = UUID.randomUUID()
 
       when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval), any(), any())(any(), any()))
@@ -230,9 +279,17 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
           )
         )
       )
+
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditApiResponse(any(), any(), any(), any(), any(), any())(any())
+
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditAuthScopes(any(), any(), any())(any())
     }
 
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
+
+      Mockito.reset(liveEmploymentsController.auditHelper)
 
       when(mockAuthConnector.authorise(any(), any())(any(), any())).thenReturn(Future.failed(InsufficientEnrolments()))
 
@@ -241,9 +298,12 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       status(result) shouldBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
+
+      verify(liveEmploymentsController.auditHelper, times(1)).
+        auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
-    "not require bearer token authentication" in new Setup {
+    "not require bearer token authentication in sandbox" in new Setup {
 
       when(
         mockSandboxEmploymentsService.paye(
@@ -260,6 +320,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       status(eventualResult) shouldBe OK
       verifyZeroInteractions(mockAuthConnector)
+
     }
   }
 }

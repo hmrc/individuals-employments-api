@@ -113,7 +113,8 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
       }
 
-      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any())(any())
+      verify(underTest.auditHelper, times(1)).
+        auditIfApiFailure(any(), any(), any(), any(), any(), any())(any())
     }
 
     "Fail when IF returns a bad request" in new Setup {
@@ -134,7 +135,8 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
       }
 
-      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any())(any())
+      verify(underTest.auditHelper, times(1)).
+        auditIfApiFailure(any(), any(), any(), any(), any(), any())(any())
     }
 
     "for no employment data" should {
@@ -160,7 +162,8 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
           )
         )
 
-        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any())(any())
+        verify(underTest.auditHelper, times(1)).
+          auditIfApiResponse(any(), any(), any(), any(), any(), any())(any())
 
         result shouldBe noEmploymentData.employments
       }
@@ -189,7 +192,8 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
           )
         )
 
-        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any())(any())
+        verify(underTest.auditHelper, times(1)).
+          auditIfApiResponse(any(), any(), any(), any(), any(), any())(any())
 
         result shouldBe singleEmploymentData.employments
       }
@@ -218,7 +222,8 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
           )
         )
 
-        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any())(any())
+        verify(underTest.auditHelper, times(1)).
+          auditIfApiResponse(any(), any(), any(), any(), any(), any())(any())
 
         result shouldBe multiEmploymentData.employments
       }

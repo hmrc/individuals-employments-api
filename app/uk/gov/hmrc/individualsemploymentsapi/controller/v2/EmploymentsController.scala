@@ -17,51 +17,70 @@
 package uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
 import java.util.UUID
+
 import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.Interval
 import play.api.hal.Hal._
 import play.api.mvc.hal._
 import play.api.hal.HalLink
 import play.api.libs.json.Json
-import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
-import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.extractCorrelationId
+import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.validateCorrelationId
+import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.maybeCorrelationId
 
 import scala.concurrent.ExecutionContext
 
 abstract class EmploymentsController(employmentsService: EmploymentsService,
                                      scopeService: ScopesService,
                                      scopesHelper: ScopesHelper,
+                                     implicit val auditHelper: AuditHelper,
                                      cc: ControllerComponents)
                                     (implicit val ec: ExecutionContext)
   extends CommonController(cc) with PrivilegedAuthentication {
 
-  def root(matchId: UUID): Action[AnyContent] = Action.async {
-    implicit request =>
-      extractCorrelationId(request)
-      requiresPrivilegedAuthentication(scopeService.getAllScopes) { authScopes =>
-        employmentsService.resolve(matchId) map { _ =>
-          val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
-          Ok(scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink)
-        }
-      } recover recovery
+  def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
+    authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
+
+      val correlationId = validateCorrelationId(request)
+
+      employmentsService.resolve(matchId) map { _ =>
+
+        val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
+        val response = scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink
+
+        auditHelper.auditApiResponse(correlationId.toString, matchId.toString,
+          Some(authScopes.mkString(",")), request, selfLink.toString, Json.toJson(response))
+
+        Ok(response)
+
+      }
+
+    } recover withAudit(maybeCorrelationId(request), matchId.toString, "/individuals/employments")
   }
 
-  def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async {
-    implicit request =>
-      extractCorrelationId(request)
-      requiresPrivilegedAuthentication(scopeService.getEndPointScopes("paye")) { authScopes =>
-        employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
-          val selfLink =
-            HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
-          val employmentsJsObject = Json.obj("employments" -> Json.toJson(employments))
-          Ok(state(employmentsJsObject) ++ selfLink)
-        }
-      } recover recovery
+  def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
+    authenticate(scopeService.getEndPointScopes("paye"), matchId.toString) { authScopes =>
+
+      val correlationId = validateCorrelationId(request)
+
+      employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
+
+        val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
+        val response = state(Json.obj("employments" -> Json.toJson(employments))) ++ selfLink
+
+        auditHelper.auditApiResponse(correlationId.toString, matchId.toString, Some(authScopes.mkString(",")),
+          request, selfLink.toString, Json.toJson(response))
+
+        Ok(response)
+
+      }
+
+    } recover withAudit(maybeCorrelationId(request), matchId.toString, "/individuals/employments/paye")
   }
 }
 
@@ -72,8 +91,9 @@ class SandboxEmploymentsController @Inject()(
   scopesHelper: ScopesHelper,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
+  auditHelper: AuditHelper,
   cc: ControllerComponents)(override implicit val ec: ExecutionContext)
-    extends EmploymentsController(sandboxEmploymentsService, scopeService, scopesHelper, cc) {
+    extends EmploymentsController(sandboxEmploymentsService, scopeService, scopesHelper, auditHelper, cc) {
 
   override val environment: String = SANDBOX
 }
@@ -85,8 +105,9 @@ class LiveEmploymentsController @Inject()(
   scopesHelper: ScopesHelper,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
+  auditHelper: AuditHelper,
   cc: ControllerComponents)(override implicit val ec: ExecutionContext)
-    extends EmploymentsController(liveEmploymentsService, scopeService, scopesHelper, cc) {
+    extends EmploymentsController(liveEmploymentsService, scopeService, scopesHelper, auditHelper, cc) {
 
   override val environment: String = PRODUCTION
 }
