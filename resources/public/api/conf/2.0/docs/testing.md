@@ -1,6 +1,6 @@
 You can use the sandbox environment to [test this API](https://developer.service.hmrc.gov.uk/api-documentation/docs/testing).
 
-It does not currently support [stateful behaviour](https://developer.service.hmrc.gov.uk/api-documentation/docs/testing/stateful-behaviour). However, the Sandbox service for this API supports successful match responses and error scenarios described in resources.
+It does not currently support [stateful behaviour](https://developer.service.hmrc.gov.uk/api-documentation/docs/testing/stateful-behaviour). However, the sandbox service for this API supports successful match responses and error scenarios described in resources.
 
 You can set up individual test data for this API using the following resources:
 
