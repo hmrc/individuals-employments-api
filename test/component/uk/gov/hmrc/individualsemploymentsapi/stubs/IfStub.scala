@@ -18,7 +18,7 @@ package component.uk.gov.hmrc.individualsemploymentsapi.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock._
 import component.uk.gov.hmrc.individualsemploymentsapi.controller.MockHost
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.Helpers._
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
 
@@ -39,6 +39,15 @@ object IfStub extends MockHost(22004) {
             "employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employment(endDate,startDate))")
         )
         .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
+
+  def saCustomResponse(nino: String, status: Int, fromDate: String, toDate: String, response: JsValue) =
+    mock.register(
+      get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
+        .withQueryParam("startDate", equalTo(fromDate))
+        .withQueryParam("endDate", equalTo(toDate))
+        .withQueryParam("fields", equalTo("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employment(endDate,startDate))"))
+        .willReturn(aResponse().withStatus(status).withBody(Json.toJson(response.toString()).toString())))
+
 
   def enforceRateLimit(nino: String, fromDate: String, toDate: String): Unit =
     mock.register(
