@@ -100,15 +100,11 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case notFound: NotFoundException => {
+      auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, notFound.getMessage)
+      
       notFound.message.contains("NO_DATA_FOUND") match {
-        case true => {
-          auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, notFound.getMessage)
-          Future.successful(Seq.empty)
-        }
-        case _ => {
-          auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, notFound.getMessage)
-          Future.failed(notFound)
-        }
+        case true => Future.successful(Seq.empty)
+        case _    => Future.failed(notFound)
       }
     }
     case Upstream5xxResponse(msg, _, _, _) => {
