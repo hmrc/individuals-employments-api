@@ -79,9 +79,6 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
   private def callPaye(url: String, endpoint: String, matchId: String)
                       (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
     recover[IfEmployment](http.GET[IfEmployments](url)(implicitly, header(), ec) map { response =>
-
-        Logger.debug(s"$endpoint - Response: $response")
-
         auditHelper.auditIfApiResponse(extractCorrelationId(request), None,
           matchId, request, url, Json.toJson(response))
 

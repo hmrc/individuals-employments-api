@@ -47,17 +47,14 @@ class CustomErrorHandler @Inject()(
       case NOT_FOUND =>
         val event = dataEvent("ResourceNotFound", "Resource Endpoint Not Found", request)
         auditConnector.sendEvent(event)
-        Logger.debug(s"ResourceNotFound - AuditEvent: $event")
         Future.successful(ErrorNotFound.toHttpResponse)
       case BAD_REQUEST =>
         val event = dataEvent("ServerValidationError", "Request bad format exception", request)
         auditConnector.sendEvent(event)
-        Logger.debug(s"ServerValidationError - AuditEvent: $event")
         Future.successful(ErrorInvalidRequest(message).toHttpResponse)
       case _ =>
         val event = dataEvent("ClientError", s"A client error occurred, status: $statusCode", request)
         auditConnector.sendEvent(event)
-        Logger.debug(s"ClientError - AuditEvent: $event")
         Future.successful(Status(statusCode)(Json.toJson(ErrorResponse(statusCode, message))))
     }
   }
