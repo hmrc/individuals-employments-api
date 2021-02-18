@@ -17,13 +17,20 @@
 package uk.gov.hmrc.individualsemploymentsapi.audit.v2.models
 
 import play.api.libs.json.Json
+import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 
-case class ApiResponseEventModel(apiVersion: String,
+case class ApiResponseEventModel(ipAddress: String,
+                                 authorisation: String,
+                                 deviceId: String,
+                                 input: String,
+                                 method: String,
+                                 userAgent: String,
+                                 apiVersion: String,
                                  matchId: String,
                                  correlationId: Option[String],
-                                 scopes: Option[String],
-                                 requestUrl: Option[String],
-                                 response: String)
+                                 scopes: String,
+                                 returnLinks: String,
+                                 employments: Option[Seq[Employment]])
 
 object ApiResponseEventModel {
   implicit val formatApiResponseEventModel = Json.format[ApiResponseEventModel]

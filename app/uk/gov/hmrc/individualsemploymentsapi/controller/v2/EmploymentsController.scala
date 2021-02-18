@@ -54,7 +54,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
         val response = scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink
 
         auditHelper.auditApiResponse(correlationId.toString, matchId.toString,
-          Some(authScopes.mkString(",")), request, selfLink.toString, Json.toJson(response))
+          authScopes.mkString(","), request, response.toString, None)
 
         Ok(response)
 
@@ -73,8 +73,8 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
         val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
         val response = state(Json.obj("employments" -> Json.toJson(employments))) ++ selfLink
 
-        auditHelper.auditApiResponse(correlationId.toString, matchId.toString, Some(authScopes.mkString(",")),
-          request, selfLink.toString, Json.toJson(response))
+        auditHelper.auditApiResponse(correlationId.toString, matchId.toString, authScopes.mkString(","),
+          request, selfLink.toString, Some(employments))
 
         Ok(response)
 

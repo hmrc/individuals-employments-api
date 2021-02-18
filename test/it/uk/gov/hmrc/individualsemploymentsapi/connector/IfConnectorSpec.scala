@@ -28,7 +28,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HttpClient, InternalServerException, NotFoundException, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, NotFoundException, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.connector.IfConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
@@ -114,7 +114,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
       }
 
       verify(underTest.auditHelper, times(1)).
-        auditIfApiFailure(any(), any(), any(), any(), any(), any())(any())
+        auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "Fail when IF returns a bad request" in new Setup {
@@ -136,7 +136,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
       }
 
       verify(underTest.auditHelper, times(1)).
-        auditIfApiFailure(any(), any(), any(), any(), any(), any())(any())
+        auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "return an empty dataset for NO_DATA_FOUND" in new Setup {
@@ -153,7 +153,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
       result shouldBe List()
 
       verify(underTest.auditHelper, times(1)).
-        auditIfApiFailure(any(), any(), any(), any(), any(), any())(any())
+        auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "Fail when IF returns a NOT_FOUND" in new Setup {
@@ -175,7 +175,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
       }
 
       verify(underTest.auditHelper, times(1)).
-        auditIfApiFailure(any(), any(), any(), any(), any(), any())(any())
+        auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "for no employment data" should {
@@ -202,7 +202,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
 
         verify(underTest.auditHelper, times(1)).
-          auditIfApiResponse(any(), any(), any(), any(), any(), any())(any())
+          auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
         result shouldBe noEmploymentData.employments
       }
@@ -232,7 +232,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
 
         verify(underTest.auditHelper, times(1)).
-          auditIfApiResponse(any(), any(), any(), any(), any(), any())(any())
+          auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
         result shouldBe singleEmploymentData.employments
       }
@@ -262,7 +262,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
 
         verify(underTest.auditHelper, times(1)).
-          auditIfApiResponse(any(), any(), any(), any(), any(), any())(any())
+          auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
         result shouldBe multiEmploymentData.employments
       }

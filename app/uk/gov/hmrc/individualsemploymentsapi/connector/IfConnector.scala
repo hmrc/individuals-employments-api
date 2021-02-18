@@ -21,7 +21,6 @@ import java.util.UUID
 import javax.inject.Inject
 import org.joda.time.{Interval, LocalDate}
 import play.api.Logger
-import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.logging.Authorization
@@ -79,11 +78,15 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
   private def callPaye(url: String, endpoint: String, matchId: String)
                       (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
     recover[IfEmployment](http.GET[IfEmployments](url)(implicitly, header(), ec) map { response =>
+<<<<<<< Updated upstream
 
         Logger.debug(s"$endpoint - Response: $response")
 
         auditHelper.auditIfApiResponse(extractCorrelationId(request), None,
           matchId, request, url, Json.toJson(response))
+=======
+        auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, response)
+>>>>>>> Stashed changes
 
         response.employments
       },
@@ -96,32 +99,54 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
                          requestUrl: String)
                         (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[A]] = x.recoverWith {
     case validationError: JsValidationException => {
+<<<<<<< Updated upstream
       auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, s"Error parsing IF response: ${validationError.errors}")
+=======
+      Logger.warn("Integration Framework JsValidationException encountered")
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Error parsing IF response: ${validationError.errors}")
+>>>>>>> Stashed changes
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case notFound: NotFoundException => {
-      auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, notFound.getMessage)
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, notFound.getMessage)
       
       notFound.message.contains("NO_DATA_FOUND") match {
         case true => Future.successful(Seq.empty)
         case _    => Future.failed(notFound)
       }
     }
+<<<<<<< Updated upstream
     case Upstream5xxResponse(msg, _, _, _) => {
       auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, s"Internal Server error: $msg")
+=======
+    case Upstream5xxResponse(msg, code, _, _) => {
+      Logger.warn(s"Integration Framework Upstream5xxResponse encountered: $code")
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Internal Server error: $msg")
+>>>>>>> Stashed changes
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case Upstream4xxResponse(msg, 429, _, _) => {
       Logger.warn(s"Integration Framework Rate limited: $msg")
-      auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, s"IF Rate limited: $msg")
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"IF Rate limited: $msg")
       Future.failed(new TooManyRequestException(msg))
     }
+<<<<<<< Updated upstream
     case Upstream4xxResponse(msg, _, _, _) => {
       auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, msg)
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case e: Exception => {
       auditHelper.auditIfApiFailure(correlationId, None, matchId, request, requestUrl, e.getMessage)
+=======
+    case Upstream4xxResponse(msg, code, _, _) => {
+      Logger.warn(s"Integration Framework Upstream4xxResponse encountered: $code")
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
+      Future.failed(new InternalServerException("Something went wrong."))
+    }
+    case e: Exception => {
+      Logger.warn(s"Integration Framework Exception encountered")
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, e.getMessage)
+>>>>>>> Stashed changes
       Future.failed(new InternalServerException("Something went wrong."))
     }
   }
