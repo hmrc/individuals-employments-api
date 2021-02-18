@@ -25,24 +25,25 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.{AuditHelper, DefaultHttpExtendedAuditEvent}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
-import utils.UnitSpec
-import org.mockito.Matchers.any
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{
-  ApiFailureEvent, ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent, ScopesAuditEvent
-}
+import utils.{EmploymentsHelper, UnitSpec}
+import org.mockito.Matchers.{any, eq => eqTo}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureResponseEventModel, ApiResponseEventModel, IfApiResponseEventModel, ScopesAuditEventModel}
+import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
+import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class AuditHelperSpec extends UnitSpec with MockitoSugar {
+class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper {
 
   implicit val hc = HeaderCarrier()
 
   val nino = "CS700100A"
   val correlationId = "test"
-  val scopes = Some("test")
+  val scopes = "test"
   val matchId = "80a6bb14-d888-436e-a541-4000674c60aa"
   val request = FakeRequest()
-  val response = Json.toJson("some" -> "json")
+  val ifApiResponse = IfEmployments(List(createValidEmployment))
+  val apiResponse = Seq(Employment.create(ifApiResponse.employments.head).get)
   val ifUrl =
     s"host/individuals/employments/paye/nino/$nino?startDate=2019-01-01&endDate=2020-01-01&fields=some(vals(val1),val2)"
   val endpoint = "/test"
@@ -50,15 +51,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
   val auditConnector = mock[AuditConnector]
   val httpExtendedAuditEvent = new DefaultHttpExtendedAuditEvent("individuals-employments-api")
 
-  val apiResponseEvent = new ApiResponseEvent(httpExtendedAuditEvent)
-  val apiFailureEvent = new ApiFailureEvent(httpExtendedAuditEvent)
-  val ifApiResponseEvent = new IfApiResponseEvent(httpExtendedAuditEvent)
-  val ifApiFailureEvent = new IfApiFailureEvent(httpExtendedAuditEvent)
-  val scopesAuditEvent = new ScopesAuditEvent(httpExtendedAuditEvent)
-
-  val auditHelper = new AuditHelper(
-    auditConnector, apiResponseEvent, apiFailureEvent, ifApiResponseEvent, ifApiFailureEvent, scopesAuditEvent
-  )
+  val auditHelper = new AuditHelper(auditConnector)
 
   "Auth helper" should {
 
@@ -66,32 +59,17 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       Mockito.reset(auditConnector)
 
-      val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val captor = ArgumentCaptor.forClass(classOf[ScopesAuditEventModel])
 
-      auditHelper.auditAuthScopes(matchId, scopes.get, request)
+      auditHelper.auditAuthScopes(matchId, scopes, request)
 
-      verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
-
-      val result = Json.parse(
-        """
-          |{
-          |  "apiVersion": "2.0",
-          |  "matchId": "80a6bb14-d888-436e-a541-4000674c60aa",
-          |  "scopes": "test",
-          |  "method": "GET",
-          |  "deviceID": "-",
-          |  "ipAddress": "-",
-          |  "referrer": "-",
-          |  "Authorization": "-",
-          |  "input": "Request to /",
-          |  "userAgentString": "-"
-          |}
-          |""".stripMargin)
+      verify(auditConnector, times(1)).sendExplicitAudit(eqTo("AuthScopesAuditEvent"),
+        captor.capture())(any(), any(), any())
 
       val capturedEvent = captor.getValue
-      capturedEvent.asInstanceOf[ExtendedDataEvent].auditSource shouldEqual "individuals-employments-api"
-      capturedEvent.asInstanceOf[ExtendedDataEvent].auditType shouldEqual "AuthScopesAuditEvent"
-      capturedEvent.asInstanceOf[ExtendedDataEvent].detail shouldBe result
+      capturedEvent.asInstanceOf[ScopesAuditEventModel].apiVersion shouldEqual "2.0"
+      capturedEvent.asInstanceOf[ScopesAuditEventModel].matchId shouldEqual matchId
+      capturedEvent.asInstanceOf[ScopesAuditEventModel].scopes shouldBe scopes
 
     }
 
@@ -99,35 +77,19 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       Mockito.reset(auditConnector)
 
-      val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val captor = ArgumentCaptor.forClass(classOf[ApiResponseEventModel])
 
-      auditHelper.auditApiResponse(correlationId, matchId, scopes, request, endpoint, response)
+      auditHelper.auditApiResponse(correlationId, matchId, scopes, request, endpoint, Some(apiResponse))
 
-      verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
-
-      val result = Json.parse(
-        """
-          |{
-          |  "apiVersion": "2.0",
-          |  "matchId": "80a6bb14-d888-436e-a541-4000674c60aa",
-          |  "correlationId": "test",
-          |  "scopes": "test",
-          |  "requestUrl":"/test",
-          |  "response": "[\"some\",\"json\"]",
-          |  "method": "GET",
-          |  "deviceID": "-",
-          |  "ipAddress": "-",
-          |  "referrer": "-",
-          |  "Authorization": "-",
-          |  "input": "Request to /",
-          |  "userAgentString": "-"
-          |}
-          |""".stripMargin)
+      verify(auditConnector, times(1)).sendExplicitAudit(eqTo("ApiResponseEvent"),
+        captor.capture())(any(), any(), any())
 
       val capturedEvent = captor.getValue
-      capturedEvent.asInstanceOf[ExtendedDataEvent].auditSource shouldEqual "individuals-employments-api"
-      capturedEvent.asInstanceOf[ExtendedDataEvent].auditType shouldEqual "ApiResponseEvent"
-      capturedEvent.asInstanceOf[ExtendedDataEvent].detail shouldBe result
+      capturedEvent.asInstanceOf[ApiResponseEventModel].matchId shouldEqual matchId
+      capturedEvent.asInstanceOf[ApiResponseEventModel].correlationId shouldEqual Some(correlationId)
+      capturedEvent.asInstanceOf[ApiResponseEventModel].scopes shouldBe scopes
+      capturedEvent.asInstanceOf[ApiResponseEventModel].returnLinks shouldBe endpoint
+      capturedEvent.asInstanceOf[ApiResponseEventModel].employments shouldBe Some(apiResponse)
 
     }
 
@@ -137,70 +99,36 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       val msg = "Something went wrong"
 
-      val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val captor = ArgumentCaptor.forClass(classOf[ApiFailureResponseEventModel])
 
       auditHelper.auditApiFailure(Some(correlationId), matchId, request, "/test", msg)
 
-      verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
-
-      val result = Json.parse(
-        """
-          |{
-          |  "apiVersion": "2.0",
-          |  "matchId": "80a6bb14-d888-436e-a541-4000674c60aa",
-          |  "correlationId": "test",
-          |  "requestUrl":"/test",
-          |  "response": "Something went wrong",
-          |  "method": "GET",
-          |  "deviceID": "-",
-          |  "ipAddress": "-",
-          |  "referrer": "-",
-          |  "Authorization": "-",
-          |  "input": "Request to /",
-          |  "userAgentString": "-"
-          |}
-          |""".stripMargin)
+      verify(auditConnector, times(1)).sendExplicitAudit(eqTo("ApiFailureEvent"),
+        captor.capture())(any(), any(), any())
 
       val capturedEvent = captor.getValue
-      capturedEvent.asInstanceOf[ExtendedDataEvent].auditSource shouldEqual "individuals-employments-api"
-      capturedEvent.asInstanceOf[ExtendedDataEvent].auditType shouldEqual "ApiFailureEvent"
-      capturedEvent.asInstanceOf[ExtendedDataEvent].detail shouldBe result
-
+      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].matchId shouldEqual matchId
+      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].correlationId shouldEqual Some(correlationId)
+      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].requestUrl shouldEqual endpoint
+      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].response shouldEqual msg
     }
 
     "auditIfApiResponse" in {
 
       Mockito.reset(auditConnector)
 
-      val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val captor = ArgumentCaptor.forClass(classOf[IfApiResponseEventModel])
 
-      auditHelper.auditIfApiResponse(correlationId, scopes, matchId, request, ifUrl, response)
+      auditHelper.auditIfApiResponse(correlationId, matchId, request, ifUrl, ifApiResponse)
 
-      verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
-
-      val result = Json.parse(
-        """
-          |{
-          |  "apiVersion": "2.0",
-          |  "matchId": "80a6bb14-d888-436e-a541-4000674c60aa",
-          |  "correlationId": "test",
-          |  "scopes": "test",
-          |  "requestUrl": "host/individuals/employments/paye/nino/CS700100A?startDate=2019-01-01&endDate=2020-01-01&fields=some(vals(val1),val2)",
-          |  "response": "[\"some\",\"json\"]",
-          |  "method": "GET",
-          |  "deviceID": "-",
-          |  "ipAddress": "-",
-          |  "referrer": "-",
-          |  "Authorization": "-",
-          |  "input": "Request to /",
-          |  "userAgentString": "-"
-          |}
-          |""".stripMargin)
+      verify(auditConnector, times(1)).sendExplicitAudit(eqTo("IfApiResponseEvent"),
+        captor.capture())(any(), any(), any())
 
       val capturedEvent = captor.getValue
-      capturedEvent.asInstanceOf[ExtendedDataEvent].auditSource shouldEqual "individuals-employments-api"
-      capturedEvent.asInstanceOf[ExtendedDataEvent].auditType shouldEqual "IfApiResponseEvent"
-      capturedEvent.asInstanceOf[ExtendedDataEvent].detail shouldBe result
+      capturedEvent.asInstanceOf[IfApiResponseEventModel].matchId shouldEqual matchId
+      capturedEvent.asInstanceOf[IfApiResponseEventModel].correlationId shouldEqual correlationId
+      capturedEvent.asInstanceOf[IfApiResponseEventModel].requestUrl shouldBe ifUrl
+      capturedEvent.asInstanceOf[IfApiResponseEventModel].ifEmployments shouldBe ifApiResponse
 
     }
 
@@ -210,35 +138,17 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar {
 
       val msg = "Something went wrong"
 
-      val captor = ArgumentCaptor.forClass(classOf[ExtendedDataEvent])
+      val captor = ArgumentCaptor.forClass(classOf[ApiFailureResponseEventModel])
 
-      auditHelper.auditIfApiFailure(correlationId, scopes, matchId, request, ifUrl, msg)
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, ifUrl, msg)
 
-      verify(auditConnector, times(1)).sendExtendedEvent(captor.capture())(any(), any())
-
-      val result = Json.parse(
-        """
-          |{
-          |  "apiVersion": "2.0",
-          |  "matchId": "80a6bb14-d888-436e-a541-4000674c60aa",
-          |  "correlationId": "test",
-          |  "scopes": "test",
-          |  "requestUrl": "host/individuals/employments/paye/nino/CS700100A?startDate=2019-01-01&endDate=2020-01-01&fields=some(vals(val1),val2)",
-          |  "response": "Something went wrong",
-          |  "method": "GET",
-          |  "deviceID": "-",
-          |  "ipAddress": "-",
-          |  "referrer": "-",
-          |  "Authorization": "-",
-          |  "input": "Request to /",
-          |  "userAgentString": "-"
-          |}
-          |""".stripMargin)
+      verify(auditConnector, times(1)).sendExplicitAudit(eqTo("IfApiFailureEvent"), captor.capture())(any(), any(), any())
 
       val capturedEvent = captor.getValue
-      capturedEvent.asInstanceOf[ExtendedDataEvent].auditSource shouldEqual "individuals-employments-api"
-      capturedEvent.asInstanceOf[ExtendedDataEvent].auditType shouldEqual "IfApiFailureEvent"
-      capturedEvent.asInstanceOf[ExtendedDataEvent].detail shouldBe result
+      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].matchId shouldEqual matchId
+      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].correlationId shouldEqual Some(correlationId)
+      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].requestUrl shouldEqual ifUrl
+      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].response shouldEqual msg
 
     }
 

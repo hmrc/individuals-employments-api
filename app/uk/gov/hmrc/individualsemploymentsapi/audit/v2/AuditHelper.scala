@@ -17,39 +17,40 @@
 package uk.gov.hmrc.individualsemploymentsapi.audit.v2
 
 import javax.inject.Inject
-import play.api.libs.json.JsValue
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.events.{
-  ApiFailureEvent, ApiResponseEvent, IfApiFailureEvent, IfApiResponseEvent, ScopesAuditEvent
-}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureResponseEventModel, ApiResponseEventModel, IfApiResponseEventModel, ScopesAuditEventModel}
+import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
+import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext
 
-class AuditHelper @Inject()(auditConnector: AuditConnector,
-                            apiResponseEvent: ApiResponseEvent,
-                            apiFailureEvent: ApiFailureEvent,
-                            ifApiResponseEvent: IfApiResponseEvent,
-                            ifApiFailureEvent: IfApiFailureEvent,
-                            scopesAuditEvent: ScopesAuditEvent)
+class AuditHelper @Inject()(auditConnector: AuditConnector)
                            (implicit ec: ExecutionContext) {
 
   def auditApiResponse(correlationId: String,
                        matchId: String,
-                       scopes: Option[String],
+                       scopes: String,
                        request: RequestHeader,
-                       endpoint: String,
-                       response: JsValue)
+                       selfLink: String,
+                       employments: Option[Seq[Employment]])
                       (implicit hc: HeaderCarrier) =
-    auditConnector.sendExtendedEvent(
-      apiResponseEvent(
-        Some(correlationId),
+    auditConnector.sendExplicitAudit(
+      "ApiResponseEvent",
+      ApiResponseEventModel(
+        ipAddress = hc.forwarded.map(_.value).getOrElse("-"),
+        authorisation = hc.authorization.map(_.value).getOrElse("-"),
+        deviceId = hc.deviceID.getOrElse("-"),
+        input = s"Request to ${request.path}",
+        method = request.method.toUpperCase,
+        userAgent = request.headers.get("User-Agent").getOrElse("-"),
+        apiVersion = "2.0",
+        matchId = matchId,
+        correlationId = Some(correlationId),
         scopes,
-        matchId,
-        request,
-        Some(endpoint),
-        response.toString
+        returnLinks = selfLink,
+        employments = employments
       )
     )
 
@@ -59,49 +60,65 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
                       requestUrl: String,
                       msg: String)
                      (implicit hc: HeaderCarrier) =
-    auditConnector.sendExtendedEvent(
-      apiFailureEvent(
-        correlationId,
-        None,
-        matchId,
-        request,
-        Some(requestUrl),
+    auditConnector.sendExplicitAudit(
+      "ApiFailureEvent",
+      ApiFailureResponseEventModel(
+        ipAddress = hc.forwarded.map(_.value).getOrElse("-"),
+        authorisation = hc.authorization.map(_.value).getOrElse("-"),
+        deviceId = hc.deviceID.getOrElse("-"),
+        input = s"Request to ${request.path}",
+        method = request.method.toUpperCase,
+        userAgent = request.headers.get("User-Agent").getOrElse("-"),
+        apiVersion = "2.0",
+        matchId = matchId,
+        correlationId = correlationId,
+        requestUrl,
         msg
       )
     )
 
   def auditIfApiResponse(correlationId: String,
-                         scopes: Option[String],
                          matchId: String,
                          request: RequestHeader,
                          requestUrl: String,
-                         response: JsValue)
+                         ifEmployments: IfEmployments)
                         (implicit hc: HeaderCarrier) =
-    auditConnector.sendExtendedEvent(
-      ifApiResponseEvent(
-        Some(correlationId),
-        scopes,
-        matchId,
-        request,
-        Some(requestUrl),
-        response.toString
+    auditConnector.sendExplicitAudit(
+      "IfApiResponseEvent",
+      IfApiResponseEventModel(
+        ipAddress = hc.forwarded.map(_.value).getOrElse("-"),
+        authorisation = hc.authorization.map(_.value).getOrElse("-"),
+        deviceId = hc.deviceID.getOrElse("-"),
+        input = s"Request to ${request.path}",
+        method = request.method.toUpperCase,
+        userAgent = request.headers.get("User-Agent").getOrElse("-"),
+        apiVersion = "2.0",
+        matchId = matchId,
+        correlationId = correlationId,
+        requestUrl = requestUrl,
+        ifEmployments = ifEmployments
       )
     )
 
   def auditIfApiFailure(correlationId: String,
-                        scopes: Option[String],
                         matchId: String,
                         request: RequestHeader,
                         requestUrl: String,
                         msg: String)
                        (implicit hc: HeaderCarrier) =
-    auditConnector.sendExtendedEvent(
-      ifApiFailureEvent(
-        Some(correlationId),
-        scopes,
-        matchId,
-        request,
-        Some(requestUrl),
+    auditConnector.sendExplicitAudit(
+      "IfApiFailureEvent",
+      ApiFailureResponseEventModel(
+        ipAddress = hc.forwarded.map(_.value).getOrElse("-"),
+        authorisation = hc.authorization.map(_.value).getOrElse("-"),
+        deviceId = hc.deviceID.getOrElse("-"),
+        input = s"Request to ${request.path}",
+        method = request.method.toUpperCase,
+        userAgent = request.headers.get("User-Agent").getOrElse("-"),
+        apiVersion = "2.0",
+        matchId = matchId,
+        correlationId = Some(correlationId),
+        requestUrl,
         msg
       )
     )
@@ -110,11 +127,18 @@ class AuditHelper @Inject()(auditConnector: AuditConnector,
                       scopes:  String,
                       request: RequestHeader)
                      (implicit hc: HeaderCarrier) =
-    auditConnector.sendExtendedEvent(
-      scopesAuditEvent(
-        matchId,
-        scopes,
-        request
+    auditConnector.sendExplicitAudit(
+      "AuthScopesAuditEvent",
+      ScopesAuditEventModel(
+        ipAddress = hc.forwarded.map(_.value).getOrElse("-"),
+        authorisation = hc.authorization.map(_.value).getOrElse("-"),
+        deviceId = hc.deviceID.getOrElse("-"),
+        input = s"Request to ${request.path}",
+        method = request.method.toUpperCase,
+        userAgent = request.headers.get("User-Agent").getOrElse("-"),
+        apiVersion = "2.0",
+        matchId = matchId,
+        scopes
       )
     )
 }
