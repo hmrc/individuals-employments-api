@@ -19,12 +19,10 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.audit
 import org.mockito.Mockito.{times, verify}
 import org.mockito.{ArgumentCaptor, Mockito}
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.{AuditHelper, DefaultHttpExtendedAuditEvent}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import utils.{EmploymentsHelper, UnitSpec}
 import org.mockito.Matchers.{any, eq => eqTo}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureResponseEventModel, ApiResponseEventModel, IfApiResponseEventModel, ScopesAuditEventModel}
@@ -49,7 +47,6 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper 
   val endpoint = "/test"
 
   val auditConnector = mock[AuditConnector]
-  val httpExtendedAuditEvent = new DefaultHttpExtendedAuditEvent("individuals-employments-api")
 
   val auditHelper = new AuditHelper(auditConnector)
 
