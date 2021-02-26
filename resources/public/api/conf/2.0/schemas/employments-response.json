@@ -47,12 +47,14 @@
           },
           "startDate": {
             "type": "string",
-            "description": "The date the employment started. Date in the format: YYYY-MM-DD.",
+            "id": "full-date",
+            "description": "The date the employment started.",
             "example": "2019-01-01"
           },
           "endDate": {
             "type": "string",
-            "description": "The date the employment ended. Date in the format: YYYY-MM-DD.",
+            "id": "full-date",
+            "description": "The date the employment ended.",
             "example": "2019-03-01"
           },
           "employer": {

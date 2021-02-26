@@ -93,12 +93,12 @@ uses:
           required: true
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
         fromDate:
-          description: The date that employments data is requested from.
+          description: !include docs/employment-query-from-date.md
           type: string
           required: true
           example: 2019-01-01
         toDate:
-          description: The date that employments data is requested to. If missing, it defaults to today's date.
+          description: !include docs/employment-query-to-date.md
           type: string
           required: false
           example: 2020-03-01
