@@ -25,7 +25,7 @@
         },
         "self": {
           "type": "object",
-          "description": "The URI for this endpoint.",
+          "description": "The URL of the endpoint.",
           "properties": {
             "href": {
               "type": "string",
