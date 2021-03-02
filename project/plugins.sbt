@@ -18,3 +18,5 @@ addSbtPlugin("uk.gov.hmrc" % "sbt-artifactory" % "1.13.0")
 
 addSbtPlugin("uk.gov.hmrc" % "sbt-service-manager" % "0.8.0")
 
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.6.1")
+
