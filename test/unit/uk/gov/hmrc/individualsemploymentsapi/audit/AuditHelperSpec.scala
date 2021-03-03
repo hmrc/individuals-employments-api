@@ -25,7 +25,7 @@ import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import utils.{EmploymentsHelper, UnitSpec}
 import org.mockito.Matchers.{any, eq => eqTo}
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureResponseEventModel, ApiResponseEventModel, IfApiResponseEventModel, ScopesAuditEventModel}
+import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureResponseEventModel, ApiResponseEventModel, IntegrationFrameworkApiResponseEventModel, ScopesAuditEventModel}
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 
@@ -114,18 +114,18 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper 
 
       Mockito.reset(auditConnector)
 
-      val captor = ArgumentCaptor.forClass(classOf[IfApiResponseEventModel])
+      val captor = ArgumentCaptor.forClass(classOf[IntegrationFrameworkApiResponseEventModel])
 
       auditHelper.auditIfApiResponse(correlationId, matchId, request, ifUrl, ifApiResponse)
 
-      verify(auditConnector, times(1)).sendExplicitAudit(eqTo("IfApiResponseEvent"),
+      verify(auditConnector, times(1)).sendExplicitAudit(eqTo("IntegrationFrameworkApiResponseEvent"),
         captor.capture())(any(), any(), any())
 
       val capturedEvent = captor.getValue
-      capturedEvent.asInstanceOf[IfApiResponseEventModel].matchId shouldEqual matchId
-      capturedEvent.asInstanceOf[IfApiResponseEventModel].correlationId shouldEqual correlationId
-      capturedEvent.asInstanceOf[IfApiResponseEventModel].requestUrl shouldBe ifUrl
-      capturedEvent.asInstanceOf[IfApiResponseEventModel].ifEmployments shouldBe ifApiResponse
+      capturedEvent.asInstanceOf[IntegrationFrameworkApiResponseEventModel].matchId shouldEqual matchId
+      capturedEvent.asInstanceOf[IntegrationFrameworkApiResponseEventModel].correlationId shouldEqual correlationId
+      capturedEvent.asInstanceOf[IntegrationFrameworkApiResponseEventModel].requestUrl shouldBe ifUrl
+      capturedEvent.asInstanceOf[IntegrationFrameworkApiResponseEventModel].integrationFrameworkEmployments shouldBe ifApiResponse
 
     }
 
@@ -139,7 +139,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper 
 
       auditHelper.auditIfApiFailure(correlationId, matchId, request, ifUrl, msg)
 
-      verify(auditConnector, times(1)).sendExplicitAudit(eqTo("IfApiFailureEvent"), captor.capture())(any(), any(), any())
+      verify(auditConnector, times(1)).sendExplicitAudit(eqTo("IntegrationFrameworkApiFailureEvent"), captor.capture())(any(), any(), any())
 
       val capturedEvent = captor.getValue
       capturedEvent.asInstanceOf[ApiFailureResponseEventModel].matchId shouldEqual matchId
