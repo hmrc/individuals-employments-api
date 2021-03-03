@@ -19,7 +19,6 @@ package uk.gov.hmrc.individualsemploymentsapi.controller
 import controllers.Assets
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import play.api.http.HttpErrorHandler
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.individualsemploymentsapi.views._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -28,17 +27,16 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 class DocumentationController @Inject()(
   cc: ControllerComponents,
   assets: Assets,
-  errorHandler: HttpErrorHandler,
   config: Configuration)
     extends BackendController(cc) {
 
-  val v1WhitelistedApplicationIDs = config
+  private val v1WhitelistedApplicationIDs = config
     .getOptional[Seq[String]](
       "api.access.version-P1.0.whitelistedApplicationIds"
     )
     .getOrElse(Seq.empty)
 
-  val v2WhitelistedApplicationIDs = config
+  private val v2WhitelistedApplicationIDs = config
     .getOptional[Seq[String]](
       "api.access.version-2.0.whitelistedApplicationIds"
     )
@@ -54,7 +52,7 @@ class DocumentationController @Inject()(
       .getOptional[String]("api.access.version-2.0.status")
       .getOrElse("BETA")
 
-  def definition(): Action[AnyContent] = Action { request =>
+  def definition(): Action[AnyContent] = Action { _ =>
     Ok(
       txt.definition(
         v1WhitelistedApplicationIDs,

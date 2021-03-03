@@ -27,10 +27,6 @@ case class Address(
   postcode: Option[String])
 
 object Address {
-
-  implicit def ifAddressToAddress(address: IfAddress): Address =
-    Address(address.line1, address.line2, address.line3, address.line4, address.line5, address.postcode)
-
   implicit def ifAddressToAddressOpt(address: Option[IfAddress]): Option[Address] =
     address match {
       case Some(a) => Option(Address(a.line1, a.line2, a.line3, a.line4, a.line5, a.postcode))

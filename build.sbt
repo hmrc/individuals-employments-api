@@ -15,6 +15,18 @@ lazy val playSettings: Seq[Setting[_]] = Seq(
     "uk.gov.hmrc.individualsemploymentsapi.domain._",
     "uk.gov.hmrc.individualsemploymentsapi.Binders._"))
 
+lazy val scoverageSettings = {
+  import scoverage.ScoverageKeys
+  Seq(
+    ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;" +
+      ".*BuildInfo.;uk.gov.hmrc.BuildInfo;.*Routes;.*RoutesPrefix*;",
+    ScoverageKeys.coverageMinimum := 80,
+    ScoverageKeys.coverageFailOnMinimum := true,
+    ScoverageKeys.coverageHighlighting := true,
+    parallelExecution in Test := false
+  )
+}
+
 lazy val appDependencies: Seq[ModuleID] = compile ++ test()
 lazy val plugins: Seq[Plugins] = Seq.empty
 lazy val externalServices =
@@ -72,6 +84,7 @@ lazy val microservice =
       SbtArtifactory) ++ plugins: _*)
     .settings(playSettings: _*)
     .settings(scalaSettings: _*)
+    .settings(scoverageSettings: _*)
     .settings(publishingSettings: _*)
     .settings(scalaVersion := "2.12.11")
     .settings(defaultSettings(): _*)
