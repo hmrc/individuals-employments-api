@@ -19,9 +19,7 @@ package uk.gov.hmrc.individualsemploymentsapi.audit.v2.models
 import play.api.libs.json.Json
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 
-case class ApiResponseEventModel(ipAddress: String,
-                                 authorisation: String,
-                                 deviceId: String,
+case class ApiResponseEventModel(deviceId: String,
                                  input: String,
                                  method: String,
                                  userAgent: String,
