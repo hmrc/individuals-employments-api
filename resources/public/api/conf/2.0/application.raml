@@ -38,8 +38,8 @@ uses:
       securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
       (annotations.sandboxData): !include sandbox/root.md
       headers:
-        correlationId:
-          description: A UUID, used for traceability purposes.
+        CorrelationId:
+          description: !include ./includes/correlationId.md
           type: string
           example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
       queryParameters:
@@ -82,8 +82,8 @@ uses:
       securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
       (annotations.sandboxData): !include sandbox/employments-request.md
       headers:
-        correlationId:
-          description: A UUID, used for traceability purposes.
+        CorrelationId:
+          description: !include ./includes/correlationId.md
           type: string
           example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
       queryParameters:
