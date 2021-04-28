@@ -106,9 +106,9 @@ uses:
           description: The unique identifier for the Scheme making being requested. Must be URL encoded.
           type: string
           required: false
-          maxLength: 10
-          pattern: '^[^ ].
-          example: 247A1987CB
+          maxLength: 14
+          pattern: "^[^ ].{1,14}$"
+          example: "247%2FA1987CB"
       responses:
         200:
           description: The individual PAYE employments for the given period
