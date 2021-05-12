@@ -46,7 +46,8 @@ class EmploymentSpec extends FlatSpec with Matchers {
           payrollId = None,
           address = None
         )),
-      payments = None
+      payments = None,
+      employerRef = None
     )
 
     val employment = Employment.create(
@@ -72,7 +73,7 @@ class EmploymentSpec extends FlatSpec with Matchers {
   }
 
   it should "handle the edge case where des employment is empty" in {
-    val ifEmployment = IfEmployment(None, None, None)
+    val ifEmployment = IfEmployment(None, None, None, None)
     Employment.create(ifEmployment) shouldBe None
   }
 

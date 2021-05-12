@@ -29,7 +29,8 @@ case class Employment(
   startDate: Option[LocalDate],
   endDate: Option[LocalDate],
   payFrequency: Option[PayFrequency],
-  employer: Option[Employer])
+  employer: Option[Employer],
+  payments: Option[Seq[Payment]])
 
 object Employment {
 
@@ -40,13 +41,15 @@ object Employment {
       (JsPath \ "startDate").readNullable[LocalDate] and
         (JsPath \ "endDate").readNullable[LocalDate] and
         (JsPath \ "payFrequency").readNullable[PayFrequency] and
-        (JsPath \ "employer").readNullable[Employer]
+        (JsPath \ "employer").readNullable[Employer] and
+        (JsPath \ "payment").readNullable[Seq[Payment]]
     )(Employment.apply _),
     (
       (JsPath \ "startDate").writeNullable[LocalDate] and
         (JsPath \ "endDate").writeNullable[LocalDate] and
         (JsPath \ "payFrequency").writeNullable[PayFrequency] and
-        (JsPath \ "employer").writeNullable[Employer]
+        (JsPath \ "employer").writeNullable[Employer] and
+        (JsPath \ "payment").writeNullable[Seq[Payment]]
     )(unlift(Employment.unapply))
   )
 

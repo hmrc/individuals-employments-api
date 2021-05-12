@@ -65,7 +65,8 @@ object SandboxData {
             ))
         )
       ),
-      payments = None
+      payments = None,
+      employerRef = Some("247/A1987CB")
     )
 
     val disney = IfEmployment(
@@ -103,7 +104,8 @@ object SandboxData {
             )
           )
         )
-      )
+      ),
+      employerRef = Some("247/A1987CB")
     )
   }
 
