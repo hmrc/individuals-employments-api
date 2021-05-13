@@ -20,12 +20,20 @@ import org.joda.time.LocalDate
 import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.domain.EmpRef
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
-import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfAddress, IfEmployer, IfEmployment, IfEmploymentDetail}
-import uk.gov.hmrc.individualsemploymentsapi.domain.v2.{Address, Employer, Employment, PayFrequency}
+import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfAddress, IfEmployer, IfEmployment, IfEmploymentDetail, IfPayment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.v2.{Address, Employer, Employment, PayFrequency, Payment}
 
 class EmploymentSpec extends FlatSpec with Matchers {
 
   "Employment" should "derive itself from an instance of des employment" in {
+    val ifPayment = IfPayment(
+      Some("2016-01-01"),
+      None,
+      Some(21.21),
+      None,
+      None,
+      None
+    )
     val ifEmployment = IfEmployment(
       employer = Some(
         IfEmployer(
@@ -46,7 +54,7 @@ class EmploymentSpec extends FlatSpec with Matchers {
           payrollId = None,
           address = None
         )),
-      payments = None,
+      payments = Some(Seq(ifPayment)),
       employerRef = None
     )
 
@@ -66,7 +74,8 @@ class EmploymentSpec extends FlatSpec with Matchers {
             line5 = None,
             postcode = Some("AB1 2CD")
           ))
-      )
+      ),
+      Some(Seq(Payment.create(ifPayment)).flatten)
     )
 
     Employment.create(ifEmployment) shouldBe employment
