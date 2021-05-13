@@ -32,9 +32,15 @@ case class ApiConfig(scopes: List[ScopeConfig], endpoints: List[EndpointConfig])
 
 }
 
-case class ScopeConfig(name: String, fields: List[String]) {}
+case class ScopeConfig(name: String,
+                       fields: List[String],
+                       filters: List[String] = List()) {}
 
-case class EndpointConfig(name: String, link: String, title: String, fields: Map[String, String])
+case class EndpointConfig(name: String,
+                          link: String,
+                          title: String,
+                          fields: Map[String, String],
+                          filters: Map[String, String] = Map())
 
 object ApiConfig {
 
@@ -67,13 +73,33 @@ object ApiConfig {
                 title = config.getString(s"endpoints.$key.title"),
                 fields = node.listChildren.toList.sorted
                   .map(field => (field, config.getString(s"endpoints.$key.fields.$field")))
+                  .toMap,
+                filters = node.listChildren.toList
+                  .filter(field =>
+                    config.hasPath(s"endpoints.$key.filters.$field"))
+                  .sorted
+                  .map(field =>
+                    (field,
+                      config.getString(s"endpoints.$key.filters.$field")))
                   .toMap
             )))
       .toList
 
     val scopeTree = parseConfig("scopes")
     val scopeConfig = scopeTree.listChildren
-      .map(key => ScopeConfig(name = key, fields = config.getStringList(s"""scopes."$key".fields""").asScala.toList))
+      .map(key =>
+        ScopeConfig(
+          name = key,
+          fields = config
+            .getStringList(s"""scopes."$key".fields""")
+            .asScala
+            .toList,
+          filters =
+            if (config.hasPath(s"""scopes."$key".filters"""))
+              config
+                .getStringList(s"""scopes."$key".filters""")
+                .asScala
+                .toList else List()))
       .toList
 
     ApiConfig(
