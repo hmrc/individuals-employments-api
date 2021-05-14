@@ -29,10 +29,12 @@ trait ScopesConfig extends MockitoSugar {
   val mockScope5 = "test5"
   val mockScope6 = "test6"
   val mockScope7 = "test7"
+  val mockScope8 = "test8"
 
   val mockEndpoint1 = "endpoint1"
   val mockEndpoint2 = "endpoint2"
   val mockEndpoint3 = "endpoint3"
+  val mockEndpoint4 = "endpoint4"
 
   val mockConfig = Configuration(
     (s"api-config.scopes.$mockScope1.fields", List("A", "B", "F")),
@@ -65,7 +67,26 @@ trait ScopesConfig extends MockitoSugar {
     (s"api-config.endpoints.$mockEndpoint3.endpoint", "/a/b/e?matchId=<matchId>{&fromDate,toDate}"),
     (s"api-config.endpoints.$mockEndpoint3.title", "title"),
     (s"api-config.endpoints.$mockEndpoint3.fields.O", "field3"),
-    (s"api-config.endpoints.$mockEndpoint3.fields.P", "field4")
+    (s"api-config.endpoints.$mockEndpoint3.fields.P", "field4"),
+
+    (s"api-config.scopes.$mockScope8.fields", List("A", "B", "F")),
+    (s"api-config.scopes.$mockScope8.filters", List("A")),
+    (s"api-config.endpoints.$mockEndpoint4.endpoint", "/a/b/c?matchId=<matchId>{&fromDate,toDate}"),
+    (s"api-config.endpoints.$mockEndpoint4.title", "title"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.A", "payments"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.B", "employer/employerName"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.C", "employer/employerAddress/line1"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.D", "employer/employerAddress/line2"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.E", "employer/employerAddress/line3"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.F", "employer/employerDistrictNumber"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.G", "employer/employerSchemeReference"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.H", "employmentStartDate"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.I", "employmentLeavingDate"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.J", "employmentPayFrequency"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.K", "employeeAddress"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.L", "payrollId"),
+    (s"api-config.endpoints.$mockEndpoint4.filters.A", "employerRef eq '<employerRef>'")
+
   )
 
   val mockApiConfig = ApiConfig(

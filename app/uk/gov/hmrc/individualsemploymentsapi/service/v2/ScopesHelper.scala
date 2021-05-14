@@ -27,6 +27,34 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
 
   /**
     * @param scopes The list of scopes associated with the user
+    * @param endpoints The endpoints for which to construct the query string
+    * @param payeRef The PAYE reference
+    * @return A google fields-style query string with the fields determined by the provided endpoint(s) and scopes
+    */
+  def getQueryStringWithParameterisedFilters(scopes: Iterable[String],
+                                             endpoints: List[String],
+                                             payeRef: String): String = {
+    val queryString = getQueryStringFor(scopes, endpoints)
+
+    queryString.replace("${payeRef}", payeRef)
+  }
+
+  /**
+    * @param scopes The list of scopes associated with the user
+    * @param endpoints The endpoints for which to construct the query string
+    * @param payeRef The PAYE reference
+    * @return A google fields-style query string with the fields determined by the provided endpoint(s) and scopes
+    */
+  def getQueryStringWithParameterisedFilters(scopes: Iterable[String],
+                                             endpoints: String,
+                                             payeRef: String): String = {
+    val queryString = getQueryStringFor(scopes, endpoints)
+    println(s"blah OI ${queryString}")
+    queryString.replace("${payeRef}", payeRef)
+  }
+
+  /**
+    * @param scopes The list of scopes associated with the user
     * @param endpoint The endpoint for which to construct the query string
     * @return A google fields-style query string with the fields determined by the provided endpoint and scopes
     */
