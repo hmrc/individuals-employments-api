@@ -17,6 +17,8 @@
 package uk.gov.hmrc.individualsemploymentsapi.service.v2
 
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.api.controllers.ErrorGenericBadRequest
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryParameterException
 
 import javax.inject.Inject
 
@@ -28,8 +30,9 @@ class ScopeFilterVerificationService @Inject()(scopesService: ScopesService) {
 
   def verify(scopes: List[String], endpoint: String, rh: RequestHeader): Boolean = {
     val validFilters = scopesService.getValidFilterKeys(scopes, List(endpoint))
-    val requiredParameters = validFilters.flatMap(f => filterParameterMappings.get(f))
-
-    !requiredParameters.map(p => rh.queryString.get(p)).exists(_.isEmpty)
+    val requiredParameters = validFilters.flatMap(f => filterParameterMappings.get(f)).toList
+    val hasAllParameters = !requiredParameters.map(p => rh.queryString.get(p)).exists(_.isEmpty)
+    if(!hasAllParameters) throw new MissingQueryParameterException(s"${requiredParameters(0)} is required for the scopes you have been assigned")
+    hasAllParameters
   }
 }

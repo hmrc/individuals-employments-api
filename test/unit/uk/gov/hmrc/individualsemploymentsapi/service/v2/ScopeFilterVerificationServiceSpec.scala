@@ -18,6 +18,7 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryParameterException
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{ScopeFilterVerificationService, ScopesHelper, ScopesService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.service.ScopesConfig
 import utils.UnitSpec
@@ -38,9 +39,9 @@ class ScopeFilterVerificationServiceSpec extends UnitSpec with ScopesConfig {
 
   "should return False if any required query parameters are not present" in {
     val requestHeader = FakeRequest("GET", "/")
-    val result = scopeFilterVerificationService.verify(List(mockScope8), mockEndpoint4, requestHeader)
-
-    result shouldBe false
+    assertThrows[MissingQueryParameterException] {
+      scopeFilterVerificationService.verify(List(mockScope8), mockEndpoint4, requestHeader)
+    }
   }
 
   "should return True if query parameters are not required" in {
