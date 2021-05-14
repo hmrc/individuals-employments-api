@@ -1,4 +1,4 @@
 The unique identifier for the Scheme being requested. Must be URL encoded.
 
-<b>Required for specific API scopes and use cases. Please refer to your data requirements.</b>
+An employerPayeRef is required for specific API scopes and use cases. Refer to your data requirements to check if you need this.
 
