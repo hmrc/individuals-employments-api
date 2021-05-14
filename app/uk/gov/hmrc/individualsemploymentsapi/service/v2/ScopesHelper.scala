@@ -33,10 +33,10 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     */
   def getQueryStringWithParameterisedFilters(scopes: Iterable[String],
                                              endpoints: List[String],
-                                             payeRef: String): String = {
+                                             employerRef: String): String = {
     val queryString = getQueryStringFor(scopes, endpoints)
 
-    queryString.replace("${payeRef}", payeRef)
+    queryString.replace("<employerRef>", employerRef)
   }
 
   /**

@@ -65,6 +65,13 @@ class ScopesService @Inject()(configuration: Configuration) {
     getFieldNames(authorizedDataItemsOnEndpoint)
   }
 
+  def getValidFilterKeys(scopes: Iterable[String],
+                         endpoints: List[String]): Iterable[String] = {
+    val endpointDataItems = endpoints.flatMap(e => getEndpointFieldKeys(e).toSet)
+    val filtersForEndpoints = scopes.flatMap(getFilterKeysForScope)
+    filtersForEndpoints.filter(endpointDataItems.contains)
+  }
+
   def getValidFilters(scopes: Iterable[String],
                       endpoints: List[String]): Iterable[String] = {
     val endpointDataItems = endpoints.flatMap(e => getEndpointFieldKeys(e).toSet)
