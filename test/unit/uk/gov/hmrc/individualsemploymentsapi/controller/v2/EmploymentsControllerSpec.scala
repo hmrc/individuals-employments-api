@@ -246,7 +246,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       val matchId = UUID.randomUUID()
 
       when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval), any(), any())(any(), any()))
-        .thenReturn(Future.successful(Seq(Employment.create(Employments.acme).get)))
+        .thenReturn(Future.successful(Seq(Employment.create(Employments.example1).get)))
 
       val res =
         liveEmploymentsController.paye(matchId, interval)(FakeRequest().withHeaders(validCorrelationHeader))
@@ -312,7 +312,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
           eqTo("paye"),
           eqTo(Seq("test-scope"))
         )(any(), any())).thenReturn(
-        Future.successful(Seq(Employments.acme, Employments.disney).map(Employment.create).map(_.get))
+        Future.successful(Seq(Employments.example1, Employments.example2).map(Employment.create).map(_.get))
       )
 
       val eventualResult =

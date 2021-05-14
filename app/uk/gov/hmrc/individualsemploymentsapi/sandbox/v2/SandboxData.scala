@@ -33,7 +33,7 @@ object SandboxData {
 
   object Employments {
 
-    val acme = IfEmployment(
+    val example1 = IfEmployment(
       employer = Some(
         IfEmployer(
           name = Some("Acme"),
@@ -69,7 +69,7 @@ object SandboxData {
       employerRef = Some("247/A1987CB")
     )
 
-    val disney = IfEmployment(
+    val example2 = IfEmployment(
       payments = None,
       employer = Some(
         IfEmployer(
@@ -114,7 +114,7 @@ object SandboxData {
     val amanda = Individual(
       sandboxMatchId,
       sandboxNinoString,
-      Seq(Employments.acme, Employments.disney)
+      Seq(Employments.example1, Employments.example2)
     )
 
     val individuals = Seq(amanda)

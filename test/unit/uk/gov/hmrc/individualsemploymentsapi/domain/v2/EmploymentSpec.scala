@@ -25,7 +25,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.v2.{Address, Employer, Emplo
 
 class EmploymentSpec extends FlatSpec with Matchers {
 
-  "Employment" should "derive itself from an instance of des employment" in {
+  "Employment" should "derive itself from an instance of IF employment" in {
     val ifPayment = IfPayment(
       Some("2016-01-01"),
       None,
@@ -81,7 +81,7 @@ class EmploymentSpec extends FlatSpec with Matchers {
     Employment.create(ifEmployment) shouldBe employment
   }
 
-  it should "handle the edge case where des employment is empty" in {
+  it should "handle the edge case where IF employment is empty" in {
     val ifEmployment = IfEmployment(None, None, None, None)
     Employment.create(ifEmployment) shouldBe None
   }
