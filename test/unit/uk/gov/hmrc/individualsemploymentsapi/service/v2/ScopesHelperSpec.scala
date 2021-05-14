@@ -38,7 +38,7 @@ class ScopesHelperSpec
       val payeRef = "3287654321"
       val result =
         scopesHelper.getQueryStringWithParameterisedFilters(List(mockScope8), mockEndpoint4, payeRef)
-      result shouldBe s"employer(employerAddress(line1,line2,line3),employerDistrictNumber,employerName,employerSchemeReference),payments&filters=employerRef eq '${payeRef}'"
+      result shouldBe s"employer(employerAddress(line1,line2,line3),employerDistrictNumber,employerName,employerSchemeReference),payments&filter=employerRef eq '${payeRef}'"
     }
 
     "return correct query string" in {

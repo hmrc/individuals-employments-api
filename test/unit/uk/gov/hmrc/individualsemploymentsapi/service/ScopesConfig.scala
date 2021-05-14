@@ -69,23 +69,23 @@ trait ScopesConfig extends MockitoSugar {
     (s"api-config.endpoints.$mockEndpoint3.fields.O", "field3"),
     (s"api-config.endpoints.$mockEndpoint3.fields.P", "field4"),
 
-    (s"api-config.scopes.$mockScope8.fields", List("A", "B", "F")),
-    (s"api-config.scopes.$mockScope8.filters", List("A")),
+    (s"api-config.scopes.$mockScope8.fields", List("AC", "AD", "S", "T", "U", "V", "W")),
+    (s"api-config.scopes.$mockScope8.filters", List("AC")),
     (s"api-config.endpoints.$mockEndpoint4.endpoint", "/a/b/c?matchId=<matchId>{&fromDate,toDate}"),
     (s"api-config.endpoints.$mockEndpoint4.title", "title"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.A", "payments"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.B", "employer/employerName"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.C", "employer/employerAddress/line1"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.D", "employer/employerAddress/line2"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.E", "employer/employerAddress/line3"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.F", "employer/employerDistrictNumber"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.G", "employer/employerSchemeReference"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.H", "employmentStartDate"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.I", "employmentLeavingDate"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.J", "employmentPayFrequency"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.K", "employeeAddress"),
-    (s"api-config.endpoints.$mockEndpoint4.fields.L", "payrollId"),
-    (s"api-config.endpoints.$mockEndpoint4.filters.A", "employerRef eq '<employerRef>'")
+    (s"api-config.endpoints.$mockEndpoint4.fields.AC", "payments"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.AD", "employer/employerName"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.S", "employer/employerAddress/line1"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.T", "employer/employerAddress/line2"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.U", "employer/employerAddress/line3"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.V", "employer/employerDistrictNumber"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.W", "employer/employerSchemeReference"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.X", "employmentStartDate"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.Y", "employmentLeavingDate"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.Z", "employmentPayFrequency"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.AA", "employeeAddress"),
+    (s"api-config.endpoints.$mockEndpoint4.fields.AB", "payrollId"),
+    (s"api-config.endpoints.$mockEndpoint4.filters.AC", "employerRef eq '<employerRef>'")
 
   )
 
@@ -95,7 +95,8 @@ trait ScopesConfig extends MockitoSugar {
       ScopeConfig(mockScope2, List("A", "B", "C", "D", "E", "F", "G")),
       ScopeConfig(mockScope3, List("A", "P")),
       ScopeConfig(mockScope4, List("M", "N")),
-      ScopeConfig(mockScope5, List("O", "P"))
+      ScopeConfig(mockScope5, List("O", "P")),
+      ScopeConfig(mockScope8, List("AC", "AD", "S", "T", "U", "V", "W"))
     ),
     endpoints = List(
       EndpointConfig(
@@ -132,7 +133,29 @@ trait ScopesConfig extends MockitoSugar {
         fields = Map(
           "O" -> "field3",
           "P" -> "field4"
-        ))
+        )),
+      EndpointConfig(
+        name = mockEndpoint4,
+        title = "title",
+        link = "/a/b/c?matchId=<matchId>{&fromDate,toDate}",
+        fields = Map(
+          "AC" -> "payments",
+          "AD" -> "employer/employerName",
+          "S" -> "employer/employerAddress/line1",
+          "T" -> "employer/employerAddress/line2",
+          "U" -> "employer/employerAddress/line3",
+          "V" -> "employer/employerDistrictNumber",
+          "W" -> "employer/employerSchemeReference",
+          "X" -> "employmentStartDate",
+          "Y" -> "employmentLeavingDate",
+          "Z" -> "employmentPayFrequency",
+          "AA" -> "employeeAddress",
+          "AB" -> "payrollId"
+        ),
+        filters = Map(
+          "AC" -> "employerRef eq '<employerRef>'"
+        )
+      )
     )
   )
 }
