@@ -47,6 +47,49 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     "read:individuals-employments-lsani-c3",
     "read:individuals-employments-nictsejo-c4")
 
+  private def setUpStubs() = {
+
+    val stubData = IfEmployments(
+      Seq(
+        IfEmployment(
+          employer = Some(
+            IfEmployer(
+              name = Some("employer name"),
+              None,
+              None,
+              None
+            )
+          ),
+          None,
+          None
+        )))
+
+    IfStub.searchEmploymentIncomeForPeriodReturns(
+      nino,
+      fromDate,
+      toDate,
+      "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employment(startDate))",
+      stubData)
+
+    IfStub.searchEmploymentIncomeForPeriodReturns(
+      nino,
+      fromDate,
+      toDate,
+      "employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,employerRef,name," +
+        "schemeRef),employment(endDate,startDate),payments(date,paidTaxablePay))",
+      stubData)
+
+    IfStub.searchEmploymentIncomeForPeriodReturns(
+      nino,
+      fromDate,
+      toDate,
+      "employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,employerRef,name," +
+        "schemeRef),employment(endDate,startDate),payments(date,paidTaxablePay))",
+      "employments%5B%5D/employer/employerRef%20eq%20'%3CemployerRef%3E'",
+      stubData)
+
+  }
+
   feature("Root (hateoas) entry point is accessible") {
 
     testAuthorisation("", allScopes)
@@ -277,6 +320,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     }
 
     scenario("valid request to the live paye endpoint implementation") {
+
+
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -284,24 +329,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       And("IF will return employments for the NINO")
-      IfStub.searchEmploymentIncomeForPeriodReturns(
-        nino,
-        fromDate,
-        toDate,
-        IfEmployments(
-          Seq(
-            IfEmployment(
-              employer = Some(
-                IfEmployer(
-                  name = Some("employer name"),
-                  None,
-                  None,
-                  None
-                )
-              ),
-              None,
-              None
-            ))))
+      setUpStubs()
 
       When("the paye endpoint is invoked with a valid match id")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
