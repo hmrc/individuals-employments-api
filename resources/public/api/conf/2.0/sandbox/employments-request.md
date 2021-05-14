@@ -75,6 +75,14 @@
         </td>
     </tr>
     <tr>
+        <td><p>Missing employerPayeRef</p></td>
+        <td><p>employerPayeRef querystring parameter is missing</p></td>
+        <td>
+            <p>400 (Bad Request)</p>
+            <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;employerPayeRef is required for the scopes you have been assigned&quot; }</p></td>
+        </td>
+    </tr>    
+    <tr>
         <td><p>Malformed employerPayeRef</p></td>
         <td><p>employerPayeRef querystring parameter is malformed</p></td>
         <td>
