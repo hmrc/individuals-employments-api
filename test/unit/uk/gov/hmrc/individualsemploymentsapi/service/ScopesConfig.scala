@@ -96,7 +96,7 @@ trait ScopesConfig extends MockitoSugar {
       ScopeConfig(mockScope3, List("A", "P")),
       ScopeConfig(mockScope4, List("M", "N")),
       ScopeConfig(mockScope5, List("O", "P")),
-      ScopeConfig(mockScope8, List("AC", "AD", "S", "T", "U", "V", "W"))
+      ScopeConfig(mockScope8, List("AC", "AD", "S", "T", "U", "V", "W"), filters = List("AC"))
     ),
     endpoints = List(
       EndpointConfig(
