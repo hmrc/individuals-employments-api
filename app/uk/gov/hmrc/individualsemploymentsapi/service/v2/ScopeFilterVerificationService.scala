@@ -28,11 +28,8 @@ class ScopeFilterVerificationService @Inject()(scopesService: ScopesService) {
 
   def verify(scopes: List[String], endpoint: String, rh: RequestHeader): Boolean = {
     val validFilters = scopesService.getValidFilterKeys(scopes, List(endpoint))
-
     val requiredParameters = validFilters.flatMap(f => filterParameterMappings.get(f))
-    for( x <- validFilters) println(x)
 
-    println(s"${validFilters} oioi ${requiredParameters}")
     !requiredParameters.map(p => rh.queryString.get(p)).exists(_.isEmpty)
   }
 }
