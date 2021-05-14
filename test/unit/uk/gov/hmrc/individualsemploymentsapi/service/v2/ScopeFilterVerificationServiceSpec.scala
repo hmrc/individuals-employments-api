@@ -42,4 +42,11 @@ class ScopeFilterVerificationServiceSpec extends UnitSpec with ScopesConfig {
 
     result shouldBe false
   }
+
+  "should return True if query parameters are not required" in {
+    val requestHeader = FakeRequest("GET", "/")
+    val result = scopeFilterVerificationService.verify(List(mockScope2), mockEndpoint1, requestHeader)
+
+    result shouldBe true
+  }
 }
