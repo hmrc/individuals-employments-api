@@ -344,6 +344,23 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         "message" -> "Rate limit exceeded"
       )
     }
+
+    scenario("Missing paye employerRef") {
+      Given("a valid privileged Auth bearer token")
+      val scope = "read:individuals-employments-ho-rp2-compliance"
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scope)
+
+      When("the paye endpoint is invoked without an employerRef")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+
+      Then("the response status should be 400 (invalid request)")
+      response.code shouldBe BAD_REQUEST
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "employerRef is required for the scopes you have been assigned"
+      )
+    }
+
   }
 
 
