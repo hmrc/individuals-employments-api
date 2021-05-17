@@ -230,11 +230,14 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     }
 
     scenario("invalid match id") {
+
+      val employerRef = "247%2FZT6767895A"
+
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the paye endpoint is invoked with an invalid match id")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
 
       Then("the response status should be 404 (not found)")
       response.code shouldBe NOT_FOUND
@@ -321,6 +324,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("valid request to the live paye endpoint implementation") {
 
+      val employerRef = "247%2FZT6767895A"
 
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
@@ -332,7 +336,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       setUpStubs()
 
       When("the paye endpoint is invoked with a valid match id")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
 
       Then("the response status should be 200 (ok)")
       response.code shouldBe OK
@@ -352,6 +356,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     scenario("the IF rate limit is exceeded") {
       val matchId = UUID.randomUUID().toString
       val nino = "AA112233B"
+      val employerRef = "247%2FZT6767895A"
 
       Given("a valid privileged Auth Bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
@@ -363,7 +368,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IfStub.enforceRateLimit(nino, fromDate, toDate)
 
       When("the PAYE endpoint is invoked with a valid match ID")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
 
       Then("The response status is 429 Too Many Requests")
       response.code shouldBe TOO_MANY_REQUESTS
@@ -375,8 +380,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("Missing paye employerRef") {
       Given("a valid privileged Auth bearer token")
-      val scope = "read:individuals-employments-ho-rp2-compliance"
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scope)
+
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the paye endpoint is invoked without an employerRef")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
@@ -388,7 +393,6 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         "message" -> "employerRef is required for the scopes you have been assigned"
       )
     }
-
   }
 
 
@@ -434,6 +438,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario(s"valid request but invalid IF response") {
 
+      val employerRef = "247%2FZT6767895A"
+
       Given("A valid auth token ")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)
 
@@ -451,7 +457,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       When(
         s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
 
-      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
         .headers(requestHeaders(acceptHeaderVP2))
         .asString
 
@@ -464,6 +470,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario(s"IF returns an Internal Server Error") {
 
+      val employerRef = "247%2FZT6767895A"
+
       Given("A valid auth token ")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)
 
@@ -475,7 +483,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
       When(
         s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
-      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
         .headers(requestHeaders(acceptHeaderVP2))
         .asString
 
@@ -487,6 +495,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     }
 
     scenario(s"IF returns an Bad Request Error") {
+
+      val employerRef = "247%2FZT6767895A"
 
       Given("A valid auth token ")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)
@@ -500,7 +510,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
       When(
         s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
-      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
+      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
         .headers(requestHeaders(acceptHeaderVP2))
         .asString
 
@@ -510,6 +520,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         "code" -> "INTERNAL_SERVER_ERROR",
         "message" -> "Something went wrong.")
     }
+
   }
 
 

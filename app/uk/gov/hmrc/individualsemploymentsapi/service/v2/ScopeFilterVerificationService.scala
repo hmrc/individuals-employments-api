@@ -31,7 +31,7 @@ class ScopeFilterVerificationService @Inject()(scopesService: ScopesService) {
   def verify(scopes: List[String], endpoint: String, rh: RequestHeader): Boolean = {
     val validFilters = scopesService.getValidFilterKeys(scopes, List(endpoint))
     val requiredParameters = validFilters.flatMap(f => filterParameterMappings.get(f)).toList
-    val hasAllParameters = !requiredParameters.map(p => rh.queryString.get(p)).exists(_.isEmpty)
+    val hasAllParameters = requiredParameters.isEmpty || !requiredParameters.map(p => rh.queryString.get(p)).exists(_.isEmpty)
     if(!hasAllParameters) throw new MissingQueryParameterException(s"${requiredParameters(0)} is required for the scopes you have been assigned")
     hasAllParameters
   }
