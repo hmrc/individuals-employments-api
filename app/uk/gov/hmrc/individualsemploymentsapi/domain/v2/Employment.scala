@@ -29,7 +29,8 @@ case class Employment(
   startDate: Option[LocalDate],
   endDate: Option[LocalDate],
   payFrequency: Option[PayFrequency],
-  employer: Option[Employer])
+  employer: Option[Employer],
+  payments: Option[Seq[Payment]])
 
 object Employment {
 
@@ -40,13 +41,15 @@ object Employment {
       (JsPath \ "startDate").readNullable[LocalDate] and
         (JsPath \ "endDate").readNullable[LocalDate] and
         (JsPath \ "payFrequency").readNullable[PayFrequency] and
-        (JsPath \ "employer").readNullable[Employer]
+        (JsPath \ "employer").readNullable[Employer] and
+        (JsPath \ "payment").readNullable[Seq[Payment]]
     )(Employment.apply _),
     (
       (JsPath \ "startDate").writeNullable[LocalDate] and
         (JsPath \ "endDate").writeNullable[LocalDate] and
         (JsPath \ "payFrequency").writeNullable[PayFrequency] and
-        (JsPath \ "employer").writeNullable[Employer]
+        (JsPath \ "employer").writeNullable[Employer] and
+        (JsPath \ "payment").writeNullable[Seq[Payment]]
     )(unlift(Employment.unapply))
   )
 
@@ -54,10 +57,11 @@ object Employment {
     startDate: Option[LocalDate],
     endDate: Option[LocalDate],
     payFrequency: Option[PayFrequency],
-    employer: Option[Employer]): Option[Employment] =
-    (startDate, endDate, payFrequency, employer) match {
-      case (None, None, None, None) => None
-      case _                        => Some(new Employment(startDate, endDate, payFrequency, employer))
+    employer: Option[Employer],
+    payments: Option[Seq[Payment]]): Option[Employment] =
+    (startDate, endDate, payFrequency, employer, payments) match {
+      case (None, None, None, None, None) => None
+      case _                        => Some(new Employment(startDate, endDate, payFrequency, employer, payments))
     }
 
   def create(ifEmployment: IfEmployment): Option[Employment] = {
@@ -66,10 +70,11 @@ object Employment {
     val startDate = ifEmployment.employment.flatMap(d => d.startDate).map(s => LocalDate.parse(s))
     val endDate = ifEmployment.employment.flatMap(d => d.endDate).map(s => LocalDate.parse(s))
     val payFrequency = ifEmployment.employment.flatMap(d => d.payFrequency).flatMap(PayFrequency.from)
+    val payments = ifEmployment.payments.map(d => d.flatMap(Payment.create))
 
-    (startDate, endDate, payFrequency, employer) match {
-      case (None, None, None, None) => None
-      case _                        => Some(new Employment(startDate, endDate, payFrequency, employer))
+    (startDate, endDate, payFrequency, employer, payments) match {
+      case (None, None, None, None, None) => None
+      case _                        => Some(new Employment(startDate, endDate, payFrequency, employer, payments))
     }
   }
 }
