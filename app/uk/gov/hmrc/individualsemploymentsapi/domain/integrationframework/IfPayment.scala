@@ -50,7 +50,7 @@ object IfPayment {
   def paymentAmountValidator: Reads[Double] =
     verifying[Double](value => isInRange(value) && isMultipleOfPointZeroOne(value))
 
-  implicit val paymentFormat: Format[IfPayment] = Format(
+  implicit val ifPaymentFormat: Format[IfPayment] = Format(
     (
       (JsPath \ "date").readNullable[String](pattern(datePattern, "Date format is incorrect")) and
         (JsPath \ "ytdTaxablePay").readNullable[Double](paymentAmountValidator) and

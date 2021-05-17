@@ -297,6 +297,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
                 )
               ),
               None,
+              None,
               None
             ))))
 
@@ -380,6 +381,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
               None
             )
           ),
+          None,
           None,
           None
         )))
