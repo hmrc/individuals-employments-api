@@ -28,13 +28,15 @@ class ScopeFilterVerificationServiceSpec extends UnitSpec with ScopesConfig {
     override lazy val apiConfig = mockApiConfig
   }
 
-  val scopeFilterVerificationService = new ScopeFilterVerificationService(scopesService)
+  val scopesHelper = new ScopesHelper(scopesService)
+
+  val scopeFilterVerificationService = new ScopeFilterVerificationService(scopesService, scopesHelper)
 
   "should return True if all required query parameters are present" in {
-    val requestHeader = FakeRequest("GET", "/?employerRef='3287654321'")
+    val requestHeader = FakeRequest("GET", "/?employerRef='247%2FZT6767895A'")
     val result = scopeFilterVerificationService.verify(List(mockScope8), mockEndpoint4, requestHeader)
 
-    result shouldBe true
+    result.hasAllParameters shouldBe true
   }
 
   "should return False if any required query parameters are not present" in {
@@ -48,6 +50,27 @@ class ScopeFilterVerificationServiceSpec extends UnitSpec with ScopesConfig {
     val requestHeader = FakeRequest("GET", "/")
     val result = scopeFilterVerificationService.verify(List(mockScope2), mockEndpoint1, requestHeader)
 
-    result shouldBe true
+    result.hasAllParameters shouldBe true
+  }
+
+  "should get none-filtered query string when filters are not required" in {
+    val requestHeader = FakeRequest("GET", "/")
+
+    val result = scopeFilterVerificationService.getQueryStringForDefinedScopes(List(mockScope2), mockEndpoint1, requestHeader)
+
+    result shouldBe "employer(employerAddress(line1,line2,line3),employerDistrictNumber,employerName,employerSchemeReference),payments"
+  }
+
+  "should get replaced query string when filters are required" in {
+    val employerRef = "247%2FZT6767895A"
+
+    val urlDecodedEmployerRef = "247/ZT6767895A"
+
+    val requestHeader = FakeRequest("GET", s"/?employerRef=$employerRef")
+
+    val result = scopeFilterVerificationService.getQueryStringForDefinedScopes(List(mockScope8), mockEndpoint4, requestHeader)
+
+    println(requestHeader.queryString.get("employerRef"))
+    result shouldBe s"employer(employerAddress(line1,line2,line3),employerDistrictNumber,employerName,employerSchemeReference),payments&filter=employerRef eq '$urlDecodedEmployerRef'"
   }
 }

@@ -58,7 +58,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
     implicit lazy val ec = fakeApplication.injector.instanceOf[ExecutionContext]
     lazy val scopeService: ScopesService = new ScopesService(mockScopesConfig)
     lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
-    val scopeFilterVerificationService = new ScopeFilterVerificationService(scopeService)
+    val scopeFilterVerificationService = new ScopeFilterVerificationService(scopeService, scopesHelper)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val auditHelper: AuditHelper = mock[AuditHelper]
     val hmctsClientId = "hmctsClientId"

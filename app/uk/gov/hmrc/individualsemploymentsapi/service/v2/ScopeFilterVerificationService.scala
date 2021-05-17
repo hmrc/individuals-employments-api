@@ -22,17 +22,32 @@ import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryPa
 
 import javax.inject.Inject
 
-class ScopeFilterVerificationService @Inject()(scopesService: ScopesService) {
+case class VerifyResult(hasAllParameters: Boolean, requiredFields: List[String])
+
+class ScopeFilterVerificationService @Inject()(scopesService: ScopesService, scopesHelper: ScopesHelper) {
 
   val filterParameterMappings = Map(
     "M" -> "employerRef"
   )
 
-  def verify(scopes: List[String], endpoint: String, rh: RequestHeader): Boolean = {
+  def verify(scopes: List[String], endpoint: String, rh: RequestHeader): VerifyResult = {
     val validFilters = scopesService.getValidFilterKeys(scopes, List(endpoint))
     val requiredParameters = validFilters.flatMap(f => filterParameterMappings.get(f)).toList
     val hasAllParameters = requiredParameters.isEmpty || !requiredParameters.map(p => rh.queryString.get(p)).exists(_.isEmpty)
-    if(!hasAllParameters) throw new MissingQueryParameterException(s"${requiredParameters(0)} is required for the scopes you have been assigned")
-    hasAllParameters
+    if (!hasAllParameters) throw new MissingQueryParameterException(s"${requiredParameters.head} is required for the scopes you have been assigned")
+    VerifyResult(hasAllParameters, requiredParameters)
   }
+
+   def getQueryStringForDefinedScopes(scopes: List[String], endpoint: String, rh: RequestHeader): String = {
+     val verifyResult = verify(scopes, endpoint, rh)
+     if (verifyResult.hasAllParameters && verifyResult.requiredFields.isEmpty) {
+        scopesHelper.getQueryStringFor(scopes, endpoint)
+     }
+     else if (verifyResult.hasAllParameters && verifyResult.requiredFields.contains("employerRef")) {
+       val extractedEmployerRef = rh.queryString.get("employerRef").map(x => x.head).get
+      scopesHelper.getQueryStringWithParameterisedFilters(scopes, endpoint, extractedEmployerRef)
+     }
+     else {
+       throw new MissingQueryParameterException(s"${verifyResult.requiredFields.head} is required for the scopes you have been assigned")   }
+     }
 }

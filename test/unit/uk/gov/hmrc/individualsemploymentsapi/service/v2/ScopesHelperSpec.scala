@@ -34,11 +34,11 @@ class ScopesHelperSpec
 
     val scopesHelper = new ScopesHelper(scopesService)
 
-    "return replaced payeRef" in {
-      val payeRef = "3287654321"
+    "return replaced employerRef" in {
+      val employerRef = "247%2FZT6767895A"
       val result =
-        scopesHelper.getQueryStringWithParameterisedFilters(List(mockScope8), mockEndpoint4, payeRef)
-      result shouldBe s"employer(employerAddress(line1,line2,line3),employerDistrictNumber,employerName,employerSchemeReference),payments&filter=employerRef eq '${payeRef}'"
+        scopesHelper.getQueryStringWithParameterisedFilters(List(mockScope8), mockEndpoint4, employerRef)
+      result shouldBe s"employer(employerAddress(line1,line2,line3),employerDistrictNumber,employerName,employerSchemeReference),payments&filter=employerRef eq '${employerRef}'"
     }
 
     "return correct query string" in {
