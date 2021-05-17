@@ -40,6 +40,35 @@ object IfStub extends MockHost(22004) {
         )
         .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
 
+  def searchEmploymentIncomeForPeriodReturns(
+                                              nino: String,
+                                              fromDate: String,
+                                              toDate: String,
+                                              fields: String,
+                                              ifEmployments: IfEmployments) =
+    mock.register(
+      get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
+        .withQueryParam("startDate", equalTo(fromDate))
+        .withQueryParam("endDate", equalTo(toDate))
+        .withQueryParam("fields", equalTo(fields))
+        .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
+
+  def searchEmploymentIncomeForPeriodReturns(
+                                              nino: String,
+                                              fromDate: String,
+                                              toDate: String,
+                                              fields: String,
+                                              filter: String,
+                                              ifEmployments: IfEmployments) =
+    mock.register(
+      get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
+        .withQueryParam("startDate", equalTo(fromDate))
+        .withQueryParam("endDate", equalTo(toDate))
+        .withQueryParam("fields", equalTo(fields))
+        .withQueryParam("filter", equalTo(filter))
+        .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
+
+
   def saCustomResponse(nino: String, status: Int, fromDate: String, toDate: String, response: JsValue) =
     mock.register(
       get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
@@ -54,11 +83,6 @@ object IfStub extends MockHost(22004) {
       get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
         .withQueryParam("startDate", equalTo(fromDate))
         .withQueryParam("endDate", equalTo(toDate))
-        .withQueryParam(
-          "fields",
-          equalTo(
-            "employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employment(endDate,startDate))")
-        )
         .willReturn(aResponse().withStatus(TOO_MANY_REQUESTS)))
 
 }
