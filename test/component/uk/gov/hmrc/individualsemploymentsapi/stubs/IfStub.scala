@@ -32,7 +32,7 @@ object IfStub extends MockHost(22004) {
       None),
     ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name," +
       "schemeRef),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))",
-      Some("employments%5B%5D/employer/employerRef%20eq%20'%3CemployerRef%3E'")))
+      Some("employments%5B%5D/employerRef%20eq%20'%3CemployerRef%3E'")))
 
   def searchEmploymentIncomeForPeriodReturns(
     nino: String,
