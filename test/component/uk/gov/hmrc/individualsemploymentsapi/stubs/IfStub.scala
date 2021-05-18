@@ -24,58 +24,54 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmplo
 
 object IfStub extends MockHost(22004) {
 
+  val fieldsAndFilters = List[(String, Option[String])](
+    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employment(startDate))",
+      None),
+    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,employerRef,name," +
+      "schemeRef),employment(endDate,startDate),payments(date,paidTaxablePay))",
+      None),
+    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,employerRef,name," +
+      "schemeRef),employment(endDate,startDate),payments(date,paidTaxablePay))",
+      Some("employments%5B%5D/employer/employerRef%20eq%20'%3CemployerRef%3E'")))
+
   def searchEmploymentIncomeForPeriodReturns(
     nino: String,
     fromDate: String,
     toDate: String,
     ifEmployments: IfEmployments) =
-    mock.register(
-      get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
-        .withQueryParam("startDate", equalTo(fromDate))
-        .withQueryParam("endDate", equalTo(toDate))
-        .withQueryParam(
-          "fields",
-          equalTo(
-            "employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employment(endDate,startDate))")
-        )
-        .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
+    fieldsAndFilters.foreach((fieldFilter) => fieldFilter._2 match {
+      case None => mock.register(
+        get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
+          .withQueryParam("startDate", equalTo(fromDate))
+          .withQueryParam("endDate", equalTo(toDate))
+          .withQueryParam("fields", equalTo(fieldFilter._1))
+          .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
+      case Some(filter) => mock.register(
+        get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
+          .withQueryParam("startDate", equalTo(fromDate))
+          .withQueryParam("endDate", equalTo(toDate))
+          .withQueryParam("fields", equalTo(fieldFilter._1))
+          .withQueryParam("filter", equalTo(filter))
+          .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
+    })
 
-  def searchEmploymentIncomeForPeriodReturns(
-                                              nino: String,
-                                              fromDate: String,
-                                              toDate: String,
-                                              fields: String,
-                                              ifEmployments: IfEmployments) =
-    mock.register(
-      get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
-        .withQueryParam("startDate", equalTo(fromDate))
-        .withQueryParam("endDate", equalTo(toDate))
-        .withQueryParam("fields", equalTo(fields))
-        .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
-
-  def searchEmploymentIncomeForPeriodReturns(
-                                              nino: String,
-                                              fromDate: String,
-                                              toDate: String,
-                                              fields: String,
-                                              filter: String,
-                                              ifEmployments: IfEmployments) =
-    mock.register(
-      get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
-        .withQueryParam("startDate", equalTo(fromDate))
-        .withQueryParam("endDate", equalTo(toDate))
-        .withQueryParam("fields", equalTo(fields))
-        .withQueryParam("filter", equalTo(filter))
-        .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
 
 
   def saCustomResponse(nino: String, status: Int, fromDate: String, toDate: String, response: JsValue) =
-    mock.register(
-      get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
+    fieldsAndFilters.foreach((fieldFilter) => fieldFilter._2 match {
+      case None => mock.register(
+        get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
         .withQueryParam("startDate", equalTo(fromDate))
         .withQueryParam("endDate", equalTo(toDate))
-        .withQueryParam("fields", equalTo("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employment(endDate,startDate))"))
+        .withQueryParam("fields", equalTo(fieldFilter._1))
         .willReturn(aResponse().withStatus(status).withBody(Json.toJson(response.toString()).toString())))
+      case Some(filter) => mock.register(
+        get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
+        .withQueryParam("startDate", equalTo(fromDate))
+        .withQueryParam("endDate", equalTo(toDate))
+        .withQueryParam("fields", equalTo(fieldFilter._1))
+        .withQueryParam("filter", equalTo(filter))
+        .willReturn(aResponse().withStatus(status).withBody(Json.toJson(response.toString()).toString())))})
 
 
   def enforceRateLimit(nino: String, fromDate: String, toDate: String): Unit =

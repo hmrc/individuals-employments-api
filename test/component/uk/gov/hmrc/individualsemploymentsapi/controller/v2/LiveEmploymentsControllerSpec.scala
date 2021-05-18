@@ -47,48 +47,21 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     "read:individuals-employments-lsani-c3",
     "read:individuals-employments-nictsejo-c4")
 
-  private def setUpStubs() = {
-
-    val stubData = IfEmployments(
-      Seq(
-        IfEmployment(
-          employer = Some(
-            IfEmployer(
-              name = Some("employer name"),
-              None,
-              None,
-              None
-            )
-          ),
-          None,
-          None
-        )))
-
-    IfStub.searchEmploymentIncomeForPeriodReturns(
-      nino,
-      fromDate,
-      toDate,
-      "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employment(startDate))",
-      stubData)
-
-    IfStub.searchEmploymentIncomeForPeriodReturns(
-      nino,
-      fromDate,
-      toDate,
-      "employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,employerRef,name," +
-        "schemeRef),employment(endDate,startDate),payments(date,paidTaxablePay))",
-      stubData)
-
-    IfStub.searchEmploymentIncomeForPeriodReturns(
-      nino,
-      fromDate,
-      toDate,
-      "employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,employerRef,name," +
-        "schemeRef),employment(endDate,startDate),payments(date,paidTaxablePay))",
-      "employments%5B%5D/employer/employerRef%20eq%20'%3CemployerRef%3E'",
-      stubData)
-
-  }
+  val validData = IfEmployments(
+    Seq(
+      IfEmployment(
+        employer = Some(
+          IfEmployer(
+            name = Some("employer name"),
+            None,
+            None,
+            None
+          )
+        ),
+        None,
+        None,
+        None
+      )))
 
   feature("Root (hateoas) entry point is accessible") {
 
@@ -333,7 +306,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       And("IF will return employments for the NINO")
-      setUpStubs()
+     IfStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, validData)
 
       When("the paye endpoint is invoked with a valid match id")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
@@ -433,6 +406,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
             )
           ),
           None,
+          None,
           None
         )))
 
@@ -447,12 +421,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IndividualsMatchingApiStub.hasMatchingRecord(matchId.toString, nino)
 
       And("IF will return invalid response")
-      IfStub.searchEmploymentIncomeForPeriodReturns(
-        nino,
-        fromDate,
-        toDate,
-        invalidEmployment
-      )
+      IfStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, invalidEmployment)
 
       When(
         s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
