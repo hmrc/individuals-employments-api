@@ -77,19 +77,19 @@ class IfQueriesSpec extends BaseSpec {
 
     scenario("For read:individuals-employments-ho-ecp-application") {
       val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-ho-ecp-application"), "paye")
-      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),employerRef,name),employment(endDate,startDate),payments(date,paidTaxablePay))"
+      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))"
     }
     scenario("For read:individuals-employments-ho-ecp-compliance") {
       val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-ho-ecp-compliance"), "paye")
-      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),employerRef,name),employment(endDate,startDate),payments(date,paidTaxablePay))"
+      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))"
     }
     scenario("For read:individuals-employments-ho-rp2-application") {
       val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-ho-rp2-application"), "paye")
-      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),employerRef,name),employment(endDate,startDate),payments(date,paidTaxablePay))&filter=employments%5B%5D/employer/employerRef eq '<employerRef>'"
+      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))&filter=employments%5B%5D/employer/employerRef eq '<employerRef>'"
     }
     scenario("For read:individuals-employments-ho-rp2-compliance") {
       val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-ho-rp2-compliance"), "paye")
-      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),employerRef,name),employment(endDate,startDate),payments(date,paidTaxablePay))&filter=employments%5B%5D/employer/employerRef eq '<employerRef>'"
+      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))&filter=employments%5B%5D/employer/employerRef eq '<employerRef>'"
     }
   }
 }
