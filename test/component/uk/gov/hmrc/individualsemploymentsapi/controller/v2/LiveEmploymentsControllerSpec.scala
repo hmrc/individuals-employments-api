@@ -35,14 +35,33 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     "read:individuals-employments-hmcts-c2",
     "read:individuals-employments-hmcts-c3",
     "read:individuals-employments-hmcts-c4",
+    "read:individuals-employments-ho-ecp-application",
+    "read:individuals-employments-ho-ecp-compliance",
+    "read:individuals-employments-ho-rp2-application",
+    "read:individuals-employments-ho-rp2-compliance",
     "read:individuals-employments-laa-c1",
     "read:individuals-employments-laa-c2",
     "read:individuals-employments-laa-c3",
     "read:individuals-employments-laa-c4",
     "read:individuals-employments-lsani-c1",
     "read:individuals-employments-lsani-c3",
-    "read:individuals-employments-nictsejo-c4"
-  )
+    "read:individuals-employments-nictsejo-c4")
+
+  val validData = IfEmployments(
+    Seq(
+      IfEmployment(
+        employer = Some(
+          IfEmployer(
+            name = Some("employer name"),
+            None,
+            None,
+            None
+          )
+        ),
+        None,
+        None,
+        None
+      )))
 
   feature("Root (hateoas) entry point is accessible") {
 
@@ -274,6 +293,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     }
 
     scenario("valid request to the live paye endpoint implementation") {
+
+
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -281,25 +302,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       And("IF will return employments for the NINO")
-      IfStub.searchEmploymentIncomeForPeriodReturns(
-        nino,
-        fromDate,
-        toDate,
-        IfEmployments(
-          Seq(
-            IfEmployment(
-              employer = Some(
-                IfEmployer(
-                  name = Some("employer name"),
-                  None,
-                  None,
-                  None
-                )
-              ),
-              None,
-              None,
-              None
-            ))))
+     IfStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, validData)
 
       When("the paye endpoint is invoked with a valid match id")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
@@ -395,12 +398,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IndividualsMatchingApiStub.hasMatchingRecord(matchId.toString, nino)
 
       And("IF will return invalid response")
-      IfStub.searchEmploymentIncomeForPeriodReturns(
-        nino,
-        fromDate,
-        toDate,
-        invalidEmployment
-      )
+      IfStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, invalidEmployment)
 
       When(
         s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
