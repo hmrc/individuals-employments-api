@@ -48,6 +48,7 @@ class ScopeFilterVerificationService @Inject()(scopesService: ScopesService, sco
       scopesHelper.getQueryStringWithParameterisedFilters(scopes, endpoint, extractedEmployerRef)
      }
      else {
-       throw new MissingQueryParameterException(s"${verifyResult.requiredFields.head} is required for the scopes you have been assigned")   }
+       throw new MissingQueryParameterException(s"${verifyResult.requiredFields.head} is required for the scopes you have been assigned")
      }
+   }
 }
