@@ -30,10 +30,8 @@ object IfStub extends MockHost(22004) {
     ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name," +
       "schemeRef),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))",
       None),
-    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name," +
-      "schemeRef),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))",
-      Some("employments%5B%5D/employerRef%20eq%20'%3CemployerRef%3E'")))
-
+    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))", Some("employments%5B%5D/employerRef%20eq%20'%3CemployerRef%3E'")),
+    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employerRef,employment(endDate,payFrequency,startDate),payments(date,paidTaxablePay))", Some("employments%5B%5D/employerRef%20eq%20'247ZT6767895A'")))
   def searchEmploymentIncomeForPeriodReturns(
     nino: String,
     fromDate: String,
@@ -46,13 +44,15 @@ object IfStub extends MockHost(22004) {
           .withQueryParam("endDate", equalTo(toDate))
           .withQueryParam("fields", equalTo(fieldFilter._1))
           .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
-      case Some(filter) => mock.register(
-        get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
-          .withQueryParam("startDate", equalTo(fromDate))
-          .withQueryParam("endDate", equalTo(toDate))
-          .withQueryParam("fields", equalTo(fieldFilter._1))
-          .withQueryParam("filter", equalTo(filter))
-          .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
+      case Some(filter) => {
+        mock.register(
+          get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
+            .withQueryParam("startDate", equalTo(fromDate))
+            .withQueryParam("endDate", equalTo(toDate))
+            .withQueryParam("fields", equalTo(fieldFilter._1))
+            .withQueryParam("filter", equalTo(filter))
+            .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
+      }
     })
 
 

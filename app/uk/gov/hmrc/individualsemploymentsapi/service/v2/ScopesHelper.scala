@@ -46,9 +46,10 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     * @return A google fields-style query string with the fields determined by the provided endpoint(s) and scopes
     */
   def getQueryStringWithParameterisedFilters(scopes: Iterable[String],
-                                             endpoints: String,
+                                             endpoint: String,
                                              employerRef: String): String = {
-    val queryString = getQueryStringFor(scopes, endpoints)
+    val queryString = getQueryStringFor(scopes, endpoint)
+    println("ACHI2: " + queryString)
     queryString.replace("<employerRef>", employerRef)
   }
 
@@ -59,6 +60,7 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     */
   def getQueryStringFor(scopes: Iterable[String], endpoint: String): String = {
     val filters = scopesService.getValidFilters(scopes, List(endpoint))
+    println("ACHI3 filters: " + filters)
     s"${PathTree(scopesService.getValidItemsFor(scopes, List(endpoint))).toString}${if (filters.nonEmpty)
       s"&filter=${filters.mkString("&filter=")}"
     else ""}"

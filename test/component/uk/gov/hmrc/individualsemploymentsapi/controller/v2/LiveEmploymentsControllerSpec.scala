@@ -297,7 +297,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario("valid request to the live paye endpoint implementation") {
 
-      val employerRef = "247%2FZT6767895A"
+      val employerRef = "247ZT6767895A"
 
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
