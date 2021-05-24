@@ -76,7 +76,6 @@ class ScopesService @Inject()(configuration: Configuration) {
                       endpoints: List[String]): Iterable[String] = {
     val endpointDataItems = endpoints.flatMap(e => getEndpointFieldKeys(e).toSet)
     val filtersForEndpoints = scopes.flatMap(getFilterKeysForScope).toSet
-    println("ACHI4: " + filtersForEndpoints)
     val authorizedDataItemsOnEndpoint = filtersForEndpoints.filter(endpointDataItems.contains)
     getFilters(authorizedDataItemsOnEndpoint)
   }
