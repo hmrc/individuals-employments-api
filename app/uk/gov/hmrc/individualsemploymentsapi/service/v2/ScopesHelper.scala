@@ -49,6 +49,7 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
                                              endpoints: String,
                                              employerRef: String): String = {
     val queryString = getQueryStringFor(scopes, endpoints)
+    println(queryString)
     queryString.replace("<employerRef>", employerRef)
   }
 

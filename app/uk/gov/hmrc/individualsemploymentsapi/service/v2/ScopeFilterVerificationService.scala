@@ -40,6 +40,7 @@ class ScopeFilterVerificationService @Inject()(scopesService: ScopesService, sco
 
    def getQueryStringForDefinedScopes(scopes: List[String], endpoint: String, rh: RequestHeader): String = {
      val verifyResult = verify(scopes, endpoint, rh)
+     println(verifyResult)
      if (verifyResult.hasAllParameters && verifyResult.requiredFields.isEmpty) {
         scopesHelper.getQueryStringFor(scopes, endpoint)
      }

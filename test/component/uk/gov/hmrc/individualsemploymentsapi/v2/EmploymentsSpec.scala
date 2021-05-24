@@ -51,7 +51,7 @@ class EmploymentsSpec extends BaseSpec {
                 "endDate":"2016-06-30",
                 "payFrequency":"FOUR_WEEKLY",
                 "employer":{
-                  "payeReference":"123/AI45678",
+                  "payeReference":"247/A1987CB",
                   "name":"Acme",
                   "address":{
                     "line1":"Acme Inc Building",

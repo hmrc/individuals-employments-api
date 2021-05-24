@@ -176,7 +176,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
             "endDate":"2017-03-01",
             "payFrequency":"FORTNIGHTLY",
             "employer":{
-              "payeReference":"123/DI45678",
+              "payeReference":"247/A1987CB",
               "name":"Disney",
               "address":{
                 "line1":"Friars House",

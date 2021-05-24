@@ -32,32 +32,31 @@ object Employer {
       (JsPath \ "payeReference").readNullable[EmpRef] and
         (JsPath \ "name").readNullable[String] and
         (JsPath \ "address").readNullable[Address]
-    )(Employer.apply _),
+      ) (Employer.apply _),
     (
       (JsPath \ "payeReference").writeNullable[EmpRef] and
         (JsPath \ "name").writeNullable[String] and
         (JsPath \ "address").writeNullable[Address]
-    )(unlift(Employer.unapply))
+      ) (unlift(Employer.unapply))
   )
 
   def create(payeReference: Option[EmpRef], name: Option[String], address: Option[Address]): Option[Employer] =
     (payeReference, name, address) match {
       case (None, None, None) => None
-      case _                  => Some(new Employer(payeReference, name, address))
+      case _ => Some(new Employer(payeReference, name, address))
     }
 
   def create(ifEmployment: IfEmployment): Option[Employer] = {
-    val empRef: Option[EmpRef] = for {
-      districtNumber <- ifEmployment.employer.flatMap(_.districtNumber)
-      schemeRef      <- ifEmployment.employer.flatMap(_.schemeRef)
-    } yield EmpRef(districtNumber, schemeRef)
-
     val name = ifEmployment.employer.flatMap(e => e.name)
     val address = ifEmployment.employer.flatMap(e => e.address)
+    val empRef = ifEmployment.employerRef.map(x => {
+      val splits = x.split('/')
+      EmpRef(splits(0), splits(1))
+    })
 
     (empRef, name, address) match {
       case (None, None, None) => None
-      case _                  => Employer.create(empRef, name, address)
+      case _ => Employer.create(empRef, name, address)
     }
   }
 
