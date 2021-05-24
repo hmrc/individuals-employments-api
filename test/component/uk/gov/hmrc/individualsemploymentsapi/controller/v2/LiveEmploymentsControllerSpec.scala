@@ -306,7 +306,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       And("IF will return employments for the NINO")
-     IfStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, validData)
+      IfStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, validData)
 
       When("the paye endpoint is invoked with a valid match id")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
