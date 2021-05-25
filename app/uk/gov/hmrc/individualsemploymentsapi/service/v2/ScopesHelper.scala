@@ -35,7 +35,6 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
                                              endpoints: List[String],
                                              employerRef: String): String = {
     val queryString = getQueryStringFor(scopes, endpoints)
-
     queryString.replace("<employerRef>", employerRef)
   }
 
@@ -47,10 +46,9 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     */
   def getQueryStringWithParameterisedFilters(scopes: Iterable[String],
                                              endpoint: String,
-                                             employerRef: String): String = {
-    val queryString = getQueryStringFor(scopes, endpoint)
-    queryString.replace("<employerRef>", employerRef)
-  }
+                                             employerRef: String): String =
+    getQueryStringFor(scopes, endpoint).replace("<employerRef>", employerRef)
+
 
   /**
     * @param scopes The list of scopes associated with the user

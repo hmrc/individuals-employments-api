@@ -30,6 +30,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
   private val nino = "AB123456C"
   val fromDate = "2017-01-01"
   val toDate = "2017-09-25"
+  private val employerRef = "247ZT6767895A"
 
   private val allScopes = List(
     "read:individuals-employments-hmcts-c2",
@@ -203,9 +204,6 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     }
 
     scenario("invalid match id") {
-
-      val employerRef = "247%2FZT6767895A"
-
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -296,9 +294,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     }
 
     scenario("valid request to the live paye endpoint implementation") {
-
-      val employerRef = "247ZT6767895A"
-
+      
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -329,7 +325,6 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     scenario("the IF rate limit is exceeded") {
       val matchId = UUID.randomUUID().toString
       val nino = "AA112233B"
-      val employerRef = "247%2FZT6767895A"
 
       Given("a valid privileged Auth Bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
@@ -412,8 +407,6 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario(s"valid request but invalid IF response") {
 
-      val employerRef = "247%2FZT6767895A"
-
       Given("A valid auth token ")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)
 
@@ -439,8 +432,6 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
     scenario(s"IF returns an Internal Server Error") {
 
-      val employerRef = "247%2FZT6767895A"
-
       Given("A valid auth token ")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)
 
@@ -464,8 +455,6 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     }
 
     scenario(s"IF returns an Bad Request Error") {
-
-      val employerRef = "247%2FZT6767895A"
 
       Given("A valid auth token ")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)
