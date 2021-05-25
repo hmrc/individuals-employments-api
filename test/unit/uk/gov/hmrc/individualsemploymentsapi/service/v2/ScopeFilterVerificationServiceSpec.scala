@@ -70,7 +70,6 @@ class ScopeFilterVerificationServiceSpec extends UnitSpec with ScopesConfig {
 
     val result = scopeFilterVerificationService.getQueryStringForDefinedScopes(List(mockScope8), mockEndpoint4, requestHeader)
 
-    println(requestHeader.queryString.get("employerRef"))
     result shouldBe s"employer(employerAddress(line1,line2,line3),employerDistrictNumber,employerName,employerSchemeReference),payments&filter=employerRef eq '$urlDecodedEmployerRef'"
   }
 }

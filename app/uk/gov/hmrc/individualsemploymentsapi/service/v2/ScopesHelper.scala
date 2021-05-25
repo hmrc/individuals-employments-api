@@ -46,9 +46,9 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     * @return A google fields-style query string with the fields determined by the provided endpoint(s) and scopes
     */
   def getQueryStringWithParameterisedFilters(scopes: Iterable[String],
-                                             endpoints: String,
+                                             endpoint: String,
                                              employerRef: String): String = {
-    val queryString = getQueryStringFor(scopes, endpoints)
+    val queryString = getQueryStringFor(scopes, endpoint)
     queryString.replace("<employerRef>", employerRef)
   }
 
