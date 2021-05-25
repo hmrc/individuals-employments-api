@@ -25,10 +25,9 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmplo
 object IfStub extends MockHost(22004) {
 
   val fieldsAndFilters = List[(String, Option[String])](
+    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employerRef,employment(endDate,payFrequency,startDate),payments(date,paidTaxablePay))", Some("employments[]/employerRef eq '247ZT6767895A'")),
     ("employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employment(startDate))", None),
     ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))", None),
-    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))", Some("employments%5B%5D/employerRef%20eq%20'%3CemployerRef%3E'")),
-    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employerRef,employment(endDate,payFrequency,startDate),payments(date,paidTaxablePay))", Some("employments%5B%5D/employerRef%20eq%20'247ZT6767895A'"))
   )
 
   def searchEmploymentIncomeForPeriodReturns(
@@ -37,7 +36,6 @@ object IfStub extends MockHost(22004) {
     toDate: String,
     ifEmployments: IfEmployments) = {
     fieldsAndFilters.foreach((fieldFilter) => {
-      println("ff: " + fieldFilter._2)
       fieldFilter._2 match {
         case None => mock.register(
           get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
@@ -56,7 +54,6 @@ object IfStub extends MockHost(22004) {
         }
       }
     })
-    println("stubs: " + mock.allStubMappings().getMappings)
   }
 
 
