@@ -80,6 +80,14 @@ class ScopesService @Inject()(configuration: Configuration) {
     getFilters(authorizedDataItemsOnEndpoint)
   }
 
+  def getFilterToken(scopes: List[String], endpoint: String): Map[String, String] = {
+    val regex = "<([a-zA-Z]*)>".r("token")
+    def getTokenFromText(filterText:String):Option[String]  = regex.findFirstMatchIn(filterText).map(m => m.group("token"))
+    def getFilterText(filterKey:String):Option[String] = apiConfig.getEndpoint(endpoint).flatMap(c => c.filters.get(filterKey))
+    val filterKeys = getValidFilterKeys(scopes, List(endpoint))
+    filterKeys.flatMap(key => getFilterText(key).flatMap(getTokenFromText).map(token => (key, token)).toList).toMap
+  }
+
   def getValidItemsFor(scopes: Iterable[String], endpoints: List[String]): Set[String] = {
     val uniqueDataFields = scopes.flatMap(getScopeItemsKeys).toList.distinct
     val endpointDataItems = endpoints.flatMap(e => getEndpointFieldKeys(e).toSet)
