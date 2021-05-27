@@ -79,6 +79,7 @@ class LiveEmploymentsService @Inject()(
   individualsMatchingApiConnector: IndividualsMatchingApiConnector,
   ifConnector: IfConnector,
   scopesHelper: ScopesHelper,
+  scopeFilterVerificationService: ScopeFilterVerificationService,
   @Named("retryDelay") retryDelay: Int,
   cacheService: CacheService)(implicit val ec: ExecutionContext)
     extends EmploymentsService {
@@ -94,7 +95,7 @@ class LiveEmploymentsService @Inject()(
                    (implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]] =
     resolve(matchId).flatMap {
       ninoMatch =>
-        val fieldsQuery = scopesHelper.getQueryStringFor(scopes, endpoint)
+        val fieldsQuery = scopeFilterVerificationService.getQueryStringForDefinedScopes(scopes.toList, endpoint, request)
         cacheService
           .get(
             cacheId = CacheId(matchId, interval, fieldsQuery),

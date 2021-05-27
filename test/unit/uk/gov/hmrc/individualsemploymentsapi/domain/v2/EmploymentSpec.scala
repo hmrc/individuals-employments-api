@@ -55,7 +55,7 @@ class EmploymentSpec extends FlatSpec with Matchers {
           address = None
         )),
       payments = Some(Seq(ifPayment)),
-      employerRef = None
+      employerRef = Some("247/A1987CB")
     )
 
     val employment = Employment.create(
@@ -63,7 +63,7 @@ class EmploymentSpec extends FlatSpec with Matchers {
       Some(new LocalDate(2016, 12, 31)),
       Some(PayFrequency.withName("CALENDAR_MONTHLY")),
       Employer.create(
-        Some(EmpRef("123", "AB12345")),
+        Some(EmpRef("247", "A1987CB")),
         Some("Acme Inc"),
         Some(
           Address(

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
 import java.util.UUID
-
 import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.Interval
 import play.api.hal.Hal._
@@ -29,7 +28,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopeFilterVerificationService, ScopesHelper, ScopesService}
 import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.validateCorrelationId
 import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.maybeCorrelationId
 
@@ -38,6 +37,7 @@ import scala.concurrent.ExecutionContext
 abstract class EmploymentsController(employmentsService: EmploymentsService,
                                      scopeService: ScopesService,
                                      scopesHelper: ScopesHelper,
+                                     scopeFilterVerificationService: ScopeFilterVerificationService,
                                      implicit val auditHelper: AuditHelper,
                                      cc: ControllerComponents)
                                     (implicit val ec: ExecutionContext)
@@ -66,6 +66,8 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getEndPointScopes("paye"), matchId.toString) { authScopes =>
 
+      val requestHasParameters = scopeFilterVerificationService.verify(authScopes.toList, "paye", request)
+
       val correlationId = validateCorrelationId(request)
 
       employmentsService.paye(matchId, interval, "paye", authScopes).map { employments =>
@@ -86,28 +88,34 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
 
 @Singleton
 class SandboxEmploymentsController @Inject()(
-  sandboxEmploymentsService: SandboxEmploymentsService,
-  scopeService: ScopesService,
-  scopesHelper: ScopesHelper,
-  val authConnector: AuthConnector,
-  @Named("hmctsClientId") val hmctsClientId: String,
-  auditHelper: AuditHelper,
-  cc: ControllerComponents)(override implicit val ec: ExecutionContext)
-    extends EmploymentsController(sandboxEmploymentsService, scopeService, scopesHelper, auditHelper, cc) {
-
+                                              sandboxEmploymentsService: SandboxEmploymentsService,
+                                              scopeService: ScopesService,
+                                              scopesHelper: ScopesHelper,
+                                              scopeFilterVerificationService: ScopeFilterVerificationService,
+                                              val authConnector: AuthConnector,
+                                              @Named("hmctsClientId") val hmctsClientId: String,
+                                              auditHelper: AuditHelper,
+                                              cc: ControllerComponents)(override implicit val ec: ExecutionContext)
+  extends EmploymentsController(sandboxEmploymentsService,
+    scopeService,
+    scopesHelper,
+    scopeFilterVerificationService,
+    auditHelper,
+    cc) {
   override val environment: String = SANDBOX
 }
 
 @Singleton
 class LiveEmploymentsController @Inject()(
-  liveEmploymentsService: LiveEmploymentsService,
-  scopeService: ScopesService,
-  scopesHelper: ScopesHelper,
-  val authConnector: AuthConnector,
-  @Named("hmctsClientId") val hmctsClientId: String,
-  auditHelper: AuditHelper,
-  cc: ControllerComponents)(override implicit val ec: ExecutionContext)
-    extends EmploymentsController(liveEmploymentsService, scopeService, scopesHelper, auditHelper, cc) {
+                                           liveEmploymentsService: LiveEmploymentsService,
+                                           scopeService: ScopesService,
+                                           scopesHelper: ScopesHelper,
+                                           scopeFilterVerificationService: ScopeFilterVerificationService,
+                                           val authConnector: AuthConnector,
+                                           @Named("hmctsClientId") val hmctsClientId: String,
+                                           auditHelper: AuditHelper,
+                                           cc: ControllerComponents)(override implicit val ec: ExecutionContext)
+  extends EmploymentsController(liveEmploymentsService, scopeService, scopesHelper, scopeFilterVerificationService, auditHelper, cc) {
 
   override val environment: String = PRODUCTION
 }

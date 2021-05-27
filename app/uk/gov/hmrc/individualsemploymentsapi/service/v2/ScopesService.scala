@@ -65,12 +65,27 @@ class ScopesService @Inject()(configuration: Configuration) {
     getFieldNames(authorizedDataItemsOnEndpoint)
   }
 
+  def getValidFilterKeys(scopes: Iterable[String],
+                         endpoints: List[String]): Iterable[String] = {
+    val endpointDataItems = endpoints.flatMap(e => getEndpointFieldKeys(e).toSet)
+    val filtersForEndpoints = scopes.flatMap(getFilterKeysForScope)
+    filtersForEndpoints.filter(endpointDataItems.contains)
+  }
+
   def getValidFilters(scopes: Iterable[String],
                       endpoints: List[String]): Iterable[String] = {
     val endpointDataItems = endpoints.flatMap(e => getEndpointFieldKeys(e).toSet)
-    val filtersForEndpoints = scopes.flatMap(getFilterKeysForScope)
+    val filtersForEndpoints = scopes.flatMap(getFilterKeysForScope).toSet
     val authorizedDataItemsOnEndpoint = filtersForEndpoints.filter(endpointDataItems.contains)
     getFilters(authorizedDataItemsOnEndpoint)
+  }
+
+  def getFilterToken(scopes: List[String], endpoint: String): Map[String, String] = {
+    val regex = "<([a-zA-Z]*)>".r("token")
+    def getTokenFromText(filterText:String):Option[String]  = regex.findFirstMatchIn(filterText).map(m => m.group("token"))
+    def getFilterText(filterKey:String):Option[String] = apiConfig.getEndpoint(endpoint).flatMap(c => c.filters.get(filterKey))
+    val filterKeys = getValidFilterKeys(scopes, List(endpoint))
+    filterKeys.flatMap(key => getFilterText(key).flatMap(getTokenFromText).map(token => (key, token)).toList).toMap
   }
 
   def getValidItemsFor(scopes: Iterable[String], endpoints: List[String]): Set[String] = {
