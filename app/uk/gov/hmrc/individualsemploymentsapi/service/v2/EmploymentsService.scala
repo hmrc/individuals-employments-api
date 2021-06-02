@@ -41,6 +41,9 @@ trait EmploymentsService {
 
   def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])
           (implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]]
+
+  def endpoints =
+    List("paye")
 }
 
 @Singleton
@@ -79,6 +82,7 @@ class LiveEmploymentsService @Inject()(
   individualsMatchingApiConnector: IndividualsMatchingApiConnector,
   ifConnector: IfConnector,
   scopesHelper: ScopesHelper,
+  scopesService: ScopesService,
   scopeFilterVerificationService: ScopeFilterVerificationService,
   @Named("retryDelay") retryDelay: Int,
   cacheService: CacheService)(implicit val ec: ExecutionContext)
@@ -98,7 +102,8 @@ class LiveEmploymentsService @Inject()(
         val fieldsQuery = scopeFilterVerificationService.getQueryStringForDefinedScopes(scopes.toList, endpoint, request)
         cacheService
           .get(
-            cacheId = CacheId(matchId, interval, fieldsQuery),
+//            cacheId = CacheId(matchId, interval, fieldsQuery),
+            cacheId = CacheId(matchId, interval, scopesService.getValidFieldsForCacheKey(scopes.toList, endpoints)),
             functionToCache = withRetry {
               ifConnector.fetchEmployments(
                 ninoMatch.nino,

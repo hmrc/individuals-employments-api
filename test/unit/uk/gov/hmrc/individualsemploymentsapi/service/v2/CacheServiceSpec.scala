@@ -97,6 +97,7 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
       CacheId(matchId, interval, fields).id shouldBe
         s"$matchId-${interval.getStart}-${interval.getEnd}-ABDFH"
+      println(s"$matchId-${interval.getStart}-${interval.getEnd}-ABDFH")
 
     }
 
