@@ -26,8 +26,8 @@ object IfStub extends MockHost(22004) {
 
   val fieldsAndFilters = List[(String, Option[String])](
     ("employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employment(startDate))", None),
-    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))", None),
-    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employerRef,employment(endDate,payFrequency,startDate),payments(date,paidTaxablePay))", Some("employments[]/employerRef eq '247ZT6767895A'"))
+    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))", None),
+    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,payFrequency,startDate),payments(date,paidTaxablePay))", Some("employments[]/employerRef eq '247ZT6767895A'"))
   )
 
   def searchEmploymentIncomeForPeriodReturns(
@@ -73,4 +73,6 @@ object IfStub extends MockHost(22004) {
         .withQueryParam("endDate", equalTo(toDate))
         .willReturn(aResponse().withStatus(TOO_MANY_REQUESTS)))
 
+  def purge(): Unit =
+    server.resetMappings()
 }
