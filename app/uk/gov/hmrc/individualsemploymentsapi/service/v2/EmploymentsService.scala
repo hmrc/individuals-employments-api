@@ -104,7 +104,6 @@ class LiveEmploymentsService @Inject()(
         val maybeEmployerRef  = scopeFilterVerificationService.getEmployerRef(request)
         cacheService
           .get(
-//            cacheId = CacheId(matchId, interval, fieldsQuery),
             cacheId = CacheId(matchId, interval, fieldKeys, maybeEmployerRef),
             functionToCache = withRetry {
               ifConnector.fetchEmployments(
