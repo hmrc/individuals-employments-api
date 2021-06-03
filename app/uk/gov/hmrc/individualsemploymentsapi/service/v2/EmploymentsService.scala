@@ -99,11 +99,13 @@ class LiveEmploymentsService @Inject()(
                    (implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]] =
     resolve(matchId).flatMap {
       ninoMatch =>
-        val fieldsQuery = scopeFilterVerificationService.getQueryStringForDefinedScopes(scopes.toList, endpoint, request)
+        val fieldsQuery       = scopeFilterVerificationService.getQueryStringForDefinedScopes(scopes.toList, endpoint, request)
+        val fieldKeys         = scopesService.getValidFieldsForCacheKey(scopes.toList, endpoints)
+        val maybeEmployerRef  = scopeFilterVerificationService.getEmployerRef(request)
         cacheService
           .get(
 //            cacheId = CacheId(matchId, interval, fieldsQuery),
-            cacheId = CacheId(matchId, interval, scopesService.getValidFieldsForCacheKey(scopes.toList, endpoints)),
+            cacheId = CacheId(matchId, interval, fieldKeys, maybeEmployerRef),
             functionToCache = withRetry {
               ifConnector.fetchEmployments(
                 ninoMatch.nino,
