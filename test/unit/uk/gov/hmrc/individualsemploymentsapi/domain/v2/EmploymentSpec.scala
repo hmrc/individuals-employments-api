@@ -42,9 +42,7 @@ class EmploymentSpec extends FlatSpec with Matchers {
             IfAddress(
               line1 = Some("line 1"),
               postcode = Some("AB1 2CD")
-            )),
-          districtNumber = Some("123"),
-          schemeRef = Some("AB12345")
+            ))
         )),
       employment = Some(
         IfEmploymentDetail(

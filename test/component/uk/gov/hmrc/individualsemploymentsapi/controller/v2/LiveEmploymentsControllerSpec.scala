@@ -16,13 +16,13 @@
 
 package component.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
-import java.util.UUID
-
 import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec, IfStub, IndividualsMatchingApiStub}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import scalaj.http.Http
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfEmployer, IfEmployment, IfEmployments}
+
+import java.util.UUID
 
 class LiveEmploymentsControllerSpec extends BaseSpec {
 
@@ -55,8 +55,6 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
           IfEmployer(
             name = Some("employer name"),
             None,
-            None,
-            None
           )
         ),
         None,
@@ -394,9 +392,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         IfEmployment(
           employer = Some(
             IfEmployer(
-              name = Some("employer name"),
-              None,
-              districtNumber = Some("12345"),
+              name = Some(scala.util.Random.nextString(101)),
               None
             )
           ),
@@ -411,7 +407,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)
 
       And("a valid record in the matching API")
-      IndividualsMatchingApiStub.hasMatchingRecord(matchId.toString, nino)
+      IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       And("IF will return invalid response")
       IfStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, invalidEmployment)
@@ -436,7 +432,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)
 
       And("a valid record in the matching API")
-      IndividualsMatchingApiStub.hasMatchingRecord(matchId.toString, nino)
+      IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       And("IF will return Internal Server Error")
       IfStub.saCustomResponse(nino, INTERNAL_SERVER_ERROR, fromDate, toDate, Json.obj("reason" -> "Server error"))
@@ -454,13 +450,13 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         "message" -> "Something went wrong.")
     }
 
-    scenario(s"IF returns an Bad Request Error") {
+    scenario(s"IF returns a Bad Request Error") {
 
       Given("A valid auth token ")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)
 
       And("a valid record in the matching API")
-      IndividualsMatchingApiStub.hasMatchingRecord(matchId.toString, nino)
+      IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       And("IF will return Internal Server Error")
       IfStub.saCustomResponse(nino, UNPROCESSABLE_ENTITY, fromDate,  toDate, Json.obj("reason" ->

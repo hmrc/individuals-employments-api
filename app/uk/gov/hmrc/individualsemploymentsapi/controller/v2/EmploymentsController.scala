@@ -66,7 +66,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getEndPointScopes("paye"), matchId.toString) { authScopes =>
 
-      val requestHasParameters = scopeFilterVerificationService.verify(authScopes.toList, "paye", request)
+      scopeFilterVerificationService.verify(authScopes.toList, "paye", request)
 
       val correlationId = validateCorrelationId(request)
 
