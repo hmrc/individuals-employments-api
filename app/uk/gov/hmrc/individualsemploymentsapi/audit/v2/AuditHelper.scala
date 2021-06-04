@@ -16,14 +16,13 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.audit.v2
 
-import play.api.mvc.{AnyContent, Request, RequestHeader}
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureResponseEventModel, ApiResponseEventModel, IntegrationFrameworkApiResponseEventModel, ScopesAuditEventModel}
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import javax.inject.Inject
-import play.api.Logger
 
 import scala.concurrent.ExecutionContext
 
