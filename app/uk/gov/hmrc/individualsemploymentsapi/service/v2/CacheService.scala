@@ -65,13 +65,11 @@ trait CacheIdBase {
 
 case class CacheId(matchId: UUID, interval: Interval, fields: String, empRef: Option[String] = None) extends CacheIdBase {
 
-  lazy val id: String = empRef match {
-    case Some(value) => {
-      val encoded = encodeVal(value)
-      s"$matchId-${interval.getStart}-${interval.getEnd}-$fields-$encoded"
-    }
-    case None =>
-      s"$matchId-${interval.getStart}-${interval.getEnd}-$fields"
+  val empRefKey: String = empRef match {
+    case Some(value) => s"-${encodeVal(value)}"
+    case None => ""
   }
+
+  lazy val id: String = s"$matchId-${interval.getStart}-${interval.getEnd}-$fields$empRefKey"
 
 }
