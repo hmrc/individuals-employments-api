@@ -44,7 +44,9 @@ object SandboxData {
             line4 = Some("AcmeVille"),
             line5 = Some("Acme State"),
             postcode = Some("AI22 9LL")
-          ))
+          )),
+          districtNumber = Some("123"),
+          schemeRef = Some("AI45678")
         )),
       employment = Some(
         IfEmploymentDetail(
@@ -80,7 +82,9 @@ object SandboxData {
               line4 = Some("Sometown"),
               line5 = Some("Old County"),
               postcode = Some("TF22 3BC")
-            ))
+            )),
+          districtNumber = Some("123"),
+          schemeRef = Some("DI45678")
         )
       ),
       employment = Some(

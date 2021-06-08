@@ -32,7 +32,9 @@ class IfEmploymentSpec extends UnitSpec {
 
   val employer = IfEmployer(
     name = Some("Name"),
-    address = Some(address)
+    address = Some(address),
+    districtNumber = Some("ABC"),
+    schemeRef = Some("ABC")
   )
 
   val employmentDetail = IfEmploymentDetail(
