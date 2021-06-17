@@ -67,19 +67,19 @@ class ScopesServiceSpec extends UnitSpec with ScopesConfig with BeforeAndAfterEa
 
     "get valid data items keys for single scope" in {
       val result =
-        scopesService.getValidFieldsForCacheKey(List(mockScope1))
+        scopesService.getValidFieldsForCacheKey(List(mockScope1), List(mockEndpoint1))
       result shouldBe "ABF"
     }
 
     "get valid data items keys for multiple scopes" in {
       val result =
-        scopesService.getValidFieldsForCacheKey(List(mockScope1, mockScope2))
+        scopesService.getValidFieldsForCacheKey(List(mockScope1, mockScope2), List(mockEndpoint1, mockEndpoint2))
       result shouldBe "ABFCDEG"
     }
 
     "get valid data items keys for multiple scopes including no match" in {
       val result =
-        scopesService.getValidFieldsForCacheKey(List(mockScope1, mockScope2, "not-exists"))
+        scopesService.getValidFieldsForCacheKey(List(mockScope1, mockScope2, "not-exists"), List(mockEndpoint1, mockEndpoint2))
       result shouldBe "ABFCDEG"
     }
 

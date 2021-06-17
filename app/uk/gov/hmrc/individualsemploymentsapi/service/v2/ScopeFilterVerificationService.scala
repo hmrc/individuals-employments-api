@@ -35,14 +35,18 @@ class ScopeFilterVerificationService @Inject()(scopesService: ScopesService, sco
     VerifyResult(hasAllParameters, requiredParameters)
   }
 
+  def getEmployerRef(rh: RequestHeader): Option[String] = {
+    rh.queryString.get("employerRef").map(x => x.head)
+  }
+
    def getQueryStringForDefinedScopes(scopes: List[String], endpoint: String, rh: RequestHeader): String = {
      val verifyResult = verify(scopes, endpoint, rh)
      if (verifyResult.hasAllParameters && verifyResult.requiredFields.isEmpty) {
         scopesHelper.getQueryStringFor(scopes, endpoint)
      }
      else if (verifyResult.hasAllParameters && verifyResult.requiredFields.contains("employerRef")) {
-       val extractedEmployerRef = rh.queryString.get("employerRef").map(x => x.head).get
-      scopesHelper.getQueryStringWithParameterisedFilters(scopes, endpoint, extractedEmployerRef)
+       val extractedEmployerRef = getEmployerRef(rh).getOrElse("NOT_FOUND")
+       scopesHelper.getQueryStringWithParameterisedFilters(scopes, endpoint, extractedEmployerRef)
      }
      else {
        throw new MissingQueryParameterException(s"${verifyResult.requiredFields.head} is required for the scopes you have been assigned")

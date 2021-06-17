@@ -16,9 +16,11 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import java.util.UUID
+import com.google.common.base.Charsets
+import com.google.common.io.BaseEncoding
 
-import javax.inject.{Inject}
+import java.util.UUID
+import javax.inject.Inject
 import org.joda.time.Interval
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.HeaderCarrier
@@ -56,11 +58,18 @@ trait CacheIdBase {
   val id: String
 
   override def toString: String = id
+
+  def encodeVal(toEncode: String): String =
+    BaseEncoding.base64().encode(toEncode.getBytes(Charsets.UTF_8))
 }
 
-case class CacheId(matchId: UUID, interval: Interval, fields: String) extends CacheIdBase {
+case class CacheId(matchId: UUID, interval: Interval, fields: String, empRef: Option[String] = None) extends CacheIdBase {
 
-  lazy val id: String =
-    s"$matchId-${interval.getStart}-${interval.getEnd}-$fields"
+  val empRefKey: String = empRef match {
+    case Some(value) => s"-${encodeVal(value)}"
+    case None => ""
+  }
+
+  lazy val id: String = s"$matchId-${interval.getStart}-${interval.getEnd}-$fields$empRefKey"
 
 }
