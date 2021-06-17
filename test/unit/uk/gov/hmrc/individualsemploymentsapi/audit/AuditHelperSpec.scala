@@ -39,8 +39,8 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper 
   val correlationId = "test"
   val scopes = "test"
   val matchId = "80a6bb14-d888-436e-a541-4000674c60aa"
-  val clientId = "80a6bb14-d888-436e-a541-4000674c60bb"
-  val request = FakeRequest().withHeaders("X-Client-Id" -> clientId)
+  val applicationId = "80a6bb14-d888-436e-a541-4000674c60bb"
+  val request = FakeRequest().withHeaders("X-Application-Id" -> applicationId)
   val ifApiResponse = IfEmployments(List(createValidEmployment))
   val apiResponse = Seq(Employment.create(ifApiResponse.employments.head).get)
   val ifUrl =
@@ -68,7 +68,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper 
       capturedEvent.asInstanceOf[ScopesAuditEventModel].apiVersion shouldEqual "2.0"
       capturedEvent.asInstanceOf[ScopesAuditEventModel].matchId shouldEqual matchId
       capturedEvent.asInstanceOf[ScopesAuditEventModel].scopes shouldBe scopes
-      capturedEvent.asInstanceOf[ScopesAuditEventModel].clientId shouldBe clientId
+      capturedEvent.asInstanceOf[ScopesAuditEventModel].applicationId shouldBe applicationId
 
     }
 
@@ -89,7 +89,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper 
       capturedEvent.asInstanceOf[ApiResponseEventModel].scopes shouldBe scopes
       capturedEvent.asInstanceOf[ApiResponseEventModel].returnLinks shouldBe endpoint
       capturedEvent.asInstanceOf[ApiResponseEventModel].employments shouldBe Some(apiResponse)
-      capturedEvent.asInstanceOf[ApiResponseEventModel].clientId shouldBe clientId
+      capturedEvent.asInstanceOf[ApiResponseEventModel].applicationId shouldBe applicationId
 
     }
 
@@ -111,7 +111,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper 
       capturedEvent.asInstanceOf[ApiFailureResponseEventModel].correlationId shouldEqual Some(correlationId)
       capturedEvent.asInstanceOf[ApiFailureResponseEventModel].requestUrl shouldEqual endpoint
       capturedEvent.asInstanceOf[ApiFailureResponseEventModel].response shouldEqual msg
-      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].clientId shouldBe clientId
+      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].applicationId shouldBe applicationId
     }
 
     "auditIfApiResponse" in {
@@ -130,7 +130,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper 
       capturedEvent.asInstanceOf[IntegrationFrameworkApiResponseEventModel].correlationId shouldEqual correlationId
       capturedEvent.asInstanceOf[IntegrationFrameworkApiResponseEventModel].requestUrl shouldBe ifUrl
       capturedEvent.asInstanceOf[IntegrationFrameworkApiResponseEventModel].integrationFrameworkEmployments shouldBe ifApiResponse
-      capturedEvent.asInstanceOf[IntegrationFrameworkApiResponseEventModel].clientId shouldBe clientId
+      capturedEvent.asInstanceOf[IntegrationFrameworkApiResponseEventModel].applicationId shouldBe applicationId
 
     }
 
@@ -151,7 +151,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper 
       capturedEvent.asInstanceOf[ApiFailureResponseEventModel].correlationId shouldEqual Some(correlationId)
       capturedEvent.asInstanceOf[ApiFailureResponseEventModel].requestUrl shouldEqual ifUrl
       capturedEvent.asInstanceOf[ApiFailureResponseEventModel].response shouldEqual msg
-      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].clientId shouldBe clientId
+      capturedEvent.asInstanceOf[ApiFailureResponseEventModel].applicationId shouldBe applicationId
 
     }
 
