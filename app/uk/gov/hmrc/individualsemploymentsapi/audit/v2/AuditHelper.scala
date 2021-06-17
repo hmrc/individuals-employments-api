@@ -22,8 +22,8 @@ import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureResponse
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-
 import javax.inject.Inject
+
 import scala.concurrent.ExecutionContext
 
 class AuditHelper @Inject()(auditConnector: AuditConnector)
@@ -46,6 +46,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         apiVersion = "2.0",
         matchId = matchId,
         correlationId = Some(correlationId),
+        request.headers.get("X-Client-ID").getOrElse("-"),
         scopes,
         returnLinks = selfLink,
         employments = employments
@@ -68,6 +69,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         apiVersion = "2.0",
         matchId = matchId,
         correlationId = correlationId,
+        request.headers.get("X-Client-ID").getOrElse("-"),
         requestUrl,
         msg
       )
@@ -89,6 +91,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         apiVersion = "2.0",
         matchId = matchId,
         correlationId = correlationId,
+        request.headers.get("X-Client-ID").getOrElse("-"),
         requestUrl = requestUrl,
         integrationFrameworkEmployments = ifEmployments
       )
@@ -110,6 +113,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         apiVersion = "2.0",
         matchId = matchId,
         correlationId = Some(correlationId),
+        request.headers.get("X-Client-ID").getOrElse("-"),
         requestUrl,
         msg
       )
@@ -128,6 +132,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         userAgent = request.headers.get("User-Agent").getOrElse("-"),
         apiVersion = "2.0",
         matchId = matchId,
+        request.headers.get("X-Client-ID").getOrElse("-"),
         scopes
       )
     )
