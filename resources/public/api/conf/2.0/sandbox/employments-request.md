@@ -31,7 +31,7 @@
     </tr>
     <tr>
         <td><p>fromDate earlier than the current tax year minus 6</p></td>
-        <td><p>The fromDate is earlier than the current tax year minus 6. For example:</p> <p>fromDate=2014-01-01</p></td>
+        <td><p>The fromDate is earlier than the current tax year minus 6.</p><p> For example:</p> <p>fromDate=2014-01-01</p></td>
         <td><p>400 (Bad Request)</p>
         <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;fromDate is earlier than maximum allowed&quot; }</p>
         </td>
@@ -45,7 +45,7 @@
     </tr>
     <tr>
          <td><p>Invalid date format</p></td>
-         <td><p>Any date that is not ISO 8601 Extended format. Check the query parameters section for the correct format.</p>
+         <td><p>Any date that is not ISO 8601 extended format. Check the query parameters section for the correct format.</p>
          </td>
          <td><p>400 (Bad Request)</p>
          <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;fromDate: invalid date format&quot; }</p>
