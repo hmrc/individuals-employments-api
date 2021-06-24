@@ -74,16 +74,16 @@
         </td>
     </tr>
     <tr>
-        <td><p>Missing employerPayeRef</p></td>
-        <td><p>The request is missing an employerPayeRef. This is required for the scopes you have been assigned.</p></td>
+        <td><p>Missing payeReference</p></td>
+        <td><p>The request is missing a payeReference. This is required for the scopes you have been assigned.</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;employerPayeRef is required for the scopes you have been assigned&quot; }</p></td>
         </td>
     </tr>    
     <tr>
-        <td><p>Malformed employerPayeRef</p></td>
-        <td><p>employerPayeRef is in the incorrect format. Check the query parameters section for the correct format.</p></td>
+        <td><p>Malformed payeReference</p></td>
+        <td><p>payeReference is in the incorrect format. Check the query parameters section for the correct format.</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;Malformed employerPayeRef&quot; }</p></td>

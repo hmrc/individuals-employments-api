@@ -139,7 +139,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       val employerRef = "247%2FZT6767895A"
 
       val response =
-        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366&fromDate=2017-01-01&employerRef=$employerRef")
+        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366&fromDate=2017-01-01&payeReference=$employerRef")
 
       Then("the response status should be 404 (not found)")
       assertResponseIs(
@@ -159,7 +159,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
 
       When("I request the root entry point to the API")
       val response =
-        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01&employerRef=$employerRef")
+        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01&payeReference=$employerRef")
 
       Then("The response status should be 200 (ok)")
       assertResponseIs(
