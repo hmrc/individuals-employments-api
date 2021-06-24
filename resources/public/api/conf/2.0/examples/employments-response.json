@@ -6,8 +6,8 @@
   },
   "employments": [
     {
-      "fromDate": "2019-01-01",
-      "toDate": "2019-03-31",
+      "startDate": "2019-01-01",
+      "endDate": "2019-03-31",
       "payFrequency": "WEEKLY",
       "employer": {
         "name": "ACME Industries Limited",
@@ -19,7 +19,7 @@
           "line5": "UK",
           "postcode": "DH4 4YY"
         },
-        "payeReference": "123/AI45678"
+        "payeReference": "247/AI45678"
       }
     }
   ]

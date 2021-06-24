@@ -45,13 +45,13 @@
               "IRREGULAR"
             ]
           },
-          "fromDate": {
+          "startDate": {
             "type": "string",
             "id": "full-date",
             "description": "The date the employment started.",
             "example": "2019-01-01"
           },
-          "toDate": {
+          "endDate": {
             "type": "string",
             "id": "full-date",
             "description": "The date the employment ended.",

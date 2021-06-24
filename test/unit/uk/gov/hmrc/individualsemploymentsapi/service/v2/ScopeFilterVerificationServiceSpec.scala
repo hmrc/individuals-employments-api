@@ -66,7 +66,7 @@ class ScopeFilterVerificationServiceSpec extends UnitSpec with ScopesConfig {
 
     val urlDecodedEmployerRef = "247/ZT6767895A"
 
-    val requestHeader = FakeRequest("GET", s"/?employerRef=$employerRef")
+    val requestHeader = FakeRequest("GET", s"/?payeReference=$employerRef")
 
     val result = scopeFilterVerificationService.getQueryStringForDefinedScopes(List(mockScope8), mockEndpoint4, requestHeader)
 

@@ -40,8 +40,8 @@ class ScopeFilterVerificationService @Inject()(scopesService: ScopesService, sco
      if (verifyResult.hasAllParameters && verifyResult.requiredFields.isEmpty) {
         scopesHelper.getQueryStringFor(scopes, endpoint)
      }
-     else if (verifyResult.hasAllParameters && verifyResult.requiredFields.contains("employerRef")) {
-       val extractedEmployerRef = rh.queryString.get("employerRef").map(x => x.head).get
+     else if (verifyResult.hasAllParameters && verifyResult.requiredFields.contains("payeReference")) {
+       val extractedEmployerRef = rh.queryString.get("payeReference").map(x => x.head).get
       scopesHelper.getQueryStringWithParameterisedFilters(scopes, endpoint, extractedEmployerRef)
      }
      else {

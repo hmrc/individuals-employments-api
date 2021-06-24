@@ -356,7 +356,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       response.code shouldBe BAD_REQUEST
       Json.parse(response.body) shouldBe Json.obj(
         "code"    -> "INVALID_REQUEST",
-        "message" -> "employerRef is required for the scopes you have been assigned"
+        "message" -> "payeReference is required for the scopes you have been assigned"
       )
     }
   }
