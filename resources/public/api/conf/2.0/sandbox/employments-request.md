@@ -11,56 +11,55 @@
     </thead>
     <tbody>
     <tr>
-        <td><p>PAYE employments data found</p></td>
-        <td><p>matchId=&lt;obtained from Individuals Matching API.</p><p>example: 57072660-1df9-4aeb-
-                                               b4ea-cd2d7f96e430&gt;</p><p>fromDate=2019-01-01</p><p>toDate=2020-03-01</p></td>
+        <td><p>A valid, successful request for PAYE employments data</p></td>
+        <td><p>The matchId is obtained from the Individuals Matching API. For example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430</p><p>fromDate=2019-01-01</p><p>toDate=2020-03-01</p></td>
         <td><p>200 (OK)</p><p>Payload as response example above</p></td>
     </tr>
     <tr>
         <td><p>Missing matchId</p></td>
-        <td><p>matchId query parameter missing</p></td>
+        <td><p>The request is missing the matchId. Check the query parameters section for what should be included.</p></td>
         <td><p>400 (Bad Request)</p>
         <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;matchId is required&quot; }</p>
         </td>
     </tr>
     <tr>
         <td><p>Missing fromDate</p></td>
-        <td><p>fromDate query parameter missing</p></td>
+        <td><p>The request is missing a fromDate. Check the query parameters section for what should be included.</p></td>
         <td><p>400 (Bad Request)</p>
         <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;fromDate is required&quot; }</p>
         </td>
     </tr>
     <tr>
         <td><p>fromDate earlier than the current tax year minus 6</p></td>
-        <td><p>For example</p> <p>fromDate=2014-01-01</p></td>
+        <td><p>The fromDate is earlier than the current tax year minus 6.</p><p> For example:</p> <p>fromDate=2014-01-01</p></td>
         <td><p>400 (Bad Request)</p>
         <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;fromDate is earlier than maximum allowed&quot; }</p>
         </td>
     </tr>    
     <tr>
          <td><p>toDate earlier than fromDate</p></td>
-         <td><p>Any valid dates where toDate is earlier than fromDate</p>
-         <p>For example</p><p>fromDate=2020-01-01 toDate=2019-01-01</p></td>
+         <td><p>Any valid dates where the toDate is earlier than the fromDate.</p>
+         <p>For example:</p><p>fromDate=2020-01-01 toDate=2019-01-01</p></td>
          <td><p>400 (Bad Request)</p>
          <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;Invalid time period requested&quot; }</p></td>
     </tr>
     <tr>
          <td><p>Invalid date format</p></td>
-         <td><p>Any date that is not ISO 8601 Extended format</p>
-         <p>For example</p><p>20200101</p></td>
+         <td><p>Any date that is not ISO 8601 extended format. Check the query parameters section for the correct format.</p>
+         </td>
          <td><p>400 (Bad Request)</p>
          <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;fromDate: invalid date format&quot; }</p>
          <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;toDate: invalid date format&quot; }</p></td>
     </tr>
     <tr>
-        <td><p>Incorrect matchId</p></td>
-        <td><p>The matchId is not valid</p></td>
+        <td><p>No data found for the provided matchId</p></td>
+        <td><p>The matchId has no related data.</p></td>
         <td><p>404 (Not Found)</p>
         <p>{ &quot;code&quot; : &quot;NOT_FOUND&quot;,<br/>&quot;message&quot; : &quot;The resource cannot be found&quot; }</p></td>
     </tr>
     <tr>
         <td><p>Missing CorrelationId</p></td>
-        <td><p>CorrelationId header is missing</p></td>
+        <td><p>The CorrelationId is missing. Check the request headers section for what should be included.</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;CorrelationId is required&quot; }</p></td>
@@ -68,23 +67,23 @@
     </tr>
     <tr>
         <td><p>Malformed CorrelationId</p></td>
-        <td><p>CorrelationId header is malformed</p></td>
+        <td><p>The correlationId is in the incorrect format. Check the request headers section for the correct format.</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;Malformed CorrelationId&quot; }</p></td>
         </td>
     </tr>
     <tr>
-        <td><p>Missing employerPayeRef</p></td>
-        <td><p>employerPayeRef querystring parameter is missing</p></td>
+        <td><p>Missing payeReference</p></td>
+        <td><p>The request is missing a payeReference. This is required for the scopes you have been assigned.</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;employerPayeRef is required for the scopes you have been assigned&quot; }</p></td>
         </td>
     </tr>    
     <tr>
-        <td><p>Malformed employerPayeRef</p></td>
-        <td><p>employerPayeRef querystring parameter is malformed</p></td>
+        <td><p>Malformed payeReference</p></td>
+        <td><p>payeReference is in the incorrect format. Check the query parameters section for the correct format.</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;Malformed employerPayeRef&quot; }</p></td>

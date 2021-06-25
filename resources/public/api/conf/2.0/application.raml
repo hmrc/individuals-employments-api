@@ -75,7 +75,7 @@ uses:
                     code: NOT_FOUND
   /paye:
     get:
-      displayName: Get employment details
+      displayName: Get an individual's PAYE employment details
       description: !include docs/employments-endpoint-description.md
       is: [headers.acceptHeader]
       (annotations.scope): "assigned"
@@ -102,7 +102,7 @@ uses:
           type: string
           required: false
           example: 2020-03-01
-        employerPayeRef:
+        payeReference:
           description: !include docs/employer-paye-ref-desc.md
           type: string
           required: false

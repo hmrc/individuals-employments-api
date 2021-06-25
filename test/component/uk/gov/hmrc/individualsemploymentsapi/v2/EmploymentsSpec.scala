@@ -32,7 +32,7 @@ class EmploymentsSpec extends BaseSpec {
       val employerRef = "247%2FZT6767895A"
 
       When("I request individual employments for the sandbox matchId")
-      val response = Http(s"$serviceUrl/sandbox/paye?matchId=$sandboxMatchId&fromDate=2016-04-01&toDate=2017-01-01&employerRef=$employerRef")
+      val response = Http(s"$serviceUrl/sandbox/paye?matchId=$sandboxMatchId&fromDate=2016-04-01&toDate=2017-01-01&payeReference=$employerRef")
         .headers(requestHeaders(acceptHeaderVP2))
         .asString
 

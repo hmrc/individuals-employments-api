@@ -26,10 +26,20 @@ case class VerifyResult(hasAllParameters: Boolean, requiredFields: List[String])
 
 class ScopeFilterVerificationService @Inject()(scopesService: ScopesService, scopesHelper: ScopesHelper) {
 
+  // Function to decouple the solution from the IF schema
+  // Supplied query parameter names should be driven by content and not dictated by IF schemas
+  // Add any required translations here or use IF name if in agreement with the API docs content designer
+  def translate(p: String) = {
+    p match {
+      case "employerRef" => "payeReference"
+      case _ => p
+    }
+  }
+
   def verify(scopes: List[String], endpoint: String, rh: RequestHeader): VerifyResult = {
     val validFilters = scopesService.getValidFilterKeys(scopes, List(endpoint))
     val filterParameterMappings = scopesService.getFilterToken(scopes, endpoint)
-    val requiredParameters = validFilters.flatMap(f => filterParameterMappings.get(f)).toList
+    val requiredParameters = validFilters.flatMap(f => filterParameterMappings.get(f)).toList.map(p => translate(p))
     val hasAllParameters = requiredParameters.isEmpty || !requiredParameters.map(p => rh.queryString.get(p)).exists(_.isEmpty)
     if (!hasAllParameters) throw new MissingQueryParameterException(s"${requiredParameters.head} is required for the scopes you have been assigned")
     VerifyResult(hasAllParameters, requiredParameters)
@@ -40,8 +50,8 @@ class ScopeFilterVerificationService @Inject()(scopesService: ScopesService, sco
      if (verifyResult.hasAllParameters && verifyResult.requiredFields.isEmpty) {
         scopesHelper.getQueryStringFor(scopes, endpoint)
      }
-     else if (verifyResult.hasAllParameters && verifyResult.requiredFields.contains("employerRef")) {
-       val extractedEmployerRef = rh.queryString.get("employerRef").map(x => x.head).get
+     else if (verifyResult.hasAllParameters && verifyResult.requiredFields.contains("payeReference")) {
+       val extractedEmployerRef = rh.queryString.get("payeReference").map(x => x.head).get
       scopesHelper.getQueryStringWithParameterisedFilters(scopes, endpoint, extractedEmployerRef)
      }
      else {

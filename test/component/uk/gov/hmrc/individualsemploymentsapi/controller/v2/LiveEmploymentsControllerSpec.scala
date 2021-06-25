@@ -206,7 +206,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the paye endpoint is invoked with an invalid match id")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
 
       Then("the response status should be 404 (not found)")
       response.code shouldBe NOT_FOUND
@@ -303,7 +303,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IfStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, validData)
 
       When("the paye endpoint is invoked with a valid match id")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
 
       Then("the response status should be 200 (ok)")
       response.code shouldBe OK
@@ -334,7 +334,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IfStub.enforceRateLimit(nino, fromDate, toDate)
 
       When("the PAYE endpoint is invoked with a valid match ID")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
 
       Then("The response status is 429 Too Many Requests")
       response.code shouldBe TOO_MANY_REQUESTS
@@ -356,7 +356,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       response.code shouldBe BAD_REQUEST
       Json.parse(response.body) shouldBe Json.obj(
         "code"    -> "INVALID_REQUEST",
-        "message" -> "employerRef is required for the scopes you have been assigned"
+        "message" -> "payeReference is required for the scopes you have been assigned"
       )
     }
   }
@@ -415,7 +415,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       When(
         s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
 
-      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
+      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
         .headers(requestHeaders(acceptHeaderVP2))
         .asString
 
@@ -439,7 +439,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
       When(
         s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
-      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
+      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
         .headers(requestHeaders(acceptHeaderVP2))
         .asString
 
@@ -464,7 +464,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
       When(
         s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
-      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&employerRef=$employerRef")
+      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
         .headers(requestHeaders(acceptHeaderVP2))
         .asString
 
