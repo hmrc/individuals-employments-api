@@ -16,16 +16,40 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
-import org.joda.time.{Interval, LocalDate}
-import uk.gov.hmrc.domain.EmpRef
+import org.joda.time.LocalDate
+import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
+import play.api.libs.json.{Format, JsPath}
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.JodaReads._
+import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfPayment
 
 case class Payment(
-  taxablePayment: Double,
-  paymentDate: LocalDate,
-  employerPayeReference: Option[EmpRef] = None,
-  monthPayNumber: Option[Int] = None,
-  weekPayNumber: Option[Int] = None) {
+  paymentDate: Option[LocalDate],
+  taxablePayment: Option[Double]) {
 
-  def isPaidWithin(interval: Interval): Boolean = interval.contains(paymentDate.toDateTimeAtStartOfDay)
+}
 
+object Payment {
+
+  implicit val paymentFormat: Format[Payment] = Format(
+    (
+      (JsPath \ "date").readNullable[LocalDate] and
+        (JsPath \ "paidTaxablePay").readNullable[Double]
+      )(Payment.apply _),
+    (
+      (JsPath \ "date").writeNullable[LocalDate] and
+        (JsPath \ "paidTaxablePay").writeNullable[Double]
+      )(unlift(Payment.unapply))
+  )
+
+  def create(ifPayment: IfPayment): Option[Payment] = {
+    val paymentDate = ifPayment.date.map(s => LocalDate.parse(s))
+    val taxeablePayment = ifPayment.paidTaxablePay
+
+    (paymentDate, taxeablePayment) match {
+      case (None, None) => None
+      case _            => Some(new Payment(paymentDate, taxeablePayment))
+    }
+  }
 }

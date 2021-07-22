@@ -49,7 +49,7 @@ object AuthStub extends MockHost(22000) {
     )
   }
 
-  def willAuthorizePrivilegedAuthToken(authBearerToken: String, scopes: List[String]): StubMapping =
+  def willAuthorizePrivilegedAuthToken(authBearerToken: String, scopes: List[String]): StubMapping = {
     mock.register(
       post(urlEqualTo("/auth/authorise"))
         .withRequestBody(equalToJson(privilegedAuthority(scopes).toString()))
@@ -59,6 +59,7 @@ object AuthStub extends MockHost(22000) {
           .withBody(s"""{"internalId": "some-id", "allEnrolments": [ ${scopes
             .map(scope => s"""{ "key": "$scope", "value": ""}""")
             .reduce((a, b) => s"$a, $b")} ]}""")))
+  }
 
   def willAuthorizePrivilegedAuthToken(authBearerToken: String, scope: String): StubMapping =
     mock.register(

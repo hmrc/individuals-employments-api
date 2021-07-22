@@ -76,7 +76,9 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
 
     scenario("valid request to the sandbox implementation") {
       When("I request the root entry point to the API")
-      val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430")
+      val employerRef = "247%2FZT6767895A"
+
+      val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&employerRef=$employerRef")
 
       Then("The response status should be 200 (ok)")
       assertResponseIs(
@@ -134,8 +136,10 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
 
     scenario("invalid match id") {
       When("the root entry point to the API is invoked with an invalid match id")
+      val employerRef = "247%2FZT6767895A"
+
       val response =
-        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366&fromDate=2017-01-01")
+        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366&fromDate=2017-01-01&payeReference=$employerRef")
 
       Then("the response status should be 404 (not found)")
       assertResponseIs(
@@ -151,9 +155,11 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
     }
 
     scenario("valid request to the sandbox implementation") {
+      val employerRef = "247%2FZT6767895A"
+
       When("I request the root entry point to the API")
       val response =
-        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01")
+        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01&payeReference=$employerRef")
 
       Then("The response status should be 200 (ok)")
       assertResponseIs(
@@ -170,7 +176,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
             "endDate":"2017-03-01",
             "payFrequency":"FORTNIGHTLY",
             "employer":{
-              "payeReference":"123/DI45678",
+              "payeReference":"247/A1987CB",
               "name":"Disney",
               "address":{
                 "line1":"Friars House",

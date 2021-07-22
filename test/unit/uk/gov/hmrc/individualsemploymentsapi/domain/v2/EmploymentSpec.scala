@@ -20,12 +20,20 @@ import org.joda.time.LocalDate
 import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.domain.EmpRef
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
-import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfAddress, IfEmployer, IfEmployment, IfEmploymentDetail}
-import uk.gov.hmrc.individualsemploymentsapi.domain.v2.{Address, Employer, Employment, PayFrequency}
+import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfAddress, IfEmployer, IfEmployment, IfEmploymentDetail, IfPayment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.v2.{Address, Employer, Employment, PayFrequency, Payment}
 
 class EmploymentSpec extends FlatSpec with Matchers {
 
-  "Employment" should "derive itself from an instance of des employment" in {
+  "Employment" should "derive itself from an instance of IF employment" in {
+    val ifPayment = IfPayment(
+      Some("2016-01-01"),
+      None,
+      Some(21.21),
+      None,
+      None,
+      None
+    )
     val ifEmployment = IfEmployment(
       employer = Some(
         IfEmployer(
@@ -34,9 +42,7 @@ class EmploymentSpec extends FlatSpec with Matchers {
             IfAddress(
               line1 = Some("line 1"),
               postcode = Some("AB1 2CD")
-            )),
-          districtNumber = Some("123"),
-          schemeRef = Some("AB12345")
+            ))
         )),
       employment = Some(
         IfEmploymentDetail(
@@ -46,7 +52,8 @@ class EmploymentSpec extends FlatSpec with Matchers {
           payrollId = None,
           address = None
         )),
-      payments = None
+      payments = Some(Seq(ifPayment)),
+      employerRef = Some("247/A1987CB")
     )
 
     val employment = Employment.create(
@@ -54,7 +61,7 @@ class EmploymentSpec extends FlatSpec with Matchers {
       Some(new LocalDate(2016, 12, 31)),
       Some(PayFrequency.withName("CALENDAR_MONTHLY")),
       Employer.create(
-        Some(EmpRef("123", "AB12345")),
+        Some(EmpRef("247", "A1987CB")),
         Some("Acme Inc"),
         Some(
           Address(
@@ -65,14 +72,15 @@ class EmploymentSpec extends FlatSpec with Matchers {
             line5 = None,
             postcode = Some("AB1 2CD")
           ))
-      )
+      ),
+      Some(Seq(Payment.create(ifPayment)).flatten)
     )
 
     Employment.create(ifEmployment) shouldBe employment
   }
 
-  it should "handle the edge case where des employment is empty" in {
-    val ifEmployment = IfEmployment(None, None, None)
+  it should "handle the edge case where IF employment is empty" in {
+    val ifEmployment = IfEmployment(None, None, None, None)
     Employment.create(ifEmployment) shouldBe None
   }
 

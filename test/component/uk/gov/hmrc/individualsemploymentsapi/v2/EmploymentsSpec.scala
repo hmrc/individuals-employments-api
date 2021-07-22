@@ -29,8 +29,10 @@ class EmploymentsSpec extends BaseSpec {
 
     scenario("Valid request to the sandbox implementation") {
 
+      val employerRef = "247%2FZT6767895A"
+
       When("I request individual employments for the sandbox matchId")
-      val response = Http(s"$serviceUrl/sandbox/paye?matchId=$sandboxMatchId&fromDate=2016-04-01&toDate=2017-01-01")
+      val response = Http(s"$serviceUrl/sandbox/paye?matchId=$sandboxMatchId&fromDate=2016-04-01&toDate=2017-01-01&payeReference=$employerRef")
         .headers(requestHeaders(acceptHeaderVP2))
         .asString
 
@@ -49,7 +51,7 @@ class EmploymentsSpec extends BaseSpec {
                 "endDate":"2016-06-30",
                 "payFrequency":"FOUR_WEEKLY",
                 "employer":{
-                  "payeReference":"123/AI45678",
+                  "payeReference":"247/A1987CB",
                   "name":"Acme",
                   "address":{
                     "line1":"Acme Inc Building",

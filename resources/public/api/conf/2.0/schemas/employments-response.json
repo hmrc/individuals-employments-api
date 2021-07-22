@@ -63,8 +63,8 @@
             "properties": {
               "payeReference": {
                 "type": "string",
-                "description": "The employer's PAYE reference",
-                "example": "123/AI45678"
+                "description": "The employer's PAYE reference number. This is a unique identifier that a business gets when they register with HMRC as an employer.",
+                "example": "247/A1987CB"
               },
               "name": {
                 "type": "string",

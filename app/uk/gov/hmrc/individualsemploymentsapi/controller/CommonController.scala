@@ -86,6 +86,11 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInternalServer("Something went wrong.").toHttpResponse
     }
+    case e: MissingQueryParameterException => {
+      Logger.warn("Controllers MissingQueryParameterException encountered")
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorInvalidRequest(e.getMessage).toHttpResponse
+    }
     case e: Exception => {
       Logger.warn("Controllers Exception encountered")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)

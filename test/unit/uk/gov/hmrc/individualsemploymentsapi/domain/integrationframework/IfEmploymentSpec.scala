@@ -32,9 +32,7 @@ class IfEmploymentSpec extends UnitSpec {
 
   val employer = IfEmployer(
     name = Some("Name"),
-    address = Some(address),
-    districtNumber = Some("ABC"),
-    schemeRef = Some("ABC")
+    address = Some(address)
   )
 
   val employmentDetail = IfEmploymentDetail(
@@ -56,7 +54,8 @@ class IfEmploymentSpec extends UnitSpec {
   val employment = IfEmployment(
     employer = Some(employer),
     employment = Some(employmentDetail),
-    payments = Some(Seq(payment))
+    payments = Some(Seq(payment)),
+    employerRef = Some("247/A1987CB")
   )
 
   "Employment" should {
@@ -105,7 +104,8 @@ class IfEmploymentSpec extends UnitSpec {
           |    "paidNonTaxOrNICPayment" : 123123.32,
           |    "week" : 52,
           |    "month" : 12
-          |  } ]
+          |  } ],
+          |  "employerRef" : "247/A1987CB"
           |}
           |""".stripMargin
 

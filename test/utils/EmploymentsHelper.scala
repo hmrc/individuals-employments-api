@@ -31,9 +31,7 @@ trait EmploymentsHelper {
 
   val employer = IfEmployer(
     name = Some("Name"),
-    address = Some(address),
-    districtNumber = Some("ABC"),
-    schemeRef = Some("ABC")
+    address = Some(address)
   )
 
   val employmentDetail = IfEmploymentDetail(
@@ -55,14 +53,16 @@ trait EmploymentsHelper {
   val employment = IfEmployment(
     employer = Some(employer),
     employment = Some(employmentDetail),
-    payments = Some(Seq(payment))
+    payments = Some(Seq(payment)),
+    employerRef = Some("247/A1987CB")
   )
 
   def createValidEmployment() =
     IfEmployment(
       employer = Some(employer),
       employment = Some(employmentDetail),
-      payments = Some(Seq(payment))
+      payments = Some(Seq(payment)),
+      Some("247/A1987CB")
     )
 
 }

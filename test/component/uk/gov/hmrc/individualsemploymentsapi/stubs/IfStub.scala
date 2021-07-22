@@ -24,41 +24,55 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmplo
 
 object IfStub extends MockHost(22004) {
 
+  val fieldsAndFilters = List[(String, Option[String])](
+    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employment(startDate))", None),
+    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))", None),
+    ("employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,payFrequency,startDate),payments(date,paidTaxablePay))", Some("employments[]/employerRef eq '247ZT6767895A'"))
+  )
+
   def searchEmploymentIncomeForPeriodReturns(
-    nino: String,
-    fromDate: String,
-    toDate: String,
-    ifEmployments: IfEmployments) =
-    mock.register(
-      get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
-        .withQueryParam("startDate", equalTo(fromDate))
-        .withQueryParam("endDate", equalTo(toDate))
-        .withQueryParam(
-          "fields",
-          equalTo(
-            "employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employment(endDate,startDate))")
-        )
-        .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
+                                              nino: String,
+                                              fromDate: String,
+                                              toDate: String,
+                                              ifEmployments: IfEmployments) = {
+    fieldsAndFilters.foreach(fieldFilter => {
+      mock.register(
+        get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
+          .withQueryParam("startDate", equalTo(fromDate))
+          .withQueryParam("endDate", equalTo(toDate))
+          .withQueryParam("fields", equalTo(fieldFilter._1))
+          .withQueryParam("filter",
+            fieldFilter._2 match {
+              case None => absent()
+              case Some(filter) => equalTo(filter)
+            })
+          .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ifEmployments).toString())))
+    })
+  }
 
-  def saCustomResponse(nino: String, status: Int, fromDate: String, toDate: String, response: JsValue) =
-    mock.register(
-      get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
-        .withQueryParam("startDate", equalTo(fromDate))
-        .withQueryParam("endDate", equalTo(toDate))
-        .withQueryParam("fields", equalTo("employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employment(endDate,startDate))"))
-        .willReturn(aResponse().withStatus(status).withBody(Json.toJson(response.toString()).toString())))
-
+  def saCustomResponse(nino: String, status: Int, fromDate: String, toDate: String, response: JsValue) = {
+    fieldsAndFilters.foreach(fieldFilter => {
+      mock.register(
+        get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
+          .withQueryParam("startDate", equalTo(fromDate))
+          .withQueryParam("endDate", equalTo(toDate))
+          .withQueryParam("fields", equalTo(fieldFilter._1))
+          .withQueryParam("filter",
+            fieldFilter._2 match {
+              case None => absent()
+              case Some(filter) => equalTo(filter)
+            })
+          .willReturn(aResponse().withStatus(status).withBody(Json.toJson(response.toString()).toString())))
+    })
+  }
 
   def enforceRateLimit(nino: String, fromDate: String, toDate: String): Unit =
     mock.register(
       get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
         .withQueryParam("startDate", equalTo(fromDate))
         .withQueryParam("endDate", equalTo(toDate))
-        .withQueryParam(
-          "fields",
-          equalTo(
-            "employments(employer(address(line1,line2,line3,line4,line5,postcode),districtNumber,name,schemeRef),employment(endDate,startDate))")
-        )
         .willReturn(aResponse().withStatus(TOO_MANY_REQUESTS)))
 
+  def purge(): Unit =
+    server.resetMappings()
 }

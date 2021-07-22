@@ -38,5 +38,6 @@ object ErrorResponses {
 
   class ValidationException(message: String) extends RuntimeException(message)
   class MatchNotFoundException extends RuntimeException
+  class MissingQueryParameterException(message: String) extends RuntimeException(message)
 
 }

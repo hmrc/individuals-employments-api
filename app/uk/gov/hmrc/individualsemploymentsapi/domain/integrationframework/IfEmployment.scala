@@ -23,19 +23,22 @@ import play.api.libs.json.{Format, JsPath}
 case class IfEmployment(
   employer: Option[IfEmployer],
   employment: Option[IfEmploymentDetail],
-  payments: Option[Seq[IfPayment]])
+  payments: Option[Seq[IfPayment]],
+  employerRef: Option[String])
 
 object IfEmployment {
   implicit val employmentFormat: Format[IfEmployment] = Format(
     (
       (JsPath \ "employer").readNullable[IfEmployer] and
         (JsPath \ "employment").readNullable[IfEmploymentDetail] and
-        (JsPath \ "payments").readNullable[Seq[IfPayment]]
+        (JsPath \ "payments").readNullable[Seq[IfPayment]] and
+        (JsPath \ "employerRef").readNullable[String]
     )(IfEmployment.apply _),
     (
       (JsPath \ "employer").writeNullable[IfEmployer] and
         (JsPath \ "employment").writeNullable[IfEmploymentDetail] and
-        (JsPath \ "payments").writeNullable[Seq[IfPayment]]
+        (JsPath \ "payments").writeNullable[Seq[IfPayment]] and
+        (JsPath \ "employerRef").writeNullable[String]
     )(unlift(IfEmployment.unapply))
   )
 }
