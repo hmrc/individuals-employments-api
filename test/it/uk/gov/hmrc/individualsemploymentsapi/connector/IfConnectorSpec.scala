@@ -28,7 +28,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, NotFoundException, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, InternalServerException, NotFoundException, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.connector.IfConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
@@ -53,7 +53,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
   override lazy val fakeApplication = new GuiceApplicationBuilder()
     .bindings(bindModules: _*)
     .configure(
-      "microservice.services.integration-framework.host"                -> "localhost",
+      "microservice.services.integration-framework.host"         -> "127.0.0.1",
       "microservice.services.integration-framework.port"                -> "11122",
       "microservice.services.integration-framework.authorization-token" -> integrationFrameworkAuthorizationToken,
       "microservice.services.integration-framework.environment"         -> integrationFrameworkEnvironment
@@ -187,7 +187,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
           get(urlPathMatching(s"/individuals/employment/nino/$nino"))
             .withQueryParam("startDate", equalTo(startDate))
             .withQueryParam("endDate", equalTo(endDate))
-            .withHeader("Authorization", equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
+            .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
             .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
             .willReturn(aResponse()
               .withStatus(200)
@@ -217,7 +217,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
           get(urlPathMatching(s"/individuals/employment/nino/$nino"))
             .withQueryParam("startDate", equalTo(startDate))
             .withQueryParam("endDate", equalTo(endDate))
-            .withHeader("Authorization", equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
+            .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
             .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
             .willReturn(aResponse()
               .withStatus(200)
@@ -247,7 +247,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
           get(urlPathMatching(s"/individuals/employment/nino/$nino"))
             .withQueryParam("startDate", equalTo(startDate))
             .withQueryParam("endDate", equalTo(endDate))
-            .withHeader("Authorization", equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
+            .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
             .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
             .willReturn(aResponse()
               .withStatus(200)
