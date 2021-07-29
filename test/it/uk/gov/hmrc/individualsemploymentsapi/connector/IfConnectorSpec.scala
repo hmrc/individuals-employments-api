@@ -67,7 +67,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
     val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
     val sampleCorrelationIdHeader = ("CorrelationId" -> sampleCorrelationId)
 
-    implicit val hc = HeaderCarrier()
+    implicit val hc = HeaderCarrier().withExtraHeaders(sampleCorrelationIdHeader)
 
     val config = fakeApplication.injector.instanceOf[ServicesConfig]
     val httpClient = fakeApplication.injector.instanceOf[HttpClient]
@@ -189,6 +189,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
             .withQueryParam("endDate", equalTo(endDate))
             .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
             .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
+            .withHeader("CorrelationId", equalTo(sampleCorrelationId))
             .willReturn(aResponse()
               .withStatus(200)
               .withBody(Json.toJson(noEmploymentData).toString())))
@@ -219,6 +220,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
             .withQueryParam("endDate", equalTo(endDate))
             .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
             .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
+            .withHeader("CorrelationId", equalTo(sampleCorrelationId))
             .willReturn(aResponse()
               .withStatus(200)
               .withBody(Json.toJson(singleEmploymentData).toString())))
@@ -249,6 +251,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
             .withQueryParam("endDate", equalTo(endDate))
             .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
             .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
+            .withHeader("CorrelationId", equalTo(sampleCorrelationId))
             .willReturn(aResponse()
               .withStatus(200)
               .withBody(Json.toJson(multiEmploymentData).toString())))
