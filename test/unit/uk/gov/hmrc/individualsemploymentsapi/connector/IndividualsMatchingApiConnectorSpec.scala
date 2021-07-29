@@ -42,7 +42,7 @@ class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEa
     val individualsMatchingApiConnector = new IndividualsMatchingApiConnector(
       fakeApplication.injector.instanceOf[ServicesConfig],
       fakeApplication.injector.instanceOf[HttpClient]) {
-      override val serviceUrl = "http://localhost:11121"
+      override val serviceUrl = "http://127.0.0.1:11121"
     }
   }
 
