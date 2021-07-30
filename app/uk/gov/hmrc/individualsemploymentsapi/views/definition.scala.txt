@@ -72,7 +72,7 @@
       "name":"access individuals employment information for HO RP2",
       "description":"Scope for HO RP2 to access employments information on individuals"
     },
-    {s
+    {
       "key":"read:individuals-employments-ho-ecp",
       "name":"access individuals employment information for HO ECP",
       "description":"Scope for HO ECP to access employments information on individuals"
