@@ -108,6 +108,24 @@
                 }
               }
             }
+          },
+          "payment": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "description": "The date of the payment.",
+                  "id": "full-date",
+                  "example": "2019-01-31"
+                },
+                "paidTaxablePay": {
+                  "description": "Amount of the payment.",
+                  "type": "number",
+                  "example": "4765.32"
+                }
+              }
+            }
           }
         }
       }
