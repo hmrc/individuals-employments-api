@@ -116,6 +116,7 @@
               "properties": {
                 "date": {
                   "description": "The date of the payment.",
+                  "type": "string",
                   "id": "full-date",
                   "example": "2019-01-31"
                 },
