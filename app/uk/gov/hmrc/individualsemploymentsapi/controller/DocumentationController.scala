@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+// $COVERAGE-OFF$
 package uk.gov.hmrc.individualsemploymentsapi.controller
 
 import controllers.Assets
@@ -73,3 +74,4 @@ class DocumentationController @Inject()(
     assets.at(s"/public/api/conf/$version", file)
 
 }
+// $COVERAGE-ON$
