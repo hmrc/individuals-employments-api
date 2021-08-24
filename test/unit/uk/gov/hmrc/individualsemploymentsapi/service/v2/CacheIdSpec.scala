@@ -29,8 +29,8 @@ class CacheIdSpec extends WordSpec with Matchers with Intervals {
 
   "Cache Id" should {
     "Generate string correctly" in {
-      val id = CacheId(uuid, interval,"A,B,C")
-      id.toString shouldBe "fcb6218d-0f90-4c5d-bb58-6b128d30ac04-2016-01-01T00:00:00.000Z-2017-03-01T00:00:00.000Z-A,B,C"
+      val id = CacheId(uuid, interval,"ABC")
+      id.toString shouldBe "fcb6218d-0f90-4c5d-bb58-6b128d30ac04-2016-01-01T00:00:00.000Z-2017-03-01T00:00:00.000Z-ABC"
     }
   }
 }
