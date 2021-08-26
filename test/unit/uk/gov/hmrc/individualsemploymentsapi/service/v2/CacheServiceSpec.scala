@@ -16,8 +16,10 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import java.util.UUID
+import com.google.common.base.Charsets
+import com.google.common.io.BaseEncoding
 
+import java.util.UUID
 import org.joda.time.{Interval, LocalDate}
 import org.mockito.BDDMockito.given
 import org.mockito.Matchers.{any, eq => eqTo}
@@ -98,6 +100,26 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
       CacheId(matchId, interval, fields).id shouldBe
         s"$matchId-${interval.getStart}-${interval.getEnd}-ABDFH"
 
+    }
+
+    "produce cacheId based on matchid, scopes, and employer ref" in {
+
+      val matchId = UUID.randomUUID()
+      val fromDateString = "2017-03-02"
+      val toDateString = "2017-05-31"
+
+      val interval = new Interval(
+        new LocalDate(fromDateString).toDateTimeAtStartOfDay,
+        new LocalDate(toDateString).toDateTimeAtStartOfDay)
+
+      val fields = "ABDFH"
+
+      val filters = Some("employerRef")
+
+      val encodedFilter = BaseEncoding.base64().encode(filters.get.getBytes(Charsets.UTF_8))
+
+      CacheId(matchId, interval, fields, filters).id shouldBe
+        s"$matchId-${interval.getStart}-${interval.getEnd}-ABDFH-$encodedFilter"
     }
 
   }
