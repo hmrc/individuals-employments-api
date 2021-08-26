@@ -33,7 +33,7 @@ class ScopeFilterVerificationServiceSpec extends UnitSpec with ScopesConfig {
   val scopeFilterVerificationService = new ScopeFilterVerificationService(scopesService, scopesHelper)
 
   "should return True if all required query parameters are present" in {
-    val requestHeader = FakeRequest("GET", "/?employerRef='247%2FZT6767895A'")
+    val requestHeader = FakeRequest("GET", "/?payeReference='247%2FZT6767895A'")
     val result = scopeFilterVerificationService.verify(List(mockScope8), mockEndpoint4, requestHeader)
 
     result.hasAllParameters shouldBe true
@@ -66,7 +66,7 @@ class ScopeFilterVerificationServiceSpec extends UnitSpec with ScopesConfig {
 
     val urlDecodedEmployerRef = "247/ZT6767895A"
 
-    val requestHeader = FakeRequest("GET", s"/?employerRef=$employerRef")
+    val requestHeader = FakeRequest("GET", s"/?payeReference=$employerRef")
 
     val result = scopeFilterVerificationService.getQueryStringForDefinedScopes(List(mockScope8), mockEndpoint4, requestHeader)
 

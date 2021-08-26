@@ -6,11 +6,12 @@
   },
   "employments": [
     {
-      "fromDate": "2019-01-01",
-      "toDate": "2019-03-31",
+      "startDate": "2019-01-01",
+      "endDate": "2019-03-31",
       "payFrequency": "WEEKLY",
       "employer": {
         "name": "ACME Industries Limited",
+        "payeReference": "247/A1987CB",
         "address": {
           "line1": "Unit 23",
           "line2": "Utilitarian Industrial Park",
@@ -18,9 +19,14 @@
           "line4": "County Durham",
           "line5": "UK",
           "postcode": "DH4 4YY"
-        },
-        "payeReference": "123/AI45678"
-      }
+        }
+      },
+      "payment": [
+        {
+          "date": "2019-01-31",
+          "paidTaxablePay": 4765.32
+        }
+      ]
     }
   ]
 }

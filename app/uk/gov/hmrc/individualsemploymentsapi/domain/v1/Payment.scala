@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.v1
 
-import org.joda.time.{Interval, LocalDate}
+import org.joda.time.LocalDate
 import uk.gov.hmrc.domain.EmpRef
 
 case class Payment(
@@ -24,8 +24,4 @@ case class Payment(
   paymentDate: LocalDate,
   employerPayeReference: Option[EmpRef] = None,
   monthPayNumber: Option[Int] = None,
-  weekPayNumber: Option[Int] = None) {
-
-  def isPaidWithin(interval: Interval): Boolean = interval.contains(paymentDate.toDateTimeAtStartOfDay)
-
-}
+  weekPayNumber: Option[Int] = None)

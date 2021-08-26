@@ -200,6 +200,22 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
+    "fail with status 500 when an unknown exception is thrown" in new Setup {
+
+      Mockito.reset(liveEmploymentsController.auditHelper)
+
+      when(mockAuthConnector.authorise(any(), any())(any(), any()))
+        .thenReturn(Future.failed(new Exception("Test Exception")))
+
+      val result = liveEmploymentsController.root(randomMatchId)(FakeRequest().withHeaders(validCorrelationHeader))
+
+      status(result) shouldBe INTERNAL_SERVER_ERROR
+      verifyZeroInteractions(mockLiveEmploymentsService)
+
+      verify(liveEmploymentsController.auditHelper, times(1))
+        .auditApiFailure(any(), any(), any(), any(), any())(any())
+    }
+
     "not require bearer token authentication for sandbox" in new Setup {
 
       when(mockSandboxEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))

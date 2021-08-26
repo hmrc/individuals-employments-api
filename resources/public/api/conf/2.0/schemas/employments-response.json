@@ -63,8 +63,8 @@
             "properties": {
               "payeReference": {
                 "type": "string",
-                "description": "The employer's PAYE reference",
-                "example": "123/AI45678"
+                "description": "The employer's PAYE reference number. This is a unique identifier that a business gets when they register with HMRC as an employer.",
+                "example": "247/A1987CB"
               },
               "name": {
                 "type": "string",
@@ -105,6 +105,25 @@
                     "description": "The postcode for the address.",
                     "example": "DH4 4YY"
                   }
+                }
+              }
+            }
+          },
+          "payment": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "description": "The date of the payment.",
+                  "type": "string",
+                  "id": "full-date",
+                  "example": "2019-01-31"
+                },
+                "paidTaxablePay": {
+                  "description": "Amount of the payment.",
+                  "type": "number",
+                  "example": "4765.32"
                 }
               }
             }

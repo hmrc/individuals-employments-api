@@ -68,6 +68,16 @@
       "description":"Scope for NICTSEJO use case 4 to access employments information on individuals"
     },
     {
+      "key":"read:individuals-employments-ho-rp2",
+      "name":"access individuals employment information for HO RP2",
+      "description":"Scope for HO RP2 to access employments information on individuals"
+    },
+    {
+      "key":"read:individuals-employments-ho-ecp",
+      "name":"access individuals employment information for HO ECP",
+      "description":"Scope for HO ECP to access employments information on individuals"
+    },
+    {
       "key":"read:individuals-employments-paye",
       "name":"access all paye individuals employment information",
       "description":"Access paye employments history for all individuals"

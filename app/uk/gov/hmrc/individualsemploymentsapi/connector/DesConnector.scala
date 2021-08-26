@@ -21,7 +21,6 @@ import org.joda.time.Interval
 import play.api.Logger
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http._
-import uk.gov.hmrc.http.logging.Authorization
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments}
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -31,22 +30,25 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
 
-  private val serviceUrl = servicesConfig.baseUrl("des")
+  private val serviceUrl     = servicesConfig.baseUrl("des")
   private val desBearerToken = servicesConfig.getString("microservice.services.des.authorization-token")
   private val desEnvironment = servicesConfig.getString("microservice.services.des.environment")
+
+  def headers = Seq(
+    HeaderNames.authorisation -> s"Bearer $desBearerToken",
+    "Environment"             -> desEnvironment,
+    "Source"                  -> "MDTP"
+  )
 
   def fetchEmployments(nino: Nino, interval: Interval)(
     implicit hc: HeaderCarrier,
     ec: ExecutionContext): Future[Seq[DesEmployment]] = {
-    val fromDate = interval.getStart.toLocalDate
-    val toDate = interval.getEnd.toLocalDate
-    val header = hc
-      .copy(authorization = Some(Authorization(s"Bearer $desBearerToken")))
-      .withExtraHeaders("Environment" -> desEnvironment, "Source" -> "MDTP")
 
+    val fromDate       = interval.getStart.toLocalDate
+    val toDate         = interval.getEnd.toLocalDate
     val employmentsUrl = s"$serviceUrl/individuals/nino/$nino/employments/income?from=$fromDate&to=$toDate"
 
-    http.GET[DesEmployments](employmentsUrl)(implicitly, header, ec).map(_.employments).recoverWith {
+    http.GET[DesEmployments](employmentsUrl, headers = headers).map(_.employments).recoverWith {
       case _: NotFoundException => Future.successful(Seq.empty)
       case Upstream4xxResponse(msg, 429, _, _) => {
         Logger.warn(s"DES Rate limited: $msg")

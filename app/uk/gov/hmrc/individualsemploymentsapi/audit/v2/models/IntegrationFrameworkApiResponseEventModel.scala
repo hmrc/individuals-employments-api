@@ -26,6 +26,7 @@ case class IntegrationFrameworkApiResponseEventModel(deviceId: String,
                                                      apiVersion: String,
                                                      matchId: String,
                                                      correlationId: String,
+                                                     applicationId: String,
                                                      requestUrl: String,
                                                      integrationFrameworkEmployments: IfEmployments)
 

@@ -19,7 +19,8 @@ lazy val scoverageSettings = {
   import scoverage.ScoverageKeys
   Seq(
     ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;" +
-      ".*BuildInfo.;uk.gov.hmrc.BuildInfo;.*Routes;.*RoutesPrefix*;",
+      ".*BuildInfo.;uk.gov.hmrc.BuildInfo;.*Routes;.*RoutesPrefix*;" +
+      ".*definition*;",
     ScoverageKeys.coverageMinimum := 80,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
@@ -52,19 +53,18 @@ dependencyOverrides += "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion
 
 val compile = Seq(
   ws,
-  hmrc                %% "bootstrap-backend-play-26" % "3.4.0",
-  hmrc                %% "domain"                    % "5.10.0-play-26",
-  hmrc                %% "auth-client"               % "3.3.0-play-26",
+  hmrc                %% "bootstrap-backend-play-26" % "5.7.0",
+  hmrc                %% "domain"                    % "6.1.0-play-26",
   hmrc                %% "play-hal"                  % "2.1.0-play-26",
-  hmrc                %% "play-hmrc-api"             % "5.3.0-play-26",
-  hmrc                %% "mongo-caching"             % "6.16.0-play-26",
-  hmrc                %% "json-encryption"           % "4.8.0-play-26",
+  hmrc                %% "play-hmrc-api"             % "6.4.0-play-26",
+  hmrc                %% "mongo-caching"             % "7.0.0-play-26",
+  hmrc                %% "json-encryption"           % "4.10.0-play-26",
   "com.typesafe.play" %% "play-json-joda"            % "2.9.2"
 )
 
 def test(scope: String = "test,it") = Seq(
-  hmrc                     %% "service-integration-test" % "0.13.0-play-26"    % scope,
-  hmrc                     %% "reactivemongo-test"       % "4.22.0-play-26"    % scope,
+  hmrc                     %% "service-integration-test" % "1.1.0-play-26"    % scope,
+  hmrc                     %% "reactivemongo-test"       % "5.0.0-play-26"    % scope,
   "org.scalatest"          %% "scalatest"                % "3.0.8"             % scope,
   "org.pegdown"            % "pegdown"                   % "1.6.0"             % scope,
   "com.typesafe.play"      %% "play-test"                % PlayVersion.current % scope,
@@ -115,7 +115,6 @@ lazy val microservice =
       parallelExecution in ComponentTest := false
     )
     .settings(resolvers ++= Seq(
-      Resolver.bintrayRepo("hmrc", "releases"),
       Resolver.jcenterRepo
     ))
     .settings(PlayKeys.playDefaultPort := 9651)
