@@ -46,7 +46,7 @@ class ScopeFilterVerificationService @Inject()(scopesService: ScopesService, sco
   }
 
   def getEmployerRef(rh: RequestHeader): Option[String] = {
-    rh.queryString.get("employerRef").map(x => x.head)
+    rh.queryString.get("payeReference").map(x => x.head)
   }
 
    def getQueryStringForDefinedScopes(scopes: List[String], endpoint: String, rh: RequestHeader): String = {
