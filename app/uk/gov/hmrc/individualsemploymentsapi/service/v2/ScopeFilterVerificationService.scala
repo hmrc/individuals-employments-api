@@ -46,6 +46,7 @@ class ScopeFilterVerificationService @Inject()(scopesService: ScopesService, sco
   }
 
   def getEmployerRef(rh: RequestHeader): Option[String] = {
+    println(rh.queryString.get("payeReference"))
     rh.queryString.get("payeReference").map(x => x.head)
   }
 
@@ -55,7 +56,7 @@ class ScopeFilterVerificationService @Inject()(scopesService: ScopesService, sco
         scopesHelper.getQueryStringFor(scopes, endpoint)
      }
      else if (verifyResult.hasAllParameters && verifyResult.requiredFields.contains("payeReference")) {
-       val extractedEmployerRef = rh.queryString.get("payeReference").map(x => x.head).get
+       val extractedEmployerRef = getEmployerRef(rh).get
        scopesHelper.getQueryStringWithParameterisedFilters(scopes, endpoint, extractedEmployerRef)
      }
      else {

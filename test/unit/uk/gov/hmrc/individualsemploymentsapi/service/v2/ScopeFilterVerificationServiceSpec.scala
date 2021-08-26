@@ -17,6 +17,7 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
 import play.api.libs.json.Json
+import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryParameterException
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{ScopeFilterVerificationService, ScopesHelper, ScopesService}
@@ -71,5 +72,23 @@ class ScopeFilterVerificationServiceSpec extends UnitSpec with ScopesConfig {
     val result = scopeFilterVerificationService.getQueryStringForDefinedScopes(List(mockScope8), mockEndpoint4, requestHeader)
 
     result shouldBe s"employer(employerAddress(line1,line2,line3),employerDistrictNumber,employerName,employerSchemeReference),payments&filter=employerRef eq '$urlDecodedEmployerRef'"
+  }
+
+  "get PayeReference" should {
+    "Return Some when header is present" in {
+      val employerRef = "247/ZT6767895A"
+      val rh = FakeRequest("GET", s"/?payeReference=$employerRef")
+      val result = scopeFilterVerificationService.getEmployerRef(rh)
+
+      result.isDefined shouldBe true
+      result.get shouldBe employerRef
+    }
+
+    "Return None when header is not present" in {
+      val rh  = FakeRequest()
+      val result = scopeFilterVerificationService.getEmployerRef(rh)
+
+      result.isDefined shouldBe false
+    }
   }
 }
