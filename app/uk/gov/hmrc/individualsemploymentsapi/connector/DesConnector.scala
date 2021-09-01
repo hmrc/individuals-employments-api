@@ -30,6 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
 
+  val logger: Logger = Logger(getClass)
+
   private val serviceUrl     = servicesConfig.baseUrl("des")
   private val desBearerToken = servicesConfig.getString("microservice.services.des.authorization-token")
   private val desEnvironment = servicesConfig.getString("microservice.services.des.environment")
@@ -51,7 +53,7 @@ class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
     http.GET[DesEmployments](employmentsUrl, headers = headers).map(_.employments).recoverWith {
       case _: NotFoundException => Future.successful(Seq.empty)
       case Upstream4xxResponse(msg, 429, _, _) => {
-        Logger.warn(s"DES Rate limited: $msg")
+        logger.warn(s"DES Rate limited: $msg")
         Future.failed(new TooManyRequestException(msg))
       }
     }

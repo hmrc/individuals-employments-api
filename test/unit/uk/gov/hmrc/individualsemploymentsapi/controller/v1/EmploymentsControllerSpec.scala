@@ -19,7 +19,7 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v1
 import java.util.UUID
 
 import org.joda.time.{Interval, LocalDate}
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verifyZeroInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
