@@ -27,7 +27,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.cache.v1.{CacheConfiguration, ShortLivedCache}
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.CacheService
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

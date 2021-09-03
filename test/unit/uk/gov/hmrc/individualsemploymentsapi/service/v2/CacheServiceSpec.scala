@@ -22,7 +22,7 @@ import com.google.common.io.BaseEncoding
 import java.util.UUID
 import org.joda.time.{Interval, LocalDate}
 import org.mockito.BDDMockito.given
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar

@@ -73,7 +73,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService, cc:
       case Some(clientId) if clientId == hmctsClientId => employments
       case Some(_)                                     => employments.map(_.copy(payrollId = None, employeeAddress = None))
       case None =>
-        Logger.warn("Missing X-Client-Id header")
+        logger.warn("Missing X-Client-Id header")
         employments.map(_.copy(payrollId = None, employeeAddress = None))
     }
 

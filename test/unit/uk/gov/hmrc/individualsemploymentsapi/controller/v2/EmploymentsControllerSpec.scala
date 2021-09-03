@@ -18,7 +18,7 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
 import org.joda.time.{Interval, LocalDate}
 import org.mockito.BDDMockito.`given`
-import org.mockito.Matchers.{any, refEq, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, refEq, eq => eqTo}
 import org.mockito.Mockito.{times, verify, verifyZeroInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
