@@ -85,7 +85,7 @@ trait ScopesConfig extends MockitoSugar {
     (s"api-config.endpoints.$mockEndpoint4.fields.Z", "employmentPayFrequency"),
     (s"api-config.endpoints.$mockEndpoint4.fields.AA", "employeeAddress"),
     (s"api-config.endpoints.$mockEndpoint4.fields.AB", "payrollId"),
-    (s"api-config.endpoints.$mockEndpoint4.filters.M", "employerRef eq '<employerRef>'")
+    (s"api-config.endpoints.$mockEndpoint4.filters.M", "employerRef eq '<payeReference>'")
 
   )
 
@@ -153,7 +153,7 @@ trait ScopesConfig extends MockitoSugar {
           "AB" -> "payrollId"
         ),
         filters = Map(
-          "M" -> "employerRef eq '<employerRef>'"
+          "M" -> "employerRef eq '<payeReference>'"
         )
       )
     )

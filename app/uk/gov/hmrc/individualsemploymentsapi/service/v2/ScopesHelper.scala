@@ -22,33 +22,9 @@ import javax.inject.Inject
 import play.api.hal.Hal.{linksSeq, state}
 import play.api.hal.{HalLink, HalResource}
 import play.api.libs.json.JsValue
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryParameterException
 
 class ScopesHelper @Inject()(scopesService: ScopesService) {
-
-  /**
-    * @param scopes The list of scopes associated with the user
-    * @param endpoints The endpoints for which to construct the query string
-    * @param payeRef The PAYE reference
-    * @return A google fields-style query string with the fields determined by the provided endpoint(s) and scopes
-    */
-  def getQueryStringWithParameterisedFilters(scopes: Iterable[String],
-                                             endpoints: List[String],
-                                             employerRef: String): String = {
-    val queryString = getQueryStringFor(scopes, endpoints)
-    queryString.replace("<employerRef>", employerRef)
-  }
-
-  /**
-    * @param scopes The list of scopes associated with the user
-    * @param endpoints The endpoints for which to construct the query string
-    * @param payeRef The PAYE reference
-    * @return A google fields-style query string with the fields determined by the provided endpoint(s) and scopes
-    */
-  def getQueryStringWithParameterisedFilters(scopes: Iterable[String],
-                                             endpoint: String,
-                                             employerRef: String): String =
-    getQueryStringFor(scopes, endpoint).replace("<employerRef>", employerRef)
-
 
   /**
     * @param scopes The list of scopes associated with the user
@@ -73,6 +49,44 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     s"${PathTree(scopesService.getValidItemsFor(scopes, endpoints)).toString}${if (filters.nonEmpty)
       s"&filter=${filters.mkString("&filter=")}"
     else ""}"
+  }
+
+  private[service] def verifyRequiredParameters(scopes: List[String], endpoint: String, parameters: Map[String, String]): Iterable[String] = {
+    val filterParameterMappings = scopesService.getFilterToken(scopes, endpoint)
+    if(filterParameterMappings.isEmpty)
+      Seq()
+    else
+      filterParameterMappings.values.filter(s => parameters.get(s).isEmpty)
+        .map(s => s"$s is required for the scopes you have been assigned")
+  }
+
+  private def updateString(queryString: String, tokens: List[(String, String)]): String = {
+    if(tokens.isEmpty)
+      queryString
+    else
+      updateString(queryString.replace(s"<${tokens.head._1}>", tokens.head._2), tokens.tail)
+  }
+
+  /**
+   *
+   * @param scopes the authorised scopes of the user
+   * @param endpoint the endpoint for which to generate a query string
+   * @param tokens a map of tokens in the query string to the parameters with which to replace them
+   * @return
+   */
+  def getParameterisedQueryStringFor(scopes: List[String], endpoint: String, tokens: Map[String, String]): String = {
+
+    val paramErrors = verifyRequiredParameters(scopes, endpoint, tokens)
+
+    if(paramErrors.nonEmpty)
+      throw new MissingQueryParameterException(paramErrors.head)
+
+    if (tokens.isEmpty) {
+      getQueryStringFor(scopes, endpoint)
+    }
+    else  {
+      updateString(getQueryStringFor(scopes, endpoint), tokens.toList)
+    }
   }
 
   /**

@@ -81,7 +81,7 @@ class IfQueriesSpec extends BaseSpec {
     }
     scenario("For read:individuals-employments-ho-rp2") {
       val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-ho-rp2"), "paye")
-      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,payFrequency,startDate),payments(date,paidTaxablePay))&filter=employments%5B%5D/employerRef%20eq%20'<employerRef>'"
+      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,payFrequency,startDate),payments(date,paidTaxablePay))&filter=employments%5B%5D/employerRef%20eq%20'<payeReference>'"
     }
   }
 }

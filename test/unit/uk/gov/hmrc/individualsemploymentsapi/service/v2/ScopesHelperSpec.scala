@@ -17,6 +17,8 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 import org.scalatest.BeforeAndAfterEach
 import play.api.libs.json.Json
+import play.api.test.FakeRequest
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryParameterException
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{ScopesHelper, ScopesService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.UnitSpec
 import unit.uk.gov.hmrc.individualsemploymentsapi.service.ScopesConfig
@@ -37,7 +39,7 @@ class ScopesHelperSpec
     "return replaced employerRef" in {
       val employerRef = "247%2FZT6767895A"
       val result =
-        scopesHelper.getQueryStringWithParameterisedFilters(List(mockScope8), mockEndpoint4, employerRef)
+        scopesHelper.getParameterisedQueryStringFor(List(mockScope8), mockEndpoint4, Map(("payeReference", employerRef)))
       result shouldBe s"employer(employerAddress(line1,line2,line3),employerDistrictNumber,employerName,employerSchemeReference),payments&filter=employerRef eq '${employerRef}'"
     }
 
@@ -88,5 +90,24 @@ class ScopesHelperSpec
         halLink.rel == "self" && halLink.href == "/a/b/d?matchId=<matchId>{&fromDate,toDate}") shouldBe true
 
     }
+
+
+    "should throw exception if any required query parameters are not present" in {
+      assertThrows[MissingQueryParameterException] {
+        scopesHelper.getParameterisedQueryStringFor(List(mockScope8), mockEndpoint4, Map())
+      }
+    }
+
+    "should get none-filtered query string when filters are not required" in {
+      val result = scopesHelper.getParameterisedQueryStringFor(List(mockScope2), mockEndpoint1, Map())
+      result shouldBe "employer(employerAddress(line1,line2,line3),employerDistrictNumber,employerName,employerSchemeReference),payments"
+    }
+
+    "should get replaced query string when filters are required" in {
+      val employerRef = "247/ZT6767895A"
+      val result = scopesHelper.getParameterisedQueryStringFor(List(mockScope8), mockEndpoint4, Map(("payeReference", employerRef)))
+      result shouldBe s"employer(employerAddress(line1,line2,line3),employerDistrictNumber,employerName,employerSchemeReference),payments&filter=employerRef eq '$employerRef'"
+    }
   }
+
 }
