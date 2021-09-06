@@ -50,7 +50,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
       employmentsService.resolve(matchId) map { _ =>
 
         val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
-        val response = scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink
+        val response = scopesHelper.getHalLinks(matchId, None, authScopes, None) ++ selfLink
 
         auditHelper.auditApiResponse(correlationId.toString, matchId.toString,
           authScopes.mkString(","), request, response.toString, None)
