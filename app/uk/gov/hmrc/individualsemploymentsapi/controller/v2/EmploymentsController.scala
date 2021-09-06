@@ -16,30 +16,31 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
-import java.util.UUID
-import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.Interval
 import play.api.hal.Hal._
-import play.api.mvc.hal._
 import play.api.hal.HalLink
 import play.api.libs.json.Json
+import play.api.mvc.hal._
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
-import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopeFilterVerificationService, ScopesHelper, ScopesService}
-import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.validateCorrelationId
-import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.maybeCorrelationId
+import uk.gov.hmrc.individualsemploymentsapi.service.v2._
+import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.{maybeCorrelationId, validateCorrelationId}
 
+import java.util.UUID
+import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.ExecutionContext
 
-abstract class EmploymentsController(employmentsService: EmploymentsService,
-                                     scopeService: ScopesService,
-                                     scopesHelper: ScopesHelper,
-                                     scopeFilterVerificationService: ScopeFilterVerificationService,
-                                     implicit val auditHelper: AuditHelper,
-                                     cc: ControllerComponents)
+@Singleton
+class EmploymentsController @Inject() (employmentsService: EmploymentsService,
+                            scopeService: ScopesService,
+                            scopesHelper: ScopesHelper,
+                            scopeFilterVerificationService: ScopeFilterVerificationService,
+                            val authConnector: AuthConnector,
+                            @Named("hmctsClientId") val hmctsClientId: String,
+                            implicit val auditHelper: AuditHelper,
+                            cc: ControllerComponents )
                                     (implicit val ec: ExecutionContext)
   extends CommonController(cc) with PrivilegedAuthentication {
 
@@ -48,7 +49,11 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
 
       val correlationId = validateCorrelationId(request)
 
+      print(s"CorrelationId = $correlationId")
+
       employmentsService.resolve(matchId) map { _ =>
+
+        println("REACHED HERE HAHA!")
 
         val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
         val response = scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink
@@ -84,38 +89,6 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
 
     } recover withAudit(maybeCorrelationId(request), matchId.toString, "/individuals/employments/paye")
   }
-}
 
-@Singleton
-class SandboxEmploymentsController @Inject()(
-                                              sandboxEmploymentsService: SandboxEmploymentsService,
-                                              scopeService: ScopesService,
-                                              scopesHelper: ScopesHelper,
-                                              scopeFilterVerificationService: ScopeFilterVerificationService,
-                                              val authConnector: AuthConnector,
-                                              @Named("hmctsClientId") val hmctsClientId: String,
-                                              auditHelper: AuditHelper,
-                                              cc: ControllerComponents)(override implicit val ec: ExecutionContext)
-  extends EmploymentsController(sandboxEmploymentsService,
-    scopeService,
-    scopesHelper,
-    scopeFilterVerificationService,
-    auditHelper,
-    cc) {
-  override val environment: String = SANDBOX
-}
-
-@Singleton
-class LiveEmploymentsController @Inject()(
-                                           liveEmploymentsService: LiveEmploymentsService,
-                                           scopeService: ScopesService,
-                                           scopesHelper: ScopesHelper,
-                                           scopeFilterVerificationService: ScopeFilterVerificationService,
-                                           val authConnector: AuthConnector,
-                                           @Named("hmctsClientId") val hmctsClientId: String,
-                                           auditHelper: AuditHelper,
-                                           cc: ControllerComponents)(override implicit val ec: ExecutionContext)
-  extends EmploymentsController(liveEmploymentsService, scopeService, scopesHelper, scopeFilterVerificationService, auditHelper, cc) {
-
-  override val environment: String = PRODUCTION
+  override val environment: String = "NOT_APPLICABLE" // Required due to inheriting common controller and needed for V1
 }

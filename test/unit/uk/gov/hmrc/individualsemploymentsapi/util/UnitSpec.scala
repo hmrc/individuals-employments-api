@@ -17,21 +17,21 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.util
 
 import java.nio.charset.Charset
-
 import akka.stream.Materializer
 import akka.util.ByteString
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{Matchers, WordSpec}
 import play.api.inject.guice.GuiceableModule
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 
 import scala.concurrent.ExecutionContext.Implicits.global
-
 import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 
-trait UnitSpec extends WordSpec with Matchers {
+trait UnitSpec extends AnyWordSpec with Matchers {
 
   implicit val defaultTimeout: FiniteDuration = 5 seconds
 
