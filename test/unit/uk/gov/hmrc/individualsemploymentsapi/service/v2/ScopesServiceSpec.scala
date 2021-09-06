@@ -18,7 +18,6 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
 import org.scalatest.BeforeAndAfterEach
 import uk.gov.hmrc.individualsemploymentsapi.config.EndpointConfig
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.ScopesService
 import unit.uk.gov.hmrc.individualsemploymentsapi.service.ScopesConfig
 import utils.UnitSpec
 
