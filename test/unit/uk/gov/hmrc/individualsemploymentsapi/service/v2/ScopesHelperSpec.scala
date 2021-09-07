@@ -20,12 +20,12 @@ import org.scalatest.{BeforeAndAfterEach, Matchers}
 import play.api.libs.json.Json
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryParameterException
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{ScopesHelper, ScopesService}
-import unit.uk.gov.hmrc.individualsemploymentsapi.service.{ScopesConfig, ScopesConfigNew}
+import unit.uk.gov.hmrc.individualsemploymentsapi.service.ScopesConfig
 import utils.UnitSpec
 
 class ScopesHelperSpec
     extends UnitSpec
-    with ScopesConfigNew
+    with ScopesConfig
     with BeforeAndAfterEach
     with Matchers {
 

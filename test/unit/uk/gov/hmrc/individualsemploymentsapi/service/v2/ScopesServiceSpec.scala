@@ -18,10 +18,10 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
 import org.scalatest.Matchers
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.ScopesService
-import unit.uk.gov.hmrc.individualsemploymentsapi.service.ScopesConfigNew
+import unit.uk.gov.hmrc.individualsemploymentsapi.service.ScopesConfig
 import utils.UnitSpec
 
-class ScopesServiceSpec extends UnitSpec with Matchers with ScopesConfigNew {
+class ScopesServiceSpec extends UnitSpec with Matchers with ScopesConfig {
 
   val scopesService = new ScopesService(mockConfig)
 
