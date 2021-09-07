@@ -32,6 +32,7 @@ trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
           ConfigFactory.parseString("""
                                       | metrics.jvm = false
                                       | metrics.enabled = true
+                                      | auditing.enables = false
           """.stripMargin)
         ) ++ extraConfig)
       .build()

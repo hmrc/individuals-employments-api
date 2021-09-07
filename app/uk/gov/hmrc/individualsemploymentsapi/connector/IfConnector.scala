@@ -22,7 +22,7 @@ import org.joda.time.{Interval, LocalDate}
 import play.api.Logger
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{Authorization, BadRequestException, HeaderCarrier, HeaderNames, HttpClient, InternalServerException, JsValidationException, NotFoundException, TooManyRequestException, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HeaderNames, HttpClient, InternalServerException, JsValidationException, NotFoundException, TooManyRequestException, Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfEmployment, IfEmployments}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -76,7 +76,7 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
 
   private def callPaye(url: String, endpoint: String, matchId: String)
                       (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
-    recover[IfEmployment](http.GET[IfEmployments](url, headers = setHeaders(request)) map { response =>
+    recover[IfEmployment](http.GET[IfEmployments](url, Seq(), setHeaders(request)) map { response =>
         auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, response)
 
         response.employments

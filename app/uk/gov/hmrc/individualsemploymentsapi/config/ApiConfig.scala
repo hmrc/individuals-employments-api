@@ -89,7 +89,7 @@ object ApiConfig {
             .map(field => (field, config.getString(s"fields.$field"))).toMap,
           filters =  getStringList(s"endpoints.internal.$endpointName.filters")
             .map(filter => (filter, config.getString(s"filters.$filter"))).toMap,
-        )).toList).getOrElse(List())
+        )).toList.sortBy(_.name)).getOrElse(List())
 
     val extEndpointsOpt = parseConfig("endpoints.external")
     val externalEndpointConfig: List[ExternalEndpointConfig] =
@@ -99,7 +99,7 @@ object ApiConfig {
           key = config.getString(s"endpoints.external.$key.key"),
           link = config.getString(s"endpoints.external.$key.endpoint"),
           title = config.getString(s"endpoints.external.$key.title")
-        )).toList).getOrElse(List())
+        )).toList.sortBy(_.name)).getOrElse(List())
 
     val scopesOpt = parseConfig("scopes")
     val scopeConfig = scopesOpt.map(scopes => scopes.listChildren

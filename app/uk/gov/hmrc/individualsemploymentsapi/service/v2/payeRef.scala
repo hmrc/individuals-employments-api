@@ -60,7 +60,7 @@ class ScopesService @Inject()(configuration: Configuration) {
   def getValidFilters(scopes: Iterable[String],
                       endpoints: Iterable[String]): Iterable[String] = {
     val filterKeys = scopes.flatMap(getScopeFilterKeys).toList
-    getInternalEndpoints(scopes).flatMap(endpoint =>
+    endpoints.flatMap(apiConfig.getInternalEndpoint).flatMap(endpoint =>
       endpoint.filters.filter(filterMap =>
         filterKeys.contains(filterMap._1))
       .values)
@@ -68,9 +68,11 @@ class ScopesService @Inject()(configuration: Configuration) {
 
   def getValidFilterKeys(scopes: Iterable[String],
                          endpoints: List[String]): Iterable[String] = {
-    val endpointDataItems = endpoints.flatMap(e => getEndpointFieldKeys(e).toSet)
-    val filtersForEndpoints = scopes.flatMap(getScopeFilterKeys)
-    filtersForEndpoints.filter(endpointDataItems.contains)
+    val filterKeys = scopes.flatMap(getScopeFilterKeys).toList
+    endpoints.flatMap(apiConfig.getInternalEndpoint).flatMap(endpoint =>
+      endpoint.filters.filter(filterMap =>
+        filterKeys.contains(filterMap._1))
+        .keys)
   }
 
   def getFilterToken(scopes: List[String], endpoint: String): Map[String, String] = {

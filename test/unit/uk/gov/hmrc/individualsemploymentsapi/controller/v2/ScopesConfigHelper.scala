@@ -22,10 +22,11 @@ trait ScopesConfigHelper {
 
   val mockScopesConfig = Configuration(
     (s"api-config.scopes.test-scope.fields", List("A", "B", "C")),
-    (s"api-config.endpoints.paye.endpoint", "/individuals/employments/paye?matchId=<matchId>{&startDate,endDate}"),
-    (s"api-config.endpoints.paye.title", "Get an individual's PAYE employment data"),
-    (s"api-config.endpoints.paye.fields.A", "employments/employer/name"),
-    (s"api-config.endpoints.paye.fields.B", "employments/employer/districtNumber"),
-    (s"api-config.endpoints.paye.fields.C", "employments/employer/schemeRef"),
+    (s"api-config.endpoints.internal.paye.endpoint", "/individuals/employments/paye?matchId=<matchId>{&startDate,endDate}"),
+    (s"api-config.endpoints.internal.paye.title", "Get an individual's PAYE employment data"),
+    (s"api-config.endpoints.internal.paye.fields", Seq("A", "B", "C")),
+    (s"api-config.fields.A", "employments/employer/name"),
+    (s"api-config.fields.B", "employments/employer/districtNumber"),
+    (s"api-config.fields.C", "employments/employer/schemeRef")
   )
 }

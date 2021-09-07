@@ -18,7 +18,7 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.service
 
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.Configuration
-import uk.gov.hmrc.individualsemploymentsapi.config.{ApiConfig, EndpointConfig, ScopeConfig}
+import uk.gov.hmrc.individualsemploymentsapi.config.{ApiConfig, EndpointConfig, InternalEndpointConfig, ScopeConfig}
 
 trait ScopesConfig extends MockitoSugar {
 
@@ -85,21 +85,21 @@ trait ScopesConfig extends MockitoSugar {
     (s"api-config.endpoints.internal.$mockEndpoint4.fields.Z", "employmentPayFrequency"),
     (s"api-config.endpoints.internal.$mockEndpoint4.fields.AA", "employeeAddress"),
     (s"api-config.endpoints.internal.$mockEndpoint4.fields.AB", "payrollId"),
-    (s"api-config.endpoints.internal.$mockEndpoint4.filters.M", "employerRef eq '<employerRef>'")
+    (s"api-config.endpoints.internal.$mockEndpoint4.filters.M", "employerRef eq '<payeReference>'")
 
   )
 
   val mockApiConfig = ApiConfig(
     scopes = List(
-      ScopeConfig(mockScope1, List("A", "B", "F")),
-      ScopeConfig(mockScope2, List("A", "B", "C", "D", "E", "F", "G")),
-      ScopeConfig(mockScope3, List("A", "P")),
-      ScopeConfig(mockScope4, List("AC", "N")),
-      ScopeConfig(mockScope5, List("O", "P")),
-      ScopeConfig(mockScope8, List("M", "AD", "S", "T", "U", "V", "W"), filters = List("M"))
+      ScopeConfig(mockScope1, List("A", "B", "F"), List(), List()),
+      ScopeConfig(mockScope2, List("A", "B", "C", "D", "E", "F", "G"), List(), List()),
+      ScopeConfig(mockScope3, List("A", "P"), List(), List()),
+      ScopeConfig(mockScope4, List("AC", "N"), List(), List()),
+      ScopeConfig(mockScope5, List("O", "P"), List(), List()),
+      ScopeConfig(mockScope8, List("M", "AD", "S", "T", "U", "V", "W"), filters = List("M"), endpoints = List())
     ),
-    endpoints = List(
-      EndpointConfig(
+    internalEndpoints = List(
+      InternalEndpointConfig(
         name = mockEndpoint1,
         title = "title",
         link = "/a/b/c?matchId=<matchId>{&fromDate,toDate}",
@@ -116,25 +116,28 @@ trait ScopesConfig extends MockitoSugar {
           "J" -> "employmentPayFrequency",
           "K" -> "employeeAddress",
           "L" -> "payrollId"
-        )
+        ),
+        filters = Map()
       ),
-      EndpointConfig(
+      InternalEndpointConfig(
         name = mockEndpoint2,
         title = "title",
         link = "/a/b/d?matchId=<matchId>{&fromDate,toDate}",
         fields = Map(
           "AC" -> "field1",
           "N" -> "field2"
-        )),
-      EndpointConfig(
+        ),
+        filters = Map()),
+      InternalEndpointConfig(
         name = mockEndpoint3,
         title = "title",
         link = "/a/b/e?matchId=<matchId>{&fromDate,toDate}",
         fields = Map(
           "O" -> "field3",
           "P" -> "field4"
-        )),
-      EndpointConfig(
+        ),
+        filters = Map()),
+      InternalEndpointConfig(
         name = mockEndpoint4,
         title = "title",
         link = "/a/b/c?matchId=<matchId>{&fromDate,toDate}",
@@ -156,6 +159,7 @@ trait ScopesConfig extends MockitoSugar {
           "M" -> "employerRef eq '<payeReference>'"
         )
       )
-    )
+    ),
+    externalEndpoints = List()
   )
 }
