@@ -17,10 +17,9 @@
 package uk.gov.hmrc.individualsemploymentsapi.service.v2
 
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.api.controllers.ErrorGenericBadRequest
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryParameterException
+
 import javax.inject.Inject
-import uk.gov.hmrc.individualsemploymentsapi.config.ApiConfig
 
 case class VerifyResult(hasAllParameters: Boolean, requiredFields: List[String])
 

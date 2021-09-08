@@ -30,7 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheConfiguration)(implicit ec: ExecutionContext) {
 
-  def get[T: Format](cacheId: CacheIdBase, functionToCache: => Future[T])(implicit hc: HeaderCarrier): Future[T] =
+  def get[T: Format](cacheId: CacheIdBase, functionToCache: => Future[T]): Future[T] =
     if (conf.cacheEnabled) {
       cachingClient.fetchAndGetEntry[T](cacheId.id, conf.key) flatMap {
         case Some(value) => Future.successful(value)

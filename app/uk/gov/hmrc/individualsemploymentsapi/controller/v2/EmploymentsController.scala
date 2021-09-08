@@ -24,7 +24,6 @@ import play.api.mvc.hal._
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
-import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2._
 import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.{maybeCorrelationId, validateCorrelationId}
 
@@ -42,19 +41,14 @@ class EmploymentsController @Inject() (employmentsService: EmploymentsService,
                             implicit val auditHelper: AuditHelper,
                             cc: ControllerComponents )
                                     (implicit val ec: ExecutionContext)
-  extends CommonController(cc) with PrivilegedAuthentication {
+  extends CommonControllerV2(cc) with PrivilegedAuthentication {
 
   def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
 
       val correlationId = validateCorrelationId(request)
 
-      print(s"CorrelationId = $correlationId")
-
       employmentsService.resolve(matchId) map { _ =>
-
-        println("REACHED HERE HAHA!")
-
         val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
         val response = scopesHelper.getHalLinks(matchId, authScopes) ++ selfLink
 
@@ -89,6 +83,4 @@ class EmploymentsController @Inject() (employmentsService: EmploymentsService,
 
     } recover withAudit(maybeCorrelationId(request), matchId.toString, "/individuals/employments/paye")
   }
-
-  override val environment: String = "NOT_APPLICABLE" // Required due to inheriting common controller and needed for V1
 }

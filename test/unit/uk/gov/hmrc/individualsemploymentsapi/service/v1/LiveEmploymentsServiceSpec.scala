@@ -50,7 +50,7 @@ class LiveEmploymentsServiceSpec extends SpecBase with Intervals with MockitoSug
 
   // can't mock function with by-value argument
   private val stubCache = new CacheService(null, null)(null) {
-    override def get[T: Format](cacheId: String, functionToCache: => Future[T])(implicit hc: HeaderCarrier) =
+    override def get[T: Format](cacheId: String, functionToCache: => Future[T]) =
       functionToCache
   }
 
