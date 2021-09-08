@@ -42,7 +42,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
 
-class LiveEmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar with BeforeAndAfterEach {
+class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar with BeforeAndAfterEach {
 
   private val individualsMatchingApiConnector =
     mock[IndividualsMatchingApiConnector]
