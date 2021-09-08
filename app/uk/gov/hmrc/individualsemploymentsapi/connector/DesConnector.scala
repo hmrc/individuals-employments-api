@@ -50,7 +50,7 @@ class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
     val toDate         = interval.getEnd.toLocalDate
     val employmentsUrl = s"$serviceUrl/individuals/nino/$nino/employments/income?from=$fromDate&to=$toDate"
 
-    http.GET[DesEmployments](employmentsUrl, headers = headers).map(_.employments).recoverWith {
+    http.GET[DesEmployments](employmentsUrl, Seq(), headers).map(_.employments).recoverWith {
       case _: NotFoundException => Future.successful(Seq.empty)
       case Upstream4xxResponse(msg, 429, _, _) => {
         logger.warn(s"DES Rate limited: $msg")

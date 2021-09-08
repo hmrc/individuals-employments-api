@@ -22,58 +22,61 @@ import javax.inject.Inject
 import play.api.hal.Hal.{linksSeq, state}
 import play.api.hal.{HalLink, HalResource}
 import play.api.libs.json.JsValue
+import uk.gov.hmrc.individualsemploymentsapi.config.EndpointConfig
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryParameterException
 
 class ScopesHelper @Inject()(scopesService: ScopesService) {
 
   /**
     * @param scopes The list of scopes associated with the user
-    * @param endpoints The endpoints for which to construct the query string
-    * @param payeRef The PAYE reference
+    * @param endpoints The endpoint that the user has called
     * @return A google fields-style query string with the fields determined by the provided endpoint(s) and scopes
     */
-  def getQueryStringWithParameterisedFilters(scopes: Iterable[String],
-                                             endpoints: List[String],
-                                             employerRef: String): String = {
-    val queryString = getQueryStringFor(scopes, endpoints)
-    queryString.replace("<employerRef>", employerRef)
-  }
-
-  /**
-    * @param scopes The list of scopes associated with the user
-    * @param endpoints The endpoints for which to construct the query string
-    * @param payeRef The PAYE reference
-    * @return A google fields-style query string with the fields determined by the provided endpoint(s) and scopes
-    */
-  def getQueryStringWithParameterisedFilters(scopes: Iterable[String],
-                                             endpoint: String,
-                                             employerRef: String): String =
-    getQueryStringFor(scopes, endpoint).replace("<employerRef>", employerRef)
-
-
-  /**
-    * @param scopes The list of scopes associated with the user
-    * @param endpoint The endpoint for which to construct the query string
-    * @return A google fields-style query string with the fields determined by the provided endpoint and scopes
-    */
-  def getQueryStringFor(scopes: Iterable[String], endpoint: String): String = {
-    val filters = scopesService.getValidFilters(scopes, List(endpoint))
-    s"${PathTree(scopesService.getValidItemsFor(scopes, List(endpoint))).toString}${if (filters.nonEmpty)
-      s"&filter=${filters.mkString("&filter=")}"
-    else ""}"
-  }
-
-  /**
-    * @param scopes The list of scopes associated with the user
-    * @param endpoints The endpoints for which to construct the query string
-    * @return A google fields-style query string with the fields determined by the provided endpoint(s) and scopes
-    */
-  def getQueryStringFor(scopes: Iterable[String],
-                        endpoints: List[String]): String = {
+  def getQueryStringFor(scopes: Iterable[String], endpoints: List[String]): String = {
     val filters = scopesService.getValidFilters(scopes, endpoints)
-    s"${PathTree(scopesService.getValidItemsFor(scopes, endpoints)).toString}${if (filters.nonEmpty)
+    s"${PathTree(scopesService.getIfDataPaths(scopes, endpoints)).toString}${if (filters.nonEmpty)
       s"&filter=${filters.mkString("&filter=")}"
     else ""}"
   }
+
+  private[service] def verifyRequiredParameters(scopes: List[String], endpoint: String, parameters: Map[String, String]): Iterable[String] = {
+    val filterParameterMappings = scopesService.getFilterToken(scopes, endpoint)
+    if(filterParameterMappings.isEmpty)
+      Seq()
+    else
+      filterParameterMappings.values.filter(s => parameters.get(s).isEmpty)
+        .map(s => s"$s is required for the scopes you have been assigned")
+  }
+
+  private def updateString(queryString: String, tokens: List[(String, String)]): String = {
+    if(tokens.isEmpty)
+      queryString
+    else
+      updateString(queryString.replace(s"<${tokens.head._1}>", tokens.head._2), tokens.tail)
+  }
+
+  /**
+   *
+   * @param scopes the authorised scopes of the user
+   * @param endpoint the endpoint for which to generate a query string
+   * @param tokens a map of tokens in the query string to the parameters with which to replace them
+   * @return
+   */
+  def getParameterisedQueryStringFor(scopes: List[String], endpoint: String, tokens: Map[String, String]): String = {
+
+    val paramErrors = verifyRequiredParameters(scopes, endpoint, tokens)
+
+    if(paramErrors.nonEmpty)
+      throw new MissingQueryParameterException(paramErrors.head)
+
+    if (tokens.isEmpty) {
+      getQueryStringFor(scopes, List(endpoint))
+    }
+    else  {
+      updateString(getQueryStringFor(scopes, List(endpoint)), tokens.toList)
+    }
+  }
+
 
   /**
     * @param endpoint The endpoint that the user has called
@@ -82,24 +85,52 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     * @return A HalResource containing data, and a list of valid links determined by the provided scopes
     */
   def getHalResponse(endpoint: String, scopes: List[String], data: Option[JsValue]): HalResource = {
-    val hateoasLinks = scopesService
-      .getEndpoints(scopes)
+
+    val internalEndpoints = scopesService
+      .getInternalEndpoints(scopes)
       .map(link => HalLink(rel = link.name, href = link.link, name = Some(link.title)))
-      .toList ++
+      .toList
+
+    val externalEndpoints = scopesService
+      .getExternalEndpoints(scopes)
+      .map(link => HalLink(rel = link.name, href = link.link, name = Some(link.title)))
+      .toList
+
+    val hateoasLinks = internalEndpoints ++ externalEndpoints ++
       Seq(HalLink("self", scopesService.getEndpointLink(endpoint).get))
 
     state(data) ++ linksSeq(hateoasLinks)
   }
 
-  def getHalLinks(matchId: UUID, scopes: Iterable[String]): HalResource =
-    linksSeq(
-      scopesService
-        .getEndpoints(scopes)
-        .map(
-          endpoint =>
-            HalLink(
-              rel = endpoint.name,
-              href = endpoint.link.replaceAllLiterally("<matchId>", s"$matchId"),
-              title = Some(endpoint.title)))
-        .toSeq)
+  def getHalLinks(matchId: UUID,
+                  excludeList: Option[List[String]],
+                  scopes: Iterable[String],
+                  allowedList: Option[List[String]],
+                  excludeInternal: Boolean = false): HalResource = {
+
+    val links = excludeInternal match {
+      case true  => getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getExternalEndpoints(scopes))
+      case false => getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getInternalEndpoints(scopes)) ++
+        getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getExternalEndpoints(scopes))
+    }
+
+    linksSeq(links)
+  }
+
+  private def getAllHalLinks(
+                   matchId: UUID,
+                   excludeList: Option[List[String]],
+                   allowedList: Option[List[String]],
+                   getEndpoints: () => Iterable[EndpointConfig]): Seq[HalLink] =
+
+      getEndpoints()
+        .filter(c =>
+          !excludeList.getOrElse(List()).contains(c.name) &&
+            allowedList.getOrElse(getEndpoints().map(e => e.name).toList).contains(c.name))
+        .map(endpoint =>
+          HalLink(
+            rel = endpoint.name,
+            href = endpoint.link.replaceAllLiterally("<matchId>", s"$matchId"),
+            title = Some(endpoint.title)))
+        .toSeq
 }

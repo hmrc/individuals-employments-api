@@ -1,4 +1,4 @@
 # microservice specific routes
 
 GET        /                        @uk.gov.hmrc.individualsemploymentsapi.controller.v2.LiveEmploymentsController.root(matchId: java.util.UUID)
-GET        /paye                    @uk.gov.hmrc.individualsemploymentsapi.controller.v2.LiveEmploymentsController.paye(matchId: java.util.UUID, interval: org.joda.time.Interval)
+GET        /paye                    @uk.gov.hmrc.individualsemploymentsapi.controller.v2.LiveEmploymentsController.paye(matchId: java.util.UUID, interval: org.joda.time.Interval, payeReference: Option[String])

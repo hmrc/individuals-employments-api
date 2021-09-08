@@ -26,7 +26,7 @@ import uk.gov.hmrc.individualsemploymentsapi.connector.{IfConnector, Individuals
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.Individual
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{MatchNotFoundException, MissingQueryParameterException}
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.v2.SandboxData.Individuals.find
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.v2.SandboxData.{sandboxMatchId, sandboxNino}
 
@@ -39,7 +39,7 @@ trait EmploymentsService {
 
   def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch]
 
-  def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])
+  def paye(matchId: UUID, interval: Interval,  payeReference: Option[String], endpoint: String, scopes: Iterable[String])
           (implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]]
 
   def endpoints =
@@ -54,11 +54,11 @@ class SandboxEmploymentsService extends EmploymentsService {
     if (matchId.equals(sandboxMatchId)) successful(NinoMatch(sandboxMatchId, sandboxNino))
     else failed(new MatchNotFoundException)
 
-  override def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])
+  override def paye(matchId: UUID, interval: Interval,  payeReference: Option[String], endpoint: String, scopes: Iterable[String])
                    (implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]] =
-    paye(find(matchId), interval)
+    paye(find(matchId), interval, payeReference)
 
-  private def paye(maybeIndividual: Option[Individual], interval: Interval)
+  private def paye(maybeIndividual: Option[Individual], interval: Interval, payeReference: Option[String])
                   (implicit hc: HeaderCarrier): Future[Seq[Employment]] =
     maybeIndividual match {
       case Some(i) =>
@@ -83,7 +83,6 @@ class LiveEmploymentsService @Inject()(
   ifConnector: IfConnector,
   scopesHelper: ScopesHelper,
   scopesService: ScopesService,
-  scopeFilterVerificationService: ScopeFilterVerificationService,
   @Named("retryDelay") retryDelay: Int,
   cacheService: CacheService)(implicit val ec: ExecutionContext)
     extends EmploymentsService {
@@ -95,16 +94,16 @@ class LiveEmploymentsService @Inject()(
   override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
     individualsMatchingApiConnector.resolve(matchId)
 
-  override def paye(matchId: UUID, interval: Interval, endpoint: String, scopes: Iterable[String])
+  override def paye(matchId: UUID, interval: Interval, payeReference: Option[String], endpoint: String, scopes: Iterable[String])
                    (implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]] =
     resolve(matchId).flatMap {
       ninoMatch =>
-        val fieldsQuery       = scopeFilterVerificationService.getQueryStringForDefinedScopes(scopes.toList, endpoint, request)
+        val params = payeReference.map(s => ("payeReference", s)).toMap
+        val fieldsQuery       = scopesHelper.getParameterisedQueryStringFor(scopes.toList, endpoint, params)
         val fieldKeys         = scopesService.getValidFieldsForCacheKey(scopes.toList, endpoints)
-        val maybeEmployerRef  = scopeFilterVerificationService.getEmployerRef(request)
         cacheService
           .get(
-            cacheId = CacheId(matchId, interval, fieldKeys, maybeEmployerRef),
+            cacheId = CacheId(matchId, interval, fieldKeys, payeReference),
             functionToCache = withRetry {
               ifConnector.fetchEmployments(
                 ninoMatch.nino,

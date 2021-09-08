@@ -34,7 +34,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.v2.SandboxData._
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{LiveEmploymentsService, SandboxEmploymentsService, ScopeFilterVerificationService, ScopesHelper, ScopesService}
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.AuthHelper
 
@@ -58,7 +58,6 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
     implicit lazy val ec = fakeApplication.injector.instanceOf[ExecutionContext]
     lazy val scopeService: ScopesService = new ScopesService(mockScopesConfig)
     lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
-    val scopeFilterVerificationService = new ScopeFilterVerificationService(scopeService, scopesHelper)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val auditHelper: AuditHelper = mock[AuditHelper]
     val hmctsClientId = "hmctsClientId"
@@ -67,7 +66,6 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       mockSandboxEmploymentsService,
       scopeService,
       scopesHelper,
-      scopeFilterVerificationService,
       mockAuthConnector,
       hmctsClientId,
       auditHelper,
@@ -77,7 +75,6 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       mockLiveEmploymentsService,
       scopeService,
       scopesHelper,
-      scopeFilterVerificationService,
       mockAuthConnector,
       hmctsClientId,
       auditHelper,
@@ -241,11 +238,11 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       val invalidMatchId = UUID.randomUUID()
 
-      when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval), any(), any())(any(), any()))
+      when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval), any(), any(), any())(any(), any()))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
-        liveEmploymentsController.paye(invalidMatchId, interval)(FakeRequest().withHeaders(validCorrelationHeader))
+        liveEmploymentsController.paye(invalidMatchId, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(eventualResult) shouldBe NOT_FOUND
 
@@ -264,11 +261,11 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       val matchId = UUID.randomUUID()
 
-      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval), any(), any())(any(), any()))
+      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval), any(), any(), any())(any(), any()))
         .thenReturn(Future.successful(Seq(Employment.create(Employments.example1).get)))
 
       val res =
-        liveEmploymentsController.paye(matchId, interval)(FakeRequest().withHeaders(validCorrelationHeader))
+        liveEmploymentsController.paye(matchId, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(res) shouldBe OK
 
@@ -313,7 +310,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       when(mockAuthConnector.authorise(any(), any())(any(), any())).thenReturn(Future.failed(InsufficientEnrolments()))
 
       val result =
-        liveEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest().withHeaders(validCorrelationHeader))
+        liveEmploymentsController.paye(sandboxMatchId, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(result) shouldBe UNAUTHORIZED
       verifyZeroInteractions(mockLiveEmploymentsService)
@@ -328,6 +325,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         mockSandboxEmploymentsService.paye(
           eqTo(sandboxMatchId),
           eqTo(interval),
+          any(),
           eqTo("paye"),
           eqTo(Seq("test-scope"))
         )(any(), any())).thenReturn(
@@ -335,7 +333,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       )
 
       val eventualResult =
-        sandboxEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest().withHeaders(validCorrelationHeader))
+        sandboxEmploymentsController.paye(sandboxMatchId, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(eventualResult) shouldBe OK
       verifyZeroInteractions(mockAuthConnector)
