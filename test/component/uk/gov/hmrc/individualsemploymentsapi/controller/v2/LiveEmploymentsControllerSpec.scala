@@ -347,6 +347,9 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
+      And("a valid record in the matching API")
+      IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
+
       When("the paye endpoint is invoked without an employerRef")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
 
