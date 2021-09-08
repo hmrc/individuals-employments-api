@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework
 
-import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json._
 

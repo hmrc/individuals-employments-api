@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.controller
+package uk.gov.hmrc.individualsemploymentsapi.controller.v1
 
-import javax.inject.Inject
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, InternalServerException, TooManyRequestException}
+import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment}
+import uk.gov.hmrc.http.{HeaderCarrier, TooManyRequestException}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
-import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.SANDBOX
+import uk.gov.hmrc.individualsemploymentsapi.controller.v1.Environment.SANDBOX
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses._
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import scala.xml.dtd.ValidationException
 
 abstract class CommonController @Inject()(cc: ControllerComponents) extends BackendController(cc) {
 
@@ -52,54 +51,6 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
     case tmr: TooManyRequestException => ErrorTooManyRequests.toHttpResponse
     case e: IllegalArgumentException  => ErrorInvalidRequest(e.getMessage).toHttpResponse
   }
-
-  private[controller] def withAudit(correlationId: Option[String], matchId: String, url: String)
-                                   (implicit request: RequestHeader,
-                                   auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
-    case _: MatchNotFoundException   => {
-      logger.warn("Controllers MatchNotFoundException encountered")
-      auditHelper.auditApiFailure(correlationId, matchId, request, url, "Not Found")
-      ErrorNotFound.toHttpResponse
-    }
-    case e: InsufficientEnrolments => {
-      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
-      ErrorUnauthorized("Insufficient Enrolments").toHttpResponse
-    }
-    case e: AuthorisationException   => {
-      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
-      ErrorUnauthorized(e.getMessage).toHttpResponse
-    }
-    case tmr: TooManyRequestException  => {
-      logger.warn("Controllers TooManyRequestException encountered")
-      auditHelper.auditApiFailure(correlationId, matchId, request, url, tmr.getMessage)
-      ErrorTooManyRequests.toHttpResponse
-    }
-    case br: BadRequestException  => {
-      auditHelper.auditApiFailure(correlationId, matchId, request, url, br.getMessage)
-      ErrorInvalidRequest(br.getMessage).toHttpResponse
-    }
-    case e: IllegalArgumentException => {
-      logger.warn("Controllers IllegalArgumentException encountered")
-      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
-      ErrorInvalidRequest(e.getMessage).toHttpResponse
-    }
-    case e: InternalServerException => {
-      logger.warn("Controllers InternalServerException encountered")
-      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
-      ErrorInternalServer("Something went wrong.").toHttpResponse
-    }
-    case e: MissingQueryParameterException => {
-      logger.warn("Controllers MissingQueryParameterException encountered")
-      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
-      ErrorInvalidRequest(e.getMessage).toHttpResponse
-    }
-    case e: Exception => {
-      logger.warn("Controllers Exception encountered")
-      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
-      ErrorInternalServer("Something went wrong.").toHttpResponse
-    }
-  }
-
 }
 
 trait PrivilegedAuthentication extends AuthorisedFunctions {

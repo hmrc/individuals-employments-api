@@ -62,7 +62,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
   feature("Root (hateoas) entry point is accessible") {
 
-    testAuthorisation("", allScopes)
+    testAuthorisation("")
 
     scenario("invalid token") {
       Given("an invalid token")
@@ -151,7 +151,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
   feature("Paye endpoint") {
 
     testErrorHandling("paye", nino, allScopes)
-    testAuthorisation("paye", allScopes)
+    testAuthorisation("paye")
 
     scenario("invalid token") {
       Given("an invalid token")
@@ -290,7 +290,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     }
 
     scenario("valid request to the live paye endpoint implementation") {
-      
+
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -363,10 +363,9 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
   }
 
 
-  def testAuthorisation(endpoint:String, scopes: List[String]): Unit = {
+  def testAuthorisation(endpoint:String): Unit = {
 
-
-    scenario(s"user does not have valid scopes") {
+    scenario(s"user does not have valid scopes for endpoint $endpoint") {
       Given("A valid auth token but invalid scopes")
       AuthStub.willNotAuthorizePrivilegedAuthTokenNoScopes(authToken)
 

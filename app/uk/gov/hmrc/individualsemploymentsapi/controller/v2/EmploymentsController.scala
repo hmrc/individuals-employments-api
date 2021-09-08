@@ -16,29 +16,28 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
-import java.util.UUID
-import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.Interval
 import play.api.hal.Hal._
-import play.api.mvc.hal._
 import play.api.hal.HalLink
 import play.api.libs.json.Json
+import play.api.mvc.hal._
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
-import uk.gov.hmrc.individualsemploymentsapi.controller.Environment.{PRODUCTION, SANDBOX}
-import uk.gov.hmrc.individualsemploymentsapi.controller.{CommonController, PrivilegedAuthentication}
-import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService, ScopesHelper, ScopesService}
-import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.validateCorrelationId
-import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.maybeCorrelationId
+import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, ScopesHelper, ScopesService}
+import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.{maybeCorrelationId, validateCorrelationId}
 
+import java.util.UUID
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
-abstract class EmploymentsController(employmentsService: EmploymentsService,
-                                     scopeService: ScopesService,
-                                     scopesHelper: ScopesHelper,
-                                     implicit val auditHelper: AuditHelper,
-                                     cc: ControllerComponents)
+@Singleton
+class EmploymentsController @Inject()(employmentsService: EmploymentsService,
+                                      scopeService: ScopesService,
+                                      scopesHelper: ScopesHelper,
+                                      val authConnector: AuthConnector,
+                                      implicit val auditHelper: AuditHelper,
+                                      cc: ControllerComponents)
                                     (implicit val ec: ExecutionContext)
   extends CommonController(cc) with PrivilegedAuthentication {
 
@@ -82,35 +81,4 @@ abstract class EmploymentsController(employmentsService: EmploymentsService,
 
     } recover withAudit(maybeCorrelationId(request), matchId.toString, "/individuals/employments/paye")
   }
-}
-
-@Singleton
-class SandboxEmploymentsController @Inject()(
-                                              sandboxEmploymentsService: SandboxEmploymentsService,
-                                              scopeService: ScopesService,
-                                              scopesHelper: ScopesHelper,
-                                              val authConnector: AuthConnector,
-                                              @Named("hmctsClientId") val hmctsClientId: String,
-                                              auditHelper: AuditHelper,
-                                              cc: ControllerComponents)(override implicit val ec: ExecutionContext)
-  extends EmploymentsController(sandboxEmploymentsService,
-    scopeService,
-    scopesHelper,
-    auditHelper,
-    cc) {
-  override val environment: String = SANDBOX
-}
-
-@Singleton
-class LiveEmploymentsController @Inject()(
-                                           liveEmploymentsService: LiveEmploymentsService,
-                                           scopeService: ScopesService,
-                                           scopesHelper: ScopesHelper,
-                                           val authConnector: AuthConnector,
-                                           @Named("hmctsClientId") val hmctsClientId: String,
-                                           auditHelper: AuditHelper,
-                                           cc: ControllerComponents)(override implicit val ec: ExecutionContext)
-  extends EmploymentsController(liveEmploymentsService, scopeService, scopesHelper, auditHelper, cc) {
-
-  override val environment: String = PRODUCTION
 }

@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.sandbox.v1
 
-import java.util.UUID
-
 import org.joda.time.LocalDate
 import org.joda.time.LocalDate.parse
 import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
 import uk.gov.hmrc.individualsemploymentsapi.domain.{PayFrequencyCode, des}
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment, Individual}
+
+import java.util.UUID
 
 object SandboxData {
 

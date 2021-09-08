@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.connector
 
-import java.util.UUID
-import javax.inject.Inject
 import org.joda.time.{Interval, LocalDate}
 import play.api.Logger
 import play.api.mvc.RequestHeader
@@ -27,11 +25,12 @@ import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfEmployment, IfEmployments}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 
-class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, val auditHelper: AuditHelper)
-                           (implicit ec: ExecutionContext) {
+class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, val auditHelper: AuditHelper) {
 
   val logger: Logger = Logger(getClass)
 
