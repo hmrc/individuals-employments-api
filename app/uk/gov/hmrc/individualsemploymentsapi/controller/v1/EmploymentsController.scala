@@ -33,7 +33,7 @@ import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 abstract class EmploymentsController(employmentsService: EmploymentsService, cc: ControllerComponents)
-    extends CommonControllerV1(cc) with PrivilegedAuthentication {
+    extends CommonController(cc) with PrivilegedAuthentication {
 
   val hmctsClientId: String
 

@@ -41,7 +41,7 @@ class EmploymentsController @Inject() (employmentsService: EmploymentsService,
                             implicit val auditHelper: AuditHelper,
                             cc: ControllerComponents )
                                     (implicit val ec: ExecutionContext)
-  extends CommonControllerV2(cc) with PrivilegedAuthentication {
+  extends CommonController(cc) with PrivilegedAuthentication {
 
   def root(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>

@@ -33,7 +33,7 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-abstract class CommonControllerV1 @Inject()(cc: ControllerComponents) extends BackendController(cc) {
+abstract class CommonController @Inject()(cc: ControllerComponents) extends BackendController(cc) {
 
   val logger: Logger = Logger(getClass)
 
