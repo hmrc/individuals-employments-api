@@ -78,7 +78,7 @@
         <td><p>The request is missing a payeReference. This is required for the scopes you have been assigned.</p></td>
         <td>
             <p>400 (Bad Request)</p>
-            <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;employerPayeRef is required for the scopes you have been assigned&quot; }</p></td>
+            <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;payeReference is required for the scopes you have been assigned&quot; }</p>
         </td>
     </tr>    
     <tr>
@@ -86,7 +86,7 @@
         <td><p>payeReference is in the incorrect format. Check the query parameters section for the correct format.</p></td>
         <td>
             <p>400 (Bad Request)</p>
-            <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;Malformed employerPayeRef&quot; }</p></td>
+            <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;Malformed payeReference&quot; }</p>
         </td>
     </tr>
     </tbody>
