@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi
+package uk.gov.hmrc.individualsemploymentsapi.util
 
-import uk.gov.hmrc.individualsemploymentsapi.util.{IntervalQueryStringBinder, MatchUuidQueryStringBinder, StringQueryStringBinder}
+object UuidValidator {
+  val uuidPattern = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$"
 
-package object Binders {
-  implicit val matchUuidQueryStringBinder = new MatchUuidQueryStringBinder
-  implicit val intervalQueryStringBinder = new IntervalQueryStringBinder
-  implicit val stringQueryStringBinder = new StringQueryStringBinder
+  def validate(uuid: String): Boolean = uuid.matches(uuidPattern)
 }

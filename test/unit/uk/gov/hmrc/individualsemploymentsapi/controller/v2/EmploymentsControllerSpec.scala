@@ -121,7 +121,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
-        employmentsController.root(randomMatchId)(FakeRequest().withHeaders(validCorrelationHeader))
+        employmentsController.root(randomMatchId.toString)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(eventualResult) shouldBe NOT_FOUND
       contentAsJson(eventualResult) shouldBe Json.obj(
@@ -141,7 +141,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
-        employmentsController.root(randomMatchId)(FakeRequest())
+        employmentsController.root(randomMatchId.toString)(FakeRequest())
 
       status(eventualResult) shouldBe BAD_REQUEST
       contentAsJson(eventualResult) shouldBe Json.obj(
@@ -162,7 +162,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
-        employmentsController.root(randomMatchId)(FakeRequest().withHeaders("CorrelationId" -> "FOO"))
+        employmentsController.root(randomMatchId.toString)(FakeRequest().withHeaders("CorrelationId" -> "FOO"))
 
       status(eventualResult) shouldBe BAD_REQUEST
       contentAsJson(eventualResult) shouldBe Json.obj(
@@ -183,7 +183,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
 
       val eventualResult =
-        employmentsController.root(randomMatchId)(FakeRequest().withHeaders(validCorrelationHeader))
+        employmentsController.root(randomMatchId.toString)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(eventualResult) shouldBe OK
       contentAsJson(eventualResult) shouldBe Json.obj(
@@ -212,7 +212,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       when(mockAuthConnector.authorise(any(), any())(any(), any()))
         .thenReturn(Future.failed(InsufficientEnrolments()))
 
-      val result = employmentsController.root(randomMatchId)(FakeRequest().withHeaders(validCorrelationHeader))
+      val result = employmentsController.root(randomMatchId.toString)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(result) shouldBe UNAUTHORIZED
       verifyNoInteractions(mockEmploymentsService)
@@ -228,7 +228,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       when(mockAuthConnector.authorise(any(), any())(any(), any()))
         .thenReturn(Future.failed(new Exception("Test Exception")))
 
-      val result = employmentsController.root(randomMatchId)(FakeRequest().withHeaders(validCorrelationHeader))
+      val result = employmentsController.root(randomMatchId.toString)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(result) shouldBe INTERNAL_SERVER_ERROR
       verifyNoInteractions(mockEmploymentsService)
@@ -254,7 +254,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
-        employmentsController.paye(invalidMatchId, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
+        employmentsController.paye(invalidMatchId.toString, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(eventualResult) shouldBe NOT_FOUND
 
@@ -277,7 +277,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .thenReturn(Future.successful(Seq(Employment.create(ifEmploymentExample).get)))
 
       val res =
-        employmentsController.paye(matchId, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
+        employmentsController.paye(matchId.toString, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(res) shouldBe OK
 
@@ -322,7 +322,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       when(mockAuthConnector.authorise(any(), any())(any(), any())).thenReturn(Future.failed(InsufficientEnrolments()))
 
       val result =
-        employmentsController.paye(sampleMatchId, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
+        employmentsController.paye(sampleMatchId.toString, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
 
       status(result) shouldBe UNAUTHORIZED
       verifyNoInteractions(mockEmploymentsService)

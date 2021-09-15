@@ -26,9 +26,12 @@ import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, InternalServerExcep
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInternalServer, ErrorInvalidRequest, ErrorNotFound, ErrorTooManyRequests, ErrorUnauthorized, MatchNotFoundException, MissingQueryParameterException}
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates.toFormattedLocalDate
+import uk.gov.hmrc.individualsemploymentsapi.util.UuidValidator
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import java.util.UUID
 import javax.inject.Inject
+import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
 abstract class CommonController @Inject()(cc: ControllerComponents) extends BackendController(cc) {
@@ -42,6 +45,13 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
     val urlWithFromDate = s"$url&fromDate=${toFormattedLocalDate(fromDate)}"
     getQueryParam("toDate") map (toDate => s"$urlWithFromDate&toDate=$toDate") getOrElse urlWithFromDate
   }
+
+  protected def withValidUuid(uuidString: String, uuidName: String)(f: UUID => Future[Result]): Future[Result] =
+    if (UuidValidator.validate(uuidString)) {
+      f(UUID.fromString(uuidString))
+    } else {
+      successful(ErrorInvalidRequest(s"$uuidName format is invalid").toHttpResponse)
+    }
 
   private[controller] def withAudit(correlationId: Option[String], matchId: String, url: String)
                                    (implicit request: RequestHeader,
