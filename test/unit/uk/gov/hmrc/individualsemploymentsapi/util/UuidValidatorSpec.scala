@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi
+package unit.uk.gov.hmrc.individualsemploymentsapi.util
 
-import uk.gov.hmrc.individualsemploymentsapi.util.{IntervalQueryStringBinder, MatchUuidQueryStringBinder, StringQueryStringBinder}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import uk.gov.hmrc.individualsemploymentsapi.util.UuidValidator
 
-package object Binders {
-  implicit val matchUuidQueryStringBinder = new MatchUuidQueryStringBinder
-  implicit val intervalQueryStringBinder = new IntervalQueryStringBinder
-  implicit val stringQueryStringBinder = new StringQueryStringBinder
+class UuidValidatorSpec extends AnyWordSpec with Matchers {
+
+  private val invalidUuid = "0-0-0-0-0"
+  private val validUuid = "a1c15e8f-b119-4121-bc08-6baf2af45099"
+
+  "Return true on a a valid UUID" in {
+    UuidValidator.validate(validUuid) shouldBe true
+  }
+
+  "Return false on invalid UUID" in {
+    UuidValidator.validate(invalidUuid) shouldBe false
+  }
+
 }
