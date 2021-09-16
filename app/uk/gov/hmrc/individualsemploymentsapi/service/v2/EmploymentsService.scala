@@ -57,7 +57,7 @@ class EmploymentsService @Inject()(
         cacheService
           .get(
             cacheId = CacheId(matchId, interval, fieldKeys, payeReference),
-            functionToCache = withRetry {
+            fallbackFunction = withRetry {
               ifConnector.fetchEmployments(
                 ninoMatch.nino,
                 interval,
