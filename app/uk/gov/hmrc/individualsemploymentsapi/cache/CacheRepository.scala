@@ -17,7 +17,7 @@
 package uk.gov.hmrc.individualsemploymentsapi.cache
 
 import org.mongodb.scala.model.Indexes.ascending
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, ReplaceOptions}
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
@@ -57,8 +57,7 @@ abstract class CacheRepository(val cacheConfig: CacheRepositoryConfiguration,
   implicit lazy val crypto: CompositeSymmetricCrypto = new ApplicationCrypto(
     configuration.underlying).JsonCrypto
 
-  def cache[T](id: String, value: T)(
-    implicit formats: Format[T]) = {
+  def cache[T](id: String, value: T)(implicit formats: Format[T]) = {
 
     val jsonEncryptor           = new JsonEncryptor[T]()
     val encryptedValue: JsValue = jsonEncryptor.writes(Protected[T](value))
@@ -73,7 +72,7 @@ abstract class CacheRepository(val cacheConfig: CacheRepositoryConfiguration,
     )
 
     collection
-      .insertOne(entry)
+      .replaceOne(Filters.equal("id", toBson(id)), entry, ReplaceOptions().upsert(true))
       .toFuture
       .map(_ => InsertSucceeded)
       .recover {

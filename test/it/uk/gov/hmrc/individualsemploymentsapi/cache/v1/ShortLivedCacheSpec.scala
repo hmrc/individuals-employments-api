@@ -58,17 +58,17 @@ class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
   "cache" should {
     "store the encrypted version of a value" in {
       await(shortLivedCache.cache(id, testValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString("6aZpkTxkw3C4e5xTyfy3Lf/OZOFz+GcaSkeFI++0HOs=")
+      retrieveRawCachedValue(id) shouldBe JsString("6aZpkTxkw3C4e5xTyfy3Lf/OZOFz+GcaSkeFI++0HOs=")
     }
 
     "update a cached value for a given id and key" in {
       val newValue = TestClass("three", "four")
 
       await(shortLivedCache.cache(id, testValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString("6aZpkTxkw3C4e5xTyfy3Lf/OZOFz+GcaSkeFI++0HOs=")
+      retrieveRawCachedValue(id) shouldBe JsString("6aZpkTxkw3C4e5xTyfy3Lf/OZOFz+GcaSkeFI++0HOs=")
 
       await(shortLivedCache.cache(id, newValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString("8jVeGr+Ivyk5mkBj2VsQE3G+oPGXoYejrSp5hfVAPYU=")
+      retrieveRawCachedValue(id) shouldBe JsString("8jVeGr+Ivyk5mkBj2VsQE3G+oPGXoYejrSp5hfVAPYU=")
     }
   }
 
@@ -83,8 +83,8 @@ class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
     }
   }
 
-  private def retrieveRawCachedValue(id: String, key: String) = {
-    await(shortLivedCache.collection.find(Filters.equal("cacheId", toBson(id)))
+  private def retrieveRawCachedValue(id: String) = {
+    await(shortLivedCache.collection.find(Filters.equal("id", toBson(id)))
       .headOption
       .map {
         case Some(entry) => entry.data.individualsDetails
