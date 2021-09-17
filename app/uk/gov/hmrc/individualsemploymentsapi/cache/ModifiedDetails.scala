@@ -19,20 +19,20 @@ package uk.gov.hmrc.individualsemploymentsapi.cache
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Format, JsPath}
 
+import java.time.LocalDateTime
 
-case class Entry(id: String, data: Data, modifiedDetails: ModifiedDetails)
 
-object Entry {
-  implicit val format: Format[Entry] = Format(
+case class ModifiedDetails(createdAt: LocalDateTime, lastUpdated: LocalDateTime)
+
+object ModifiedDetails {
+  implicit val format: Format[ModifiedDetails] = Format(
     (
-      (JsPath \ "id").read[String] and
-        (JsPath \ "data").read[Data] and
-        (JsPath \ "modifiedDetails").read[ModifiedDetails]
-      )(Entry.apply _),
+      (JsPath \ "createdAt").read[LocalDateTime] and
+        (JsPath \ "lastUpdated").read[LocalDateTime]
+      )(ModifiedDetails.apply _),
     (
-      (JsPath \ "id").write[String] and
-        (JsPath \ "data").write[Data] and
-        (JsPath \ "modifiedDetails").write[ModifiedDetails]
-      )(unlift(Entry.unapply))
+      (JsPath \ "createdAt").write[LocalDateTime] and
+        (JsPath \ "lastUpdated").write[LocalDateTime]
+      )(unlift(ModifiedDetails.unapply))
   )
 }

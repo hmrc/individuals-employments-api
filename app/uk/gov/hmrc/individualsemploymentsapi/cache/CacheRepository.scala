@@ -16,19 +16,19 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.cache
 
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
 import org.mongodb.scala.model.Indexes.ascending
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Protected}
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Protected}
 import uk.gov.hmrc.individualsemploymentsapi.cache.InsertResult.{AlreadyExists, InsertSucceeded}
 import uk.gov.hmrc.individualsemploymentsapi.cache.MongoErrors.Duplicate
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
-import java.time.Instant
+import java.time.{LocalDateTime, ZoneOffset}
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -40,10 +40,19 @@ abstract class CacheRepository(val cacheConfig: CacheRepositoryConfiguration,
   collectionName = cacheConfig.collName,
   domainFormat   = Entry.format,
   replaceIndexes = true,
-  indexes        = Seq(IndexModel(ascending("cacheId"), IndexOptions().
-    name("_cacheId").
-    expireAfter(cacheConfig.cacheTtl, TimeUnit.SECONDS).
-    unique(true)))) {
+  indexes        = Seq(
+    IndexModel(
+      ascending("id"),
+      IndexOptions().name("_id").
+        unique(true).
+        background(false).
+        sparse(true)),
+    IndexModel(
+      ascending("modifiedDetails.lastUpdated"),
+      IndexOptions().name("lastUpdatedIndex").
+        background(false).
+        expireAfter(cacheConfig.cacheTtl, TimeUnit.SECONDS)))
+) {
 
   implicit lazy val crypto: CompositeSymmetricCrypto = new ApplicationCrypto(
     configuration.underlying).JsonCrypto
@@ -53,7 +62,15 @@ abstract class CacheRepository(val cacheConfig: CacheRepositoryConfiguration,
 
     val jsonEncryptor           = new JsonEncryptor[T]()
     val encryptedValue: JsValue = jsonEncryptor.writes(Protected[T](value))
-    val entry                   = new Entry(id, new Data(encryptedValue), Instant.now)
+
+    val entry = new Entry(
+      id,
+      new Data(encryptedValue),
+      new ModifiedDetails(
+        LocalDateTime.now(ZoneOffset.UTC),
+        LocalDateTime.now(ZoneOffset.UTC)
+      )
+    )
 
     collection
       .insertOne(entry)
@@ -69,7 +86,7 @@ abstract class CacheRepository(val cacheConfig: CacheRepositoryConfiguration,
     val decryptor = new JsonDecryptor[T]()
 
     collection
-      .find(Filters.equal("cacheId", toBson(id)))
+      .find(Filters.equal("id", toBson(id)))
       .headOption
       .map {
         case Some(entry) => decryptor.reads(entry.data.individualsDetails).asOpt map (_.decryptedValue)
