@@ -72,7 +72,7 @@ abstract class CacheRepository(val cacheConfig: CacheRepositoryConfiguration,
     )
 
     collection
-      .replaceOne(Filters.equal("id", toBson(id)), entry, ReplaceOptions().upsert(true))
+      .insertOne(entry)
       .toFuture
       .map(_ => InsertSucceeded)
       .recover {
