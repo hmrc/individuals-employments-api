@@ -28,32 +28,3 @@ class ShortLivedCache @Inject()(
   override val cacheConfig: CacheRepositoryConfiguration, configuration: Configuration, mongo: MongoComponent)
                                (implicit ec: ExecutionContext)
   extends BaseCache(cacheConfig, configuration, mongo)
-
-//@Singleton
-//class CacheConfiguration @Inject()(configuration: Configuration) {
-//
-//  lazy val cacheEnabled = configuration
-//    .getOptional[Boolean](
-//      "cacheV2.enabled"
-//    )
-//    .getOrElse(true)
-//
-//  lazy val cacheTtl = configuration
-//    .getOptional[Int](
-//      "cacheV2.ttlInSeconds"
-//    )
-//    .getOrElse(60 * 15)
-//
-//  lazy val collName = configuration
-//    .getOptional[String](
-//      "cacheV2.collName"
-//    )
-//    .getOrElse("individuals-employments-v2-cache")
-//
-//  lazy val key = configuration
-//    .getOptional[String](
-//      "cacheV2.key"
-//    )
-//    .getOrElse("individuals-employments")
-//
-//}
