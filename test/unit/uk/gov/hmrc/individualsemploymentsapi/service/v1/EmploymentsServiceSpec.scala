@@ -26,14 +26,14 @@ import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Format
-import uk.gov.hmrc.domain.{EmpRef, Nino}
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
+import uk.gov.hmrc.domain.Nino
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
 import uk.gov.hmrc.individualsemploymentsapi.domain
+import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode.{DesPayFrequency, M1}
 import uk.gov.hmrc.individualsemploymentsapi.domain._
-import PayFrequencyCode.{DesPayFrequency, M1}
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
-import uk.gov.hmrc.individualsemploymentsapi.domain.v1.{Address, Employer, Employment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.{CacheService, LiveEmploymentsService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.Intervals
@@ -117,7 +117,7 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
       mockIndividualsMatchingApiConnectorToReturn(Future.successful(ninoMatch))
 
       when(desConnector.fetchEmployments(nino, interval))
-        .thenReturn(Future.failed(Upstream5xxResponse("""¯\_(ツ)_/¯""", 503, 503)))
+        .thenReturn(Future.failed(UpstreamErrorResponse("""¯\_(ツ)_/¯""", 503, 503)))
         .thenReturn(Future.successful(Seq(someEmployment)))
 
       await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq(Employment.from(someEmployment).get)
@@ -159,19 +159,4 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
       startDate,
       leavingDate,
       frequency)
-
-  private def anEmployer(
-    payeReference: String = "123/AI45678",
-    name: Option[String] = Some("Acme Inc"),
-    address: Option[Address] = anAddress()) =
-    Employer(Some(EmpRef.fromIdentifiers(payeReference)), name, address)
-
-  private def anAddress(
-    line1: Option[String] = Some("Acme House"),
-    line2: Option[String] = Some("23 Acme Street"),
-    line3: Option[String] = Some("Richmond"),
-    line4: Option[String] = Some("Surrey"),
-    line5: Option[String] = Some("UK"),
-    postcode: Option[String] = Some("AI22 9LL")): Option[Address] =
-    Some(Address(line1, line2, line3, line4, line5, postcode))
 }

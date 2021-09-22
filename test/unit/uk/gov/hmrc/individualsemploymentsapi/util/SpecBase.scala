@@ -18,8 +18,8 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.util
 
 import com.typesafe.config.ConfigFactory
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{Application, Configuration}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.{Application, Configuration}
 
 trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
 
@@ -34,7 +34,7 @@ trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
                                       | metrics.enabled = true
                                       | auditing.enabled = false
           """.stripMargin)
-        ) ++ extraConfig)
+        ) withFallback extraConfig)
       .build()
 
   override lazy val fakeApplication: Application = buildFakeApplication(additionalConfig)

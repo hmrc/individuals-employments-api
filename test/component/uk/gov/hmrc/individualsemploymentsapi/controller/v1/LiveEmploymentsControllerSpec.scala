@@ -31,9 +31,9 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
   private val employmentsScope = "read:individuals-employments"
   private val payeEmploymentsScope = "read:individuals-employments-paye"
 
-  feature("Root (hateoas) entry point is accessible") {
+  Feature("Root (hateoas) entry point is accessible") {
 
-    scenario("invalid token") {
+    Scenario("invalid token") {
       Given("an invalid token")
       AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, employmentsScope)
 
@@ -48,7 +48,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("missing match id") {
+    Scenario("missing match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope)
 
@@ -63,7 +63,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("malformed match id") {
+    Scenario("malformed match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope)
 
@@ -78,7 +78,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("invalid match id") {
+    Scenario("invalid match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope)
 
@@ -93,7 +93,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("valid request to the live root endpoint implementation") {
+    Scenario("valid request to the live root endpoint implementation") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, employmentsScope)
 
@@ -117,12 +117,12 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     }
   }
 
-  feature("Paye endpoint") {
+  Feature("Paye endpoint") {
 
     val fromDate = "2017-01-01"
     val toDate = "2017-09-25"
 
-    scenario("invalid token") {
+    Scenario("invalid token") {
       Given("an invalid token")
       AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
 
@@ -137,7 +137,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("missing match id") {
+    Scenario("missing match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
 
@@ -152,7 +152,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("malformed match id") {
+    Scenario("malformed match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
 
@@ -168,7 +168,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("invalid match id") {
+    Scenario("invalid match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
 
@@ -183,7 +183,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("valid request to the live paye endpoint implementation") {
+    Scenario("valid request to the live paye endpoint implementation") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, payeEmploymentsScope)
 
@@ -215,7 +215,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("the DES rate limit is exceeded") {
+    Scenario("the DES rate limit is exceeded") {
       val matchId = UUID.randomUUID().toString
       val nino = "AA112233B"
 

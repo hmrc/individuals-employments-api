@@ -18,11 +18,12 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.util
 
 import java.util.UUID.{fromString => uuid}
 
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.individualsemploymentsapi.util.MatchUuidQueryStringBinder
 
-class MatchUuidQueryStringBinderSpec extends FlatSpec with Matchers with TableDrivenPropertyChecks {
+class MatchUuidQueryStringBinderSpec extends AnyFlatSpec with Matchers with TableDrivenPropertyChecks {
 
   private val queryStringParameterName = "matchId"
 

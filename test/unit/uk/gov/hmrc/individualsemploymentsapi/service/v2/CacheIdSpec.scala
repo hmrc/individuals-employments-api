@@ -16,13 +16,14 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import org.scalatest.{Matchers, WordSpec}
+import java.util.UUID
+
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.CacheId
 import utils.Intervals
 
-import java.util.UUID
-
-class CacheIdSpec extends WordSpec with Matchers with Intervals {
+class CacheIdSpec extends AnyWordSpec with Matchers with Intervals {
 
   private val interval = toInterval("2016-01-01", "2017-03-01")
   private val uuid = UUID.fromString("fcb6218d-0f90-4c5d-bb58-6b128d30ac04");

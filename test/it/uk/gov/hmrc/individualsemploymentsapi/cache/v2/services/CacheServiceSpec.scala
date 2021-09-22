@@ -17,18 +17,20 @@
 package it.uk.gov.hmrc.individualsemploymentsapi.cache.v2.services
 
 import it.uk.gov.hmrc.individualsemploymentsapi.cache.suite.MongoSuite
+import org.scalatest.OptionValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.{FreeSpec, MustMatchers, OptionValues}
+import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.matchers.must.Matchers
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{Json, OFormat}
 import play.api.test.Helpers.running
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheIdBase, CacheService}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class CacheServiceSpec
-    extends FreeSpec with MustMatchers with ScalaFutures with OptionValues with MongoSuite with IntegrationPatience {
+    extends AnyFreeSpec with Matchers with ScalaFutures with OptionValues with MongoSuite with IntegrationPatience {
 
   implicit val hc = HeaderCarrier()
 

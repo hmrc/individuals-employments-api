@@ -19,6 +19,8 @@ package component.uk.gov.hmrc.individualsemploymentsapi.stubs
 import java.util.concurrent.TimeUnit
 
 import org.scalatest._
+import org.scalatest.featurespec.AnyFeatureSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
@@ -28,7 +30,7 @@ import play.mvc.Http.MimeTypes.JSON
 import scala.concurrent.duration.Duration
 
 trait BaseSpec
-    extends FeatureSpec with BeforeAndAfterAll with BeforeAndAfterEach with Matchers with GuiceOneServerPerSuite
+    extends AnyFeatureSpec with BeforeAndAfterAll with BeforeAndAfterEach with Matchers with GuiceOneServerPerSuite
     with GivenWhenThen {
 
   implicit override lazy val app: Application = GuiceApplicationBuilder()

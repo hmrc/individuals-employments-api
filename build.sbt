@@ -9,8 +9,10 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 val appName = "individuals-employments-api"
 val hmrc = "uk.gov.hmrc"
 
-RoutesKeys.routesImport := Seq.empty
 TwirlKeys.templateImports := Seq.empty
+RoutesKeys.routesImport := Seq(
+  "uk.gov.hmrc.individualsemploymentsapi.Binders._"
+)
 
 lazy val playSettings: Seq[Setting[_]] = Seq(
   routesImport ++= Seq(
