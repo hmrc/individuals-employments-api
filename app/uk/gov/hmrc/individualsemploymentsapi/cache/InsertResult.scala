@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.cache.v2
+package uk.gov.hmrc.individualsemploymentsapi.cache
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.individualsemploymentsapi.cache.{CacheRepository => BaseCache}
+sealed trait InsertResult
 
-import scala.concurrent.ExecutionContext
-
-@Singleton
-class ShortLivedCache @Inject()(
-  override val cacheConfig: CacheRepositoryConfiguration, configuration: Configuration, mongo: MongoComponent)
-                               (implicit ec: ExecutionContext)
-  extends BaseCache(cacheConfig, configuration, mongo)
+object InsertResult {
+  case object InsertSucceeded extends InsertResult
+  case object AlreadyExists extends InsertResult
+}

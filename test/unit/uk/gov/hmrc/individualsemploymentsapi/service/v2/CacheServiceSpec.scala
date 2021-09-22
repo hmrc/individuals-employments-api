@@ -16,19 +16,19 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
+import java.util.UUID
+
 import com.google.common.base.Charsets
 import com.google.common.io.BaseEncoding
-
-import java.util.UUID
 import org.joda.time.{Interval, LocalDate}
-import org.mockito.BDDMockito.given
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.BDDMockito.given
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfiguration, ShortLivedCache}
+import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheRepositoryConfiguration, ShortLivedCache}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheId, CacheIdBase, CacheService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
@@ -42,7 +42,7 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
   trait Setup {
     val mockClient = mock[ShortLivedCache]
-    val mockCacheConfig = mock[CacheConfiguration]
+    val mockCacheConfig = mock[CacheRepositoryConfiguration]
     implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
     implicit val hc: HeaderCarrier = HeaderCarrier()
     lazy val cacheService = new CacheService(mockClient, mockCacheConfig)
@@ -54,8 +54,7 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
     "return the cached value for a given id and key" in new Setup {
 
-      given(mockCacheConfig.key).willReturn("individuals-employments")
-      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId.id), eqTo("individuals-employments"))(any()))
+      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId.id))(any()))
         .willReturn(Future.successful(Some(cachedValue)))
 
       await(cacheService.get[TestClass](cacheId, Future.successful(newValue))) shouldBe cachedValue
@@ -64,12 +63,11 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
     "cache the result of the fallback function when no cached value exists for a given id and key" in new Setup {
 
-      given(mockCacheConfig.key).willReturn("individuals-employments")
-      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId.id), eqTo("individuals-employments"))(any()))
+      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId.id))(any()))
         .willReturn(Future.successful(None))
 
       await(cacheService.get[TestClass](cacheId, Future.successful(newValue))) shouldBe newValue
-      verify(mockClient).cache[TestClass](eqTo(cacheId.id), eqTo("individuals-employments"), eqTo(newValue))(any())
+      verify(mockClient).cache[TestClass](eqTo(cacheId.id), eqTo(newValue))(any())
 
     }
 

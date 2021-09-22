@@ -16,6 +16,9 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service.v2
 
+import java.util.UUID
+
+import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.{Interval, LocalDate}
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
@@ -23,8 +26,6 @@ import uk.gov.hmrc.individualsemploymentsapi.connector.{IfConnector, Individuals
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 
-import java.util.UUID
-import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -57,7 +58,7 @@ class EmploymentsService @Inject()(
         cacheService
           .get(
             cacheId = CacheId(matchId, interval, fieldKeys, payeReference),
-            functionToCache = withRetry {
+            fallbackFunction = withRetry {
               ifConnector.fetchEmployments(
                 ninoMatch.nino,
                 interval,

@@ -22,17 +22,19 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsString, Json, OFormat}
 import uk.gov.hmrc.individualsemploymentsapi.cache.v2.ShortLivedCache
-import uk.gov.hmrc.mongo.MongoSpecSupport
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import scala.concurrent.ExecutionContext
 
-class ShortLivedCacheSpec extends SpecBase with MongoSpecSupport with BeforeAndAfterEach {
+class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
 
   val cacheTtl = 60
   val id = UUID.randomUUID().toString
   val cachekey = "test-class-key-v2"
   val testValue = TestClass("one", "two")
+
+  protected def databaseName: String = "test-" + this.getClass.getSimpleName
+  protected def mongoUri: String     = s"mongodb://localhost:27017/$databaseName"
 
   override lazy val fakeApplication = new GuiceApplicationBuilder()
     .configure("mongodb.uri" -> mongoUri, "cache.ttlInSeconds" -> cacheTtl)
@@ -45,14 +47,14 @@ class ShortLivedCacheSpec extends SpecBase with MongoSpecSupport with BeforeAndA
   override def beforeEach() {
 
     super.beforeEach()
-    await(shortLivedCache.drop)
+    await(shortLivedCache.collection.drop().toFuture())
 
   }
 
   override def afterEach() {
 
     super.afterEach()
-    await(shortLivedCache.drop)
+    await(shortLivedCache.collection.drop().toFuture())
 
   }
 
@@ -60,20 +62,8 @@ class ShortLivedCacheSpec extends SpecBase with MongoSpecSupport with BeforeAndA
 
     "store the encrypted version of a value" in {
 
-      await(shortLivedCache.cache(id, cachekey, testValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString("6aZpkTxkw3C4e5xTyfy3Lf/OZOFz+GcaSkeFI++0HOs=")
-
-    }
-
-    "update a cached value for a given id and key" in {
-
-      val newValue = TestClass("three", "four")
-
-      await(shortLivedCache.cache(id, cachekey, testValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString("6aZpkTxkw3C4e5xTyfy3Lf/OZOFz+GcaSkeFI++0HOs=")
-
-      await(shortLivedCache.cache(id, cachekey, newValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString("8jVeGr+Ivyk5mkBj2VsQE3G+oPGXoYejrSp5hfVAPYU=")
+      await(shortLivedCache.cache(id, testValue)(TestClass.format))
+      retrieveRawCachedValue(id) shouldBe JsString("6aZpkTxkw3C4e5xTyfy3Lf/OZOFz+GcaSkeFI++0HOs=")
 
     }
   }
@@ -82,23 +72,25 @@ class ShortLivedCacheSpec extends SpecBase with MongoSpecSupport with BeforeAndA
 
     "retrieve the unencrypted cached value for a given id and key" in {
 
-      await(shortLivedCache.cache(id, cachekey, testValue)(TestClass.format))
-      await(shortLivedCache.fetchAndGetEntry[TestClass](id, cachekey)(TestClass.format)) shouldBe Some(testValue)
+      await(shortLivedCache.cache(id, testValue)(TestClass.format))
+      await(shortLivedCache.fetchAndGetEntry[TestClass](id)(TestClass.format)) shouldBe Some(testValue)
 
     }
 
     "return None if no cached value exists for a given id and key" in {
 
-      await(shortLivedCache.fetchAndGetEntry[TestClass](id, cachekey)(TestClass.format)) shouldBe None
+      await(shortLivedCache.fetchAndGetEntry[TestClass](id)(TestClass.format)) shouldBe None
 
     }
   }
 
-  private def retrieveRawCachedValue(id: String, key: String) = {
-
-    val storedValue = await(shortLivedCache.findById(id)).get
-    (storedValue.data.get \ cachekey).get
-
+  private def retrieveRawCachedValue(id: String) = {
+    await(shortLivedCache.collection.find(Filters.equal("id", toBson(id)))
+      .headOption
+      .map {
+        case Some(entry) => entry.data.individualsDetails
+        case None => None
+      })
   }
 
   case class TestClass(one: String, two: String)

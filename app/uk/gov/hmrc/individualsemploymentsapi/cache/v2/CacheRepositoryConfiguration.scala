@@ -16,14 +16,26 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.cache.v2
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import play.api.Configuration
-import uk.gov.hmrc.individualsemploymentsapi.cache.{CacheRepository => BaseCache}
+import uk.gov.hmrc.individualsemploymentsapi.cache.{CacheRepositoryConfiguration => BaseConig}
 
-import scala.concurrent.ExecutionContext
+class CacheRepositoryConfiguration @Inject()(configuration: Configuration) extends BaseConig {
+  override val cacheEnabled: Boolean = configuration
+    .getOptional[Boolean](
+      "cacheV2.enabled"
+    )
+    .getOrElse(true)
 
-@Singleton
-class ShortLivedCache @Inject()(
-  override val cacheConfig: CacheRepositoryConfiguration, configuration: Configuration, mongo: MongoComponent)
-                               (implicit ec: ExecutionContext)
-  extends BaseCache(cacheConfig, configuration, mongo)
+  override val cacheTtl: Int = configuration
+    .getOptional[Int](
+      "cacheV2.ttlInSeconds"
+    )
+    .getOrElse(60 * 15)
+
+  override val collName: String = configuration
+    .getOptional[String](
+      "cacheV2.collName"
+    )
+    .getOrElse("individuals-employments-v2-cache")
+}

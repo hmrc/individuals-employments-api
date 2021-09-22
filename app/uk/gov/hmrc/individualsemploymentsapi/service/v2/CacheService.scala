@@ -23,25 +23,33 @@ import com.google.common.io.BaseEncoding
 import javax.inject.Inject
 import org.joda.time.Interval
 import play.api.libs.json.Format
-import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheConfiguration, ShortLivedCache}
+import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheRepositoryConfiguration, ShortLivedCache}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheConfiguration)(implicit ec: ExecutionContext) {
+class CacheService @Inject()(
+                              cachingClient: ShortLivedCache,
+                              conf: CacheRepositoryConfiguration)(implicit ec: ExecutionContext) {
 
-  def get[T: Format](cacheId: CacheIdBase, functionToCache: => Future[T]): Future[T] =
-    if (conf.cacheEnabled) {
-      cachingClient.fetchAndGetEntry[T](cacheId.id, conf.key) flatMap {
-        case Some(value) => Future.successful(value)
+  lazy val cacheEnabled: Boolean = conf.cacheEnabled
+
+  def get[T: Format](cacheId: CacheIdBase,
+                     fallbackFunction: => Future[T]): Future[T] = {
+
+    if (cacheEnabled)
+      cachingClient.fetchAndGetEntry[T](cacheId.id) flatMap {
+        case Some(value) =>
+          Future.successful(value)
         case None =>
-          functionToCache map { res =>
-            cachingClient.cache(cacheId.id, conf.key, res)
-            res
+          fallbackFunction map { result =>
+            cachingClient.cache(cacheId.id, result)
+            result
           }
-      }
-    } else {
-      functionToCache
+      } else {
+      fallbackFunction
     }
+
+  }
 }
 
 // Cache ID implementations

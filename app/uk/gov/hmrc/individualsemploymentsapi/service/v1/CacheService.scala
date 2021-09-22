@@ -18,23 +18,31 @@ package uk.gov.hmrc.individualsemploymentsapi.service.v1
 
 import javax.inject.Inject
 import play.api.libs.json.Format
-import uk.gov.hmrc.individualsemploymentsapi.cache.v1.{CacheConfiguration, ShortLivedCache}
+import uk.gov.hmrc.individualsemploymentsapi.cache.v1.{CacheRepositoryConfiguration, ShortLivedCache}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheConfiguration)(implicit ec: ExecutionContext) {
+class CacheService @Inject()(
+                              cachingClient: ShortLivedCache,
+                              conf: CacheRepositoryConfiguration)(implicit ec: ExecutionContext) {
 
-  def get[T: Format](cacheId: String, functionToCache: => Future[T]): Future[T] =
-    if (conf.cacheEnabled) {
-      cachingClient.fetchAndGetEntry[T](cacheId, "paye-income") flatMap {
-        case Some(value) => Future.successful(value)
+  lazy val cacheEnabled: Boolean = conf.cacheEnabled
+
+  def get[T: Format](cacheId: String,
+                     fallbackFunction: => Future[T]): Future[T] = {
+
+    if (cacheEnabled)
+      cachingClient.fetchAndGetEntry[T](cacheId) flatMap {
+        case Some(value) =>
+          Future.successful(value)
         case None =>
-          functionToCache map { res =>
-            cachingClient.cache(cacheId, "paye-income", res)
-            res
+          fallbackFunction map { result =>
+            cachingClient.cache(cacheId, result)
+            result
           }
-      }
-    } else {
-      functionToCache
+      } else {
+      fallbackFunction
     }
+
+  }
 }

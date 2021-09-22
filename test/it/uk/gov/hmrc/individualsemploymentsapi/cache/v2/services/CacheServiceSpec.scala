@@ -16,7 +16,6 @@
 
 package it.uk.gov.hmrc.individualsemploymentsapi.cache.v2.services
 
-import it.uk.gov.hmrc.individualsemploymentsapi.cache.suite.MongoSuite
 import org.scalatest.OptionValues
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.freespec.AnyFreeSpec
@@ -30,7 +29,7 @@ import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheIdBase, CacheServi
 import scala.concurrent.Future
 
 class CacheServiceSpec
-    extends AnyFreeSpec with Matchers with ScalaFutures with OptionValues with MongoSuite with IntegrationPatience {
+    extends AnyFreeSpec with Matchers with ScalaFutures with OptionValues with IntegrationPatience {
 
   implicit val hc = HeaderCarrier()
 

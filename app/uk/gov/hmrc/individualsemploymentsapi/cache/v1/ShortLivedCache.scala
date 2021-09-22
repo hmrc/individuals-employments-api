@@ -16,48 +16,13 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.cache.v1
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import play.api.Configuration
-import play.api.libs.json.{Format, JsValue}
-import play.modules.reactivemongo.ReactiveMongoComponent
-import uk.gov.hmrc.cache.TimeToLive
-import uk.gov.hmrc.cache.repository.CacheMongoRepository
-import uk.gov.hmrc.crypto._
-import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
+import uk.gov.hmrc.individualsemploymentsapi.cache.{CacheRepository => BaseCache}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
-@Singleton
 class ShortLivedCache @Inject()(
-  val cacheConfig: CacheConfiguration,
-  configuration: Configuration,
-  mongo: ReactiveMongoComponent)(implicit ec: ExecutionContext)
-    extends CacheMongoRepository("shortLivedCache", cacheConfig.cacheTtl)(mongo.mongoConnector.db, ec) with TimeToLive {
-  implicit lazy val crypto: CompositeSymmetricCrypto = new ApplicationCrypto(configuration.underlying).JsonCrypto
-
-  def cache[T](id: String, key: String, value: T)(implicit formats: Format[T]): Future[Unit] = {
-    val jsonEncryptor = new JsonEncryptor[T]()
-    val encryptedValue: JsValue = jsonEncryptor.writes(Protected[T](value))
-    createOrUpdate(id, key, encryptedValue).map(_ => ())
-  }
-
-  def fetchAndGetEntry[T](id: String, key: String)(implicit formats: Format[T]): Future[Option[T]] = {
-    val decryptor = new JsonDecryptor[T]()
-
-    findById(id) map {
-      case Some(cache) =>
-        cache.data flatMap { json =>
-          (json \ key).toOption flatMap { jsValue =>
-            decryptor.reads(jsValue).asOpt map (_.decryptedValue)
-          }
-        }
-      case None => None
-    }
-  }
-}
-
-@Singleton
-class CacheConfiguration @Inject()(configuration: Configuration) {
-  lazy val cacheEnabled = configuration.getOptional[Boolean]("cache.enabled").getOrElse(true)
-  lazy val cacheTtl = configuration.getOptional[Int]("cache.ttlInSeconds").getOrElse(60 * 15)
-}
+                                 override val cacheConfig: CacheRepositoryConfiguration, configuration: Configuration, mongo: MongoComponent)
+                               (implicit ec: ExecutionContext)
+  extends BaseCache(cacheConfig, configuration, mongo)
