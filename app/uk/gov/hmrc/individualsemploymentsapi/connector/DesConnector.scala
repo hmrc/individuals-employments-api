@@ -24,6 +24,7 @@ import uk.gov.hmrc.http._
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments}
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -51,7 +52,7 @@ class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
     val employmentsUrl = s"$serviceUrl/individuals/nino/$nino/employments/income?from=$fromDate&to=$toDate"
 
     http.GET[DesEmployments](employmentsUrl, Seq(), headers).map(_.employments).recoverWith {
-      case _: NotFoundException => Future.successful(Seq.empty)
+      case Upstream4xxResponse(_, 404, _, _) => Future.successful(Seq.empty)
       case Upstream4xxResponse(msg, 429, _, _) => {
         logger.warn(s"DES Rate limited: $msg")
         Future.failed(new TooManyRequestException(msg))

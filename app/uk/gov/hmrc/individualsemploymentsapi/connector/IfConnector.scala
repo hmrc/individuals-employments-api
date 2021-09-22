@@ -27,6 +27,7 @@ import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HeaderNames, HttpCl
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfEmployment, IfEmployments}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
@@ -96,14 +97,14 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Error parsing IF response: ${validationError.errors}")
       Future.failed(new InternalServerException("Something went wrong."))
     }
-    case notFound: NotFoundException => {
-      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, notFound.getMessage)
+    case Upstream4xxResponse(msg, 404, _, _) => {
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
 
-      notFound.message.contains("NO_DATA_FOUND") match {
+      msg.contains("NO_DATA_FOUND") match {
         case true => Future.successful(Seq.empty)
         case _    => {
           logger.warn("Integration Framework NotFoundException encountered")
-          Future.failed(notFound)
+          Future.failed(new NotFoundException(msg))
         }
       }
     }
