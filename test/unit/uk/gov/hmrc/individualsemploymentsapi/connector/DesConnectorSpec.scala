@@ -25,7 +25,7 @@ import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, Upstream5xxResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.DesConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
@@ -171,7 +171,7 @@ class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSuga
         get(urlPathMatching(s"/individuals/nino/$nino/employments/income"))
           .willReturn(aResponse().withStatus(500)))
 
-      intercept[UpstreamErrorResponse] {
+      intercept[Upstream5xxResponse] {
         await(underTest.fetchEmployments(nino, interval))
       }
     }
