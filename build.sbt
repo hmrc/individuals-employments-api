@@ -5,14 +5,16 @@ import uk.gov.hmrc.ExternalService
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import uk.gov.hmrc.ServiceManagerPlugin.Keys.itDependenciesList
 
+import play.sbt.routes.RoutesKeys
+
 val appName = "individuals-employments-api"
 val hmrc = "uk.gov.hmrc"
 
-lazy val playSettings: Seq[Setting[_]] = Seq(
-  routesImport ++= Seq(
-    "uk.gov.hmrc.domain._",
-    "uk.gov.hmrc.individualsemploymentsapi.domain._",
-    "uk.gov.hmrc.individualsemploymentsapi.Binders._"))
+TwirlKeys.templateImports := Seq.empty
+
+RoutesKeys.routesImport := Seq(
+  "uk.gov.hmrc.individualsemploymentsapi.Binders._"
+)
 
 lazy val scoverageSettings = {
   import scoverage.ScoverageKeys
@@ -44,7 +46,6 @@ lazy val microservice =
       SbtGitVersioning,
       SbtDistributablesPlugin,
       SbtArtifactory) ++ plugins: _*)
-    .settings(playSettings: _*)
     .settings(scalaSettings: _*)
     .settings(scoverageSettings: _*)
     .settings(publishingSettings: _*)
