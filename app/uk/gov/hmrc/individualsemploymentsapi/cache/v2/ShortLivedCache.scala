@@ -19,6 +19,7 @@ package uk.gov.hmrc.individualsemploymentsapi.cache.v2
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.individualsemploymentsapi.cache.{CacheRepository => BaseCache}
+import uk.gov.hmrc.mongo.MongoComponent
 
 import scala.concurrent.ExecutionContext
 
