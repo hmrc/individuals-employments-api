@@ -55,8 +55,7 @@ class SandboxEmploymentsService extends EmploymentsService {
   override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =
     paye(find(matchId), interval)
 
-  private def paye(maybeIndividual: Option[Individual], interval: Interval)(
-    implicit hc: HeaderCarrier): Future[Seq[Employment]] =
+  private def paye(maybeIndividual: Option[Individual], interval: Interval): Future[Seq[Employment]] =
     maybeIndividual match {
       case Some(i) =>
         val employments = i.employments.flatMap(Employment.from)
