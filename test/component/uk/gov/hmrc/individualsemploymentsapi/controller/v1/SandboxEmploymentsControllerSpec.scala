@@ -22,11 +22,10 @@ import play.api.test.Helpers._
 import scalaj.http.{Http, HttpResponse}
 
 class SandboxEmploymentsControllerSpec extends BaseSpec {
-  private val employmentsScope = "read:individuals-employments"
 
-  feature("View individuals root (hateoas) entry point is accessible") {
+  Feature("View individuals root (hateoas) entry point is accessible") {
 
-    scenario("missing match id") {
+    Scenario("missing match id") {
       When("the root entry point to the API is invoked with a missing match id")
       val response = invokeEndpoint(s"$serviceUrl/sandbox")
 
@@ -39,7 +38,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
         """)
     }
 
-    scenario("malformed match id") {
+    Scenario("malformed match id") {
       When("the root entry point to the API is invoked with a malformed match id")
       val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=malformed-match-id-value")
 
@@ -56,7 +55,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("invalid match id") {
+    Scenario("invalid match id") {
 
       When("the root entry point to the API is invoked with an invalid match id")
       val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366")
@@ -74,7 +73,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("valid request to the sandbox implementation") {
+    Scenario("valid request to the sandbox implementation") {
       When("I request the root entry point to the API")
       val response = invokeEndpoint(s"$serviceUrl/sandbox?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430")
 
@@ -100,9 +99,9 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
 
   }
 
-  feature("Paye endpoint") {
+  Feature("Paye endpoint") {
 
-    scenario("missing match id") {
+    Scenario("missing match id") {
       When("the root entry point to the API is invoked with a missing match id")
       val response = invokeEndpoint(s"$serviceUrl/sandbox/paye")
 
@@ -115,7 +114,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
         """)
     }
 
-    scenario("malformed match id") {
+    Scenario("malformed match id") {
       When("the root entry point to the API is invoked with a malformed match id")
       val response = invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=malformed-match-id-value")
 
@@ -132,7 +131,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("invalid match id") {
+    Scenario("invalid match id") {
       When("the root entry point to the API is invoked with an invalid match id")
       val response =
         invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366&fromDate=2017-01-01")
@@ -150,7 +149,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("valid request to the sandbox implementation") {
+    Scenario("valid request to the sandbox implementation") {
       When("I request the root entry point to the API")
       val response =
         invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01")

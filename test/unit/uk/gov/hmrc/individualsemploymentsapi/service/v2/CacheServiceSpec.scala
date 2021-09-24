@@ -16,19 +16,19 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
+import java.util.UUID
+
 import com.google.common.base.Charsets
 import com.google.common.io.BaseEncoding
-
-import java.util.UUID
 import org.joda.time.{Interval, LocalDate}
-import org.mockito.BDDMockito.given
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.BDDMockito.given
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{ShortLivedCache, CacheRepositoryConfiguration}
+import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheRepositoryConfiguration, ShortLivedCache}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheId, CacheIdBase, CacheService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 

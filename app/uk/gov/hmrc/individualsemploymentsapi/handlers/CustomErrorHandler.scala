@@ -16,18 +16,18 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.handlers
 
+import javax.inject.Inject
 import play.api.Configuration
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND}
 import play.api.libs.json.Json
 import play.api.mvc.Results.Status
 import play.api.mvc.{RequestHeader, Result}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidRequest, ErrorNotFound}
-import uk.gov.hmrc.play.HeaderCarrierConverter
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.bootstrap.backend.http.{ErrorResponse, JsonErrorHandler}
 import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
-import javax.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -41,7 +41,7 @@ class CustomErrorHandler @Inject()(
   override def onClientError(request: RequestHeader, statusCode: Int, message: String): Future[Result] = {
 
     implicit val headerCarrier =
-      HeaderCarrierConverter.fromHeadersAndSessionAndRequest(request.headers, request = Some(request))
+      HeaderCarrierConverter.fromRequestAndSession(request, request.session)
 
     statusCode match {
       case NOT_FOUND =>

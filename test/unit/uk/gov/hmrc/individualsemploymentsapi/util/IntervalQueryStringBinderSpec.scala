@@ -17,12 +17,14 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.util
 
 import org.joda.time.LocalDateTime
+import org.scalatest.EitherValues
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{EitherValues, FlatSpec, Matchers}
 import uk.gov.hmrc.individualsemploymentsapi.util.IntervalQueryStringBinder
 import utils.Intervals
 
-class IntervalQueryStringBinderSpec extends FlatSpec with Matchers with EitherValues with Intervals {
+class IntervalQueryStringBinderSpec extends AnyFlatSpec with Matchers with EitherValues with Intervals {
 
   lazy val intervalQueryStringBinder = new IntervalQueryStringBinder
 

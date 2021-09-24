@@ -28,9 +28,9 @@ class VersioningSpec extends BaseSpec {
 
   private val sandboxMatchEndpointWithSandboxMatchId = "/sandbox?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
 
-  feature("Versioning") {
+  Feature("Versioning") {
 
-    scenario("Requests without an accept header default to version 1.0") {
+    Scenario("Requests without an accept header default to version 1.0") {
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made without an accept header")
       val response =
@@ -40,7 +40,7 @@ class VersioningSpec extends BaseSpec {
       response.code shouldBe NOT_FOUND
     }
 
-    scenario("Requests with an accept header with an invalid version") {
+    Scenario("Requests with an accept header with an invalid version") {
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version 10.0")
       val response = invokeWithHeaders(
@@ -53,7 +53,7 @@ class VersioningSpec extends BaseSpec {
       response.code shouldBe NOT_FOUND
     }
 
-    scenario("Requests with an accept header version P1.0") {
+    Scenario("Requests with an accept header version P1.0") {
 
       When(s"A request to $sandboxMatchEndpointWithSandboxMatchId is made with an accept header for version P1")
       val response =
@@ -84,7 +84,7 @@ class VersioningSpec extends BaseSpec {
     }
 
 
-    scenario("Requests with an accept header version 2.0") {
+    Scenario("Requests with an accept header version 2.0") {
       val header = FakeRequest().withHeaders(acceptHeaderVP2)
       val result = RequestHeaderUtils.getVersion(header)
       result shouldBe "2.0"

@@ -18,11 +18,12 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.util
 
 import org.joda.time.DateTime
 import org.joda.time.LocalDate.parse
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ValidationException
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates
 
-class DatesSpec extends FlatSpec with Matchers {
+class DatesSpec extends AnyFlatSpec with Matchers {
 
   "Dates utility" should "derive an interval between two dates" in {
     val (fromDate, toDate) = (parse("2020-01-01"), parse("2020-01-02"))

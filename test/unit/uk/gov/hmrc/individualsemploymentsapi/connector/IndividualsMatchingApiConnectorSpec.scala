@@ -24,10 +24,9 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.IndividualsMatchingApiConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain
-import uk.gov.hmrc.individualsemploymentsapi.domain.{NinoMatch, v1}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
@@ -62,7 +61,7 @@ class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEa
 
     "fail when upstream service fails" in new Fixture {
       stubWithResponseStatus(INTERNAL_SERVER_ERROR)
-      a[Upstream5xxResponse] should be thrownBy {
+      a[UpstreamErrorResponse] should be thrownBy {
         await(individualsMatchingApiConnector.resolve(matchId))
       }
     }

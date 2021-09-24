@@ -16,7 +16,8 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import org.scalatest.{BeforeAndAfterEach, Matchers}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.matchers.should.Matchers
 import play.api.libs.json.Json
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryParameterException
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{ScopesHelper, ScopesService}

@@ -16,13 +16,14 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.{FlatSpec, Matchers}
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode._
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.PayFrequency
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.PayFrequency._
 
-class PayFrequencySpec extends FlatSpec with Matchers {
+class PayFrequencySpec extends AnyFlatSpec with Matchers {
 
   "Pay frequency" should "derive itself from an instance of IF pay frequency" in new TableDrivenPropertyChecks {
     val fixtures = Table(

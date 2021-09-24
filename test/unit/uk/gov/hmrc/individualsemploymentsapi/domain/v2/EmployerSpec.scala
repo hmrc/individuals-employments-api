@@ -16,11 +16,12 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.domain.EmpRef
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.{Address, Employer}
 
-class EmployerSpec extends FlatSpec with Matchers {
+class EmployerSpec extends AnyFlatSpec with Matchers {
 
   "Employer" should "derive itself from some parameters" in {
     val someEmpRef = Some(EmpRef("123", "AB45678"))

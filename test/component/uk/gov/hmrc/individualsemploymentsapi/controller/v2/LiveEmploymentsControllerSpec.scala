@@ -16,13 +16,13 @@
 
 package component.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
+import java.util.UUID
+
 import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec, IfStub, IndividualsMatchingApiStub}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import scalaj.http.Http
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfEmployer, IfEmployment, IfEmployments}
-
-import java.util.UUID
 
 class LiveEmploymentsControllerSpec extends BaseSpec {
 
@@ -60,11 +60,11 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         None
       )))
 
-  feature("Root (hateoas) entry point is accessible") {
+  Feature("Root (hateoas) entry point is accessible") {
 
     testAuthorisation("")
 
-    scenario("invalid token") {
+    Scenario("invalid token") {
       Given("an invalid token")
       AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -79,7 +79,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("missing match id") {
+    Scenario("missing match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -94,7 +94,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("malformed match id") {
+    Scenario("malformed match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -109,7 +109,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("invalid match id") {
+    Scenario("invalid match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -124,7 +124,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("valid request to the live root endpoint implementation") {
+    Scenario("valid request to the live root endpoint implementation") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -148,12 +148,12 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     }
   }
 
-  feature("Paye endpoint") {
+  Feature("Paye endpoint") {
 
     testErrorHandling("paye", nino, allScopes)
     testAuthorisation("paye")
 
-    scenario("invalid token") {
+    Scenario("invalid token") {
       Given("an invalid token")
       AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -168,7 +168,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("missing match id") {
+    Scenario("missing match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -183,7 +183,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("malformed match id") {
+    Scenario("malformed match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -199,7 +199,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("invalid match id") {
+    Scenario("invalid match id") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -214,7 +214,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("missing fromDate") {
+    Scenario("missing fromDate") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -229,7 +229,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("toDate earlier than fromDate") {
+    Scenario("toDate earlier than fromDate") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -244,7 +244,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("From date requested is earlier than 31st March 2013") {
+    Scenario("From date requested is earlier than 31st March 2013") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -259,7 +259,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("Invalid fromDate") {
+    Scenario("Invalid fromDate") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -274,7 +274,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("Invalid toDate") {
+    Scenario("Invalid toDate") {
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
@@ -289,7 +289,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("valid request to the live paye endpoint implementation") {
+    Scenario("valid request to the live paye endpoint implementation") {
 
       Given("a valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
@@ -318,7 +318,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("the IF rate limit is exceeded") {
+    Scenario("the IF rate limit is exceeded") {
       val matchId = UUID.randomUUID().toString
       val nino = "AA112233B"
 
@@ -342,7 +342,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       )
     }
 
-    scenario("Missing paye employerRef") {
+    Scenario("Missing paye employerRef") {
       Given("a valid privileged Auth bearer token")
 
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
@@ -365,7 +365,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
   def testAuthorisation(endpoint:String): Unit = {
 
-    scenario(s"user does not have valid scopes for endpoint $endpoint") {
+    Scenario(s"user does not have valid scopes for endpoint $endpoint") {
       Given("A valid auth token but invalid scopes")
       AuthStub.willNotAuthorizePrivilegedAuthTokenNoScopes(authToken)
 
@@ -401,7 +401,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
           None
         )))
 
-    scenario(s"valid request but invalid IF response") {
+    Scenario(s"valid request but invalid IF response") {
 
       Given("A valid auth token ")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)
@@ -426,7 +426,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         "message" -> "Something went wrong.")
     }
 
-    scenario(s"IF returns an Internal Server Error") {
+    Scenario(s"IF returns an Internal Server Error") {
 
       Given("A valid auth token ")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)
@@ -450,7 +450,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         "message" -> "Something went wrong.")
     }
 
-    scenario(s"IF returns a Bad Request Error") {
+    Scenario(s"IF returns a Bad Request Error") {
 
       Given("A valid auth token ")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, rootScope)

@@ -16,7 +16,7 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import org.scalatest.Matchers
+import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.ScopesService
 import unit.uk.gov.hmrc.individualsemploymentsapi.service.ScopesConfig
 import utils.UnitSpec

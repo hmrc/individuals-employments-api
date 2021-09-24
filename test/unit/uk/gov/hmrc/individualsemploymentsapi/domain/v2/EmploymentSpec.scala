@@ -17,13 +17,14 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
 import org.joda.time.LocalDate
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.domain.EmpRef
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
-import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfAddress, IfEmployer, IfEmployment, IfEmploymentDetail, IfPayment}
-import uk.gov.hmrc.individualsemploymentsapi.domain.v2.{Address, Employer, Employment, PayFrequency, Payment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework._
+import uk.gov.hmrc.individualsemploymentsapi.domain.v2._
 
-class EmploymentSpec extends FlatSpec with Matchers {
+class EmploymentSpec extends AnyFlatSpec with Matchers {
 
   "Employment" should "derive itself from an instance of IF employment" in {
     val ifPayment = IfPayment(

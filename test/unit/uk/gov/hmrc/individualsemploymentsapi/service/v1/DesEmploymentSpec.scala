@@ -17,10 +17,11 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v1
 
 import org.joda.time.LocalDate
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments, DesPayment}
 
-class DesEmploymentSpec extends WordSpec with Matchers {
+class DesEmploymentSpec extends AnyWordSpec with Matchers {
 
   "Des employments" should {
     "map over correctly to employments" in {

@@ -1,12 +1,18 @@
+import play.sbt.routes.RoutesKeys
 import sbt.Keys.compile
 import sbt.Tests.{Group, SubProcess}
 import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
 import uk.gov.hmrc.ExternalService
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 import uk.gov.hmrc.ServiceManagerPlugin.Keys.itDependenciesList
+import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "individuals-employments-api"
 val hmrc = "uk.gov.hmrc"
+
+TwirlKeys.templateImports := Seq.empty
+RoutesKeys.routesImport := Seq(
+  "uk.gov.hmrc.individualsemploymentsapi.Binders._"
+)
 
 lazy val playSettings: Seq[Setting[_]] = Seq(
   routesImport ++= Seq(

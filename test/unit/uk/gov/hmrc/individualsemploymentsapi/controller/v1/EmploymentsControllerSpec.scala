@@ -20,7 +20,7 @@ import java.util.UUID
 
 import org.joda.time.{Interval, LocalDate}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verifyZeroInteractions, when}
+import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
@@ -110,7 +110,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       val result = liveEmploymentsController.root(randomMatchId)(FakeRequest())
 
       status(result) shouldBe UNAUTHORIZED
-      verifyZeroInteractions(mockLiveEmploymentsService)
+      verifyNoInteractions(mockLiveEmploymentsService)
     }
 
     "not require bearer token authentication for sandbox" in new Setup {
@@ -121,7 +121,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         sandboxEmploymentsController.root(randomMatchId)(FakeRequest())
 
       status(result) shouldBe OK
-      verifyZeroInteractions(mockAuthConnector)
+      verifyNoInteractions(mockAuthConnector)
     }
   }
 
@@ -275,7 +275,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         liveEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest())
 
       status(result) shouldBe UNAUTHORIZED
-      verifyZeroInteractions(mockLiveEmploymentsService)
+      verifyNoInteractions(mockLiveEmploymentsService)
     }
 
     "not require bearer token authentication" in new Setup {
@@ -287,7 +287,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         sandboxEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest())
 
       status(eventualResult) shouldBe OK
-      verifyZeroInteractions(mockAuthConnector)
+      verifyNoInteractions(mockAuthConnector)
     }
 
   }
