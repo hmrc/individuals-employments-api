@@ -90,7 +90,7 @@ class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
     await(shortLivedCache.collection.find(Filters.equal("id", toBson(id)))
       .headOption
       .map {
-        case Some(entry) => entry.data.individualsDetails
+        case Some(entry) => entry.data.individualsEmployments
         case None => None
       })
   }
