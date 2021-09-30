@@ -89,7 +89,7 @@ abstract class CacheRepository(val cacheConfig: CacheRepositoryConfiguration,
       .find(Filters.equal("id", toBson(id)))
       .headOption
       .map {
-        case Some(entry) => decryptor.reads(entry.data.individualsDetails).asOpt map (_.decryptedValue)
+        case Some(entry) => decryptor.reads(entry.data.individualsEmployments).asOpt map (_.decryptedValue)
         case None => None
       }
   }
