@@ -18,7 +18,7 @@ package uk.gov.hmrc.individualsemploymentsapi.cache
 
 import play.api.libs.json.{JsValue, Json, OFormat}
 
-case class Data(individualsEmployments: JsValue)
+case class Data(value: JsValue)
 
 object Data {
   implicit val format: OFormat[Data] = Json.format[Data]
