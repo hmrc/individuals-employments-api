@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,20 +17,28 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.util
 
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import uk.gov.hmrc.individualsemploymentsapi.util.UuidValidator
 
-class UuidValidatorSpec extends AnyWordSpec with Matchers {
+import java.util.UUID
+
+class UuidValidatorSpec extends SpecBase with Matchers with ScalaCheckPropertyChecks {
 
   private val invalidUuid = "0-0-0-0-0"
-  private val validUuid = "a1c15e8f-b119-4121-bc08-6baf2af45099"
 
-  "Return true on a a valid UUID" in {
-    UuidValidator.validate(validUuid) shouldBe true
+  "Return true on a valid lower-cased UUID" in {
+    forAll { uuid: UUID =>
+      UuidValidator.validate(uuid.toString) shouldBe true
+    }
+  }
+
+  "Return true on a valid upper-cased UUID" in {
+    forAll { uuid: UUID =>
+      UuidValidator.validate(uuid.toString.toUpperCase) shouldBe true
+    }
   }
 
   "Return false on invalid UUID" in {
     UuidValidator.validate(invalidUuid) shouldBe false
   }
-
 }
