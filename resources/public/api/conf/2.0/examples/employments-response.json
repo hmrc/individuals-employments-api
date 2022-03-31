@@ -21,10 +21,10 @@
           "postcode": "DH4 4YY"
         }
       },
-      "payment": [
+      "payments": [
         {
-          "date": "2019-01-31",
-          "paidTaxablePay": 4765.32
+          "paymentDate": "2019-01-31",
+          "taxablePayment": 4765.32
         }
       ]
     }

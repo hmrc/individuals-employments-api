@@ -109,19 +109,19 @@
               }
             }
           },
-          "payment": {
+          "payments": {
             "description": "The employee's payment details. ",
             "type": "array",
             "items": {
               "type": "object",
               "properties": {
-                "date": {
+                "paymentDate": {
                   "description": "The date of the payment.",
                   "type": "string",
                   "id": "full-date",
                   "example": "2019-01-31"
                 },
-                "paidTaxablePay": {
+                "taxablePayment": {
                   "description": "The amount the employee was paid.",
                   "type": "number",
                   "example": "4765.32"
