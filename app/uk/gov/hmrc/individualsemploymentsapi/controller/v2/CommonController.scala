@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
       ErrorInvalidRequest(e.getMessage).toHttpResponse
     }
     case e: Exception => {
-      logger.warn("Controllers Exception encountered")
+      logger.warn("Controllers Exception encountered", e)
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInternalServer("Something went wrong.").toHttpResponse
     }
