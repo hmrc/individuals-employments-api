@@ -38,13 +38,15 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     "read:individuals-employments-hmcts-c4",
     "read:individuals-employments-ho-ecp",
     "read:individuals-employments-ho-rp2",
+    "read:individuals-employments-ho-v2",
     "read:individuals-employments-laa-c1",
     "read:individuals-employments-laa-c2",
     "read:individuals-employments-laa-c3",
     "read:individuals-employments-laa-c4",
     "read:individuals-employments-lsani-c1",
     "read:individuals-employments-lsani-c3",
-    "read:individuals-employments-nictsejo-c4")
+    "read:individuals-employments-nictsejo-c4"
+  )
 
   val validData = IfEmployments(
     Seq(
