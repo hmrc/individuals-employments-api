@@ -94,7 +94,7 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
       ErrorInvalidRequest(e.getMessage).toHttpResponse
     }
     case e: Exception => {
-      logger.warn("Controllers Exception encountered")
+      logger.warn("Controllers Exception encountered", e)
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInternalServer("Something went wrong.").toHttpResponse
     }

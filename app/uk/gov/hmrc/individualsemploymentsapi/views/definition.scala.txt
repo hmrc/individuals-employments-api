@@ -73,6 +73,11 @@
       "description":"Scope for HO RP2 to access employments information on individuals"
     },
     {
+      "key":"read:individuals-employments-ho-v2",
+      "name":"access individuals employment information for HO V2",
+      "description":"Scope for HO that replicates the v1 version of the same scope"
+    },
+    {
       "key":"read:individuals-employments-ho-ecp",
       "name":"access individuals employment information for HO ECP",
       "description":"Scope for HO ECP to access employments information on individuals"
