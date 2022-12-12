@@ -1,0 +1,403 @@
+openapi: 3.0.0
+info:
+  title: Individuals Employments
+  contact: {}
+  version: 'P1.0'
+
+servers:
+  - url: https://api.isc.development.tax.service.gov.uk
+    description: Development
+  - url: https://api.qa.tax.service.gov.uk
+    description: QA
+  - url: https://test-api.service.hmrc.gov.uk
+    description: Sandbox
+  - url: https://api.service.hmrc.gov.uk
+    description: PRD
+
+paths:
+  /individuals/employments/:
+    get:
+      tags:
+      - individuals
+      summary: Entry point
+      description: This is the entry point to the API and returns one or more links.
+      operationId: Entrypoint
+      parameters:
+      - name: matchId
+        in: query
+        description: A short-lived UUID, typically valid for several hours. Generated through the Individuals Matching API.
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      - name: Authorization
+        in: header
+        description: OAuth 2.0 Bearer Token with the read:individuals-employments scope.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: Bearer <BEARER_TOKEN>
+      responses:
+        '200':
+          description: The resource available to view an individual's employments
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/IndividualsEmploymentsresponse'
+                - example:
+                    _links:
+                      paye:
+                        href: /individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&fromDate,toDate}
+                        title: View individual's employments
+                      self:
+                        href: /individuals/employments/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+              example:
+                _links:
+                  paye:
+                    href: /individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&fromDate,toDate}
+                    title: View individual's employments
+                  self:
+                    href: /individuals/employments/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: INVALID_REQUEST
+              examples:
+                BadRequest:
+                  description: Invalid request
+                  value:
+                    code: INVALID_REQUEST
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: NOT_FOUND
+              examples:
+                NotFound:
+                  description: Not found
+                  value:
+                    code: NOT_FOUND
+      deprecated: false
+  /individuals/employments/paye:
+    get:
+      tags:
+      - individuals
+      summary: Retrieve Employments history
+      description: >
+        <p>This endpoint returns an individual's PAYE employments data for the requested time period.</p>
+
+        <p>The fromDate and toDate are inclusive i.e. the data returned are for the time period that includes the fromDate and the toDate.</p>
+
+        <p>Employment data is only available for tax years commencing 2013-2014.</p>
+      operationId: RetrieveEmploymentshistory
+      parameters:
+      - name: matchId
+        in: query
+        description: A short-lived UUID, typically valid for several hours. Generated through the Individuals Matching API
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      - name: fromDate
+        in: query
+        description: The date from when data is requested
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 2016-01-01
+      - name: toDate
+        in: query
+        description: The date to when data is requested. If absent it defaults to today's date
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: 2017-03-01
+      - name: Authorization
+        in: header
+        description: OAuth 2.0 Bearer Token with the read:individuals-employments-paye scope.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: Bearer <BEARER_TOKEN>
+      responses:
+        '200':
+          description: The individual PAYE employments for the given period
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/IndividualsEmploymentsPayeresponse'
+                - example:
+                    _links:
+                      self:
+                        href: /individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2016-02-28&toDate=2017-03-01
+                    employments:
+                    - startDate: 2017-01-02
+                      endDate: 2017-03-01
+                      employer:
+                        payeReference: 123/DI45678
+                        name: Disney
+                        address:
+                          line1: Friars House
+                          line2: Campus Way
+                          line3: New Street
+                          line4: Sometown
+                          line5: Old County
+                          postcode: TF22 3BC
+                      payFrequency: FORTNIGHTLY
+                    - startDate: 2016-01-01
+                      endDate: 2016-06-30
+                      employer:
+                        payeReference: 123/AI45678
+                        name: Acme
+                        address:
+                          line1: Acme Inc Building
+                          line2: Acme Inc Campus
+                          line3: Acme Street
+                          line4: AcmeVille
+                          line5: Acme State
+                          postcode: AI22 9LL
+                      payFrequency: FOUR_WEEKLY
+              example:
+                _links:
+                  self:
+                    href: /individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2016-02-28&toDate=2017-03-01
+                employments:
+                - startDate: 2017-01-02
+                  endDate: 2017-03-01
+                  employer:
+                    payeReference: 123/DI45678
+                    name: Disney
+                    address:
+                      line1: Friars House
+                      line2: Campus Way
+                      line3: New Street
+                      line4: Sometown
+                      line5: Old County
+                      postcode: TF22 3BC
+                  payFrequency: FORTNIGHTLY
+                - startDate: 2016-01-01
+                  endDate: 2016-06-30
+                  employer:
+                    payeReference: 123/AI45678
+                    name: Acme
+                    address:
+                      line1: Acme Inc Building
+                      line2: Acme Inc Campus
+                      line3: Acme Street
+                      line4: AcmeVille
+                      line5: Acme State
+                      postcode: AI22 9LL
+                  payFrequency: FOUR_WEEKLY
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: INVALID_REQUEST
+              examples:
+                BadRequest:
+                  description: Invalid request
+                  value:
+                    code: INVALID_REQUEST
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: NOT_FOUND
+              examples:
+                NotFound:
+                  description: Not found
+                  value:
+                    code: NOT_FOUND
+      deprecated: false
+components:
+  schemas:
+    errorResponse:
+      title: errorResponse
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+    Address:
+      title: Address
+      type: object
+      properties:
+        line1:
+          type: string
+          description: Address line 1
+        line2:
+          type: string
+          description: Address line 2
+        line3:
+          type: string
+          description: Address line 3
+        line4:
+          type: string
+          description: Address line 4
+        line5:
+          type: string
+          description: Address line 5
+        postcode:
+          type: string
+          description: Postcode
+      description: Employer's address
+    Employer:
+      title: Employer
+      type: object
+      properties:
+        payeReference:
+          type: string
+          description: Employer PAYE Reference
+          example: 123/AI45678
+        name:
+          type: string
+          description: Employer's name
+        address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          - description: Employer's address
+      description: Employer's details
+    Employment:
+      title: Employment
+      type: object
+      properties:
+        payFrequency:
+          allOf:
+          - $ref: '#/components/schemas/PayFrequency'
+          - description: A value representing the frequency of payment for an employment
+        startDate:
+          type: string
+          description: 'The start date for an employment. Date in the format: YYYY-MM-DD.'
+          example: 2016-06-30
+        endDate:
+          type: string
+          description: 'The end date for an employment. Date in the format: YYYY-MM-DD.'
+          example: 2017-06-30
+        employer:
+          allOf:
+          - $ref: '#/components/schemas/Employer'
+          - description: Employer's details
+    IndividualsEmploymentsPayeresponse:
+      title: IndividualsEmploymentsPayeresponse
+      required:
+      - _links
+      - employments
+      type: object
+      properties:
+        _links:
+          $ref: '#/components/schemas/Links1'
+        employments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Employment'
+          description: List of employments for the requested period
+      description: Individual's PAYE employments
+    IndividualsEmploymentsresponse:
+      title: IndividualsEmploymentsresponse
+      required:
+      - _links
+      type: object
+      properties:
+        _links:
+          $ref: '#/components/schemas/Links'
+      description: Individual's employments
+    Links:
+      title: Links
+      required:
+      - paye
+      - self
+      type: object
+      properties:
+        paye:
+          allOf:
+          - $ref: '#/components/schemas/Paye'
+          - description: The URI for the resource to get the individual's employment data
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Self'
+          - description: HAL compliant. Refers to itself
+    Links1:
+      title: Links1
+      required:
+      - self
+      type: object
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Self'
+          - description: HAL compliant. Refers to itself
+    Paye:
+      title: Paye
+      required:
+      - href
+      type: object
+      properties:
+        href:
+          type: string
+          example: /individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430{&fromDate,toDate}
+        title:
+          type: string
+          example: View individual's employments
+      description: The URI for the resource to get the individual's employment data
+    PayFrequency:
+      title: PayFrequency
+      enum:
+      - WEEKLY
+      - FORTNIGHTLY
+      - FOUR_WEEKLY
+      - CALENDAR_MONTHLY
+      - QUARTERLY
+      - BI_ANNUALLY
+      - ANNUALLY
+      - ONE_OFF
+      - IRREGULAR
+      type: string
+      description: A value representing the frequency of payment for an employment
+    Self:
+      title: Self
+      required:
+      - href
+      type: object
+      properties:
+        href:
+          type: string
+          example: /individuals/employments/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      description: HAL compliant. Refers to itself
+tags:
+- name: individuals
+  description: ''
