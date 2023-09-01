@@ -25,7 +25,7 @@ import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidR
 import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.{Address, Employer, Employment, PayFrequency}
-
+import scala.language.postfixOps
 import scala.util.{Failure, Try}
 
 object JsonFormatters {

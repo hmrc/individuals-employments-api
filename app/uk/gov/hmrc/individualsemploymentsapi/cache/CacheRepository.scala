@@ -23,7 +23,7 @@ import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, ReplaceOption
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Protected}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, Protected}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -52,7 +52,7 @@ abstract class CacheRepository(val cacheConfig: CacheRepositoryConfiguration,
         expireAfter(cacheConfig.cacheTtl, TimeUnit.SECONDS)))
 ) {
 
-  implicit lazy val crypto: CompositeSymmetricCrypto = new ApplicationCrypto(
+  implicit lazy val crypto: Encrypter with Decrypter = new ApplicationCrypto(
     configuration.underlying).JsonCrypto
 
   def cache[T](id: String, value: T)(implicit formats: Format[T]) = {

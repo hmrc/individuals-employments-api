@@ -20,7 +20,7 @@ import com.typesafe.config.Config
 import play.api.ConfigLoader
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.PathTree
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 case class ApiConfig(scopes: List[ScopeConfig], internalEndpoints: List[InternalEndpointConfig], externalEndpoints: List[ExternalEndpointConfig]) {
 

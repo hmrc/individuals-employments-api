@@ -26,7 +26,7 @@ lazy val scoverageSettings = {
     ScoverageKeys.coverageExcludedPackages := "<empty>;Reverse.*;" +
       ".*BuildInfo.;uk.gov.hmrc.BuildInfo;.*Routes;.*RoutesPrefix*;" +
       ".*definition*;",
-    ScoverageKeys.coverageMinimum := 80,
+    ScoverageKeys.coverageMinimumStmtTotal := 80,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
     parallelExecution in Test := false
@@ -48,16 +48,14 @@ lazy val microservice =
       play.sbt.PlayScala,
       SbtAutoBuildPlugin,
       SbtGitVersioning,
-      SbtDistributablesPlugin,
-      SbtArtifactory) ++ plugins: _*)
+      SbtDistributablesPlugin) ++ plugins: _*)
     .settings(playSettings: _*)
     .settings(scalaSettings: _*)
     .settings(scoverageSettings: _*)
-    .settings(publishingSettings: _*)
-    .settings(scalaVersion := "2.12.11")
+    .settings(scalaVersion := "2.13.8")
     .settings(defaultSettings(): _*)
     .settings(
-      libraryDependencies ++= appDependencies,
+      libraryDependencies ++= (AppDependencies.compile ++ AppDependencies.test()),
       testOptions in Test := Seq(Tests.Filter(unitFilter)),
       retrieveManaged := true,
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
@@ -67,7 +65,6 @@ lazy val microservice =
     .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
     .settings(itDependenciesList := externalServices)
     .settings(
-      dependencyOverrides ++= AppDependencies.overrides,
       Keys.fork in IntegrationTest := false,
       unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base => Seq(base / "test")).value,
       testOptions in IntegrationTest := Seq(Tests.Filter(intTestFilter)),
@@ -86,6 +83,7 @@ lazy val microservice =
     .settings(resolvers ++= Seq(
       Resolver.jcenterRepo
     ))
+    .settings(scalacOptions += "-Wconf:src=routes/.*:s")
     .settings(PlayKeys.playDefaultPort := 9651)
     .settings(majorVersion := 0)
 
