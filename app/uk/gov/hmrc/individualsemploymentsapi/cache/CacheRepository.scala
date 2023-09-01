@@ -71,7 +71,7 @@ abstract class CacheRepository(val cacheConfig: CacheRepositoryConfiguration,
 
     collection.replaceOne(
       Filters.equal("id", toBson(id)), entry, ReplaceOptions().upsert(true)
-    ).toFuture
+    ).toFuture()
   }
 
   def fetchAndGetEntry[T](id: String)(
@@ -80,7 +80,7 @@ abstract class CacheRepository(val cacheConfig: CacheRepositoryConfiguration,
 
     collection
       .find(Filters.equal("id", toBson(id)))
-      .headOption
+      .headOption()
       .map {
         case Some(entry) => decryptor.reads(entry.data.value).asOpt map (_.decryptedValue)
         case None => None

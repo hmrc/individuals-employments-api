@@ -56,12 +56,12 @@ class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSuga
     val underTest = fakeApplication.injector.instanceOf[DesConnector]
   }
 
-  override def beforeEach() {
+  override def beforeEach() : Unit = {
     wireMockServer.start()
     configureFor(stubHost, stubPort)
   }
 
-  override def afterEach() {
+  override def afterEach() : Unit = {
     wireMockServer.stop()
   }
 

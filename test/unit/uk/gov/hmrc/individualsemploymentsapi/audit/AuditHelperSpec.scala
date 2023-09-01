@@ -41,7 +41,7 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper 
   val matchId = "80a6bb14-d888-436e-a541-4000674c60aa"
   val applicationId = "80a6bb14-d888-436e-a541-4000674c60bb"
   val request = FakeRequest().withHeaders("X-Application-Id" -> applicationId)
-  val ifApiResponse = IfEmployments(List(createValidEmployment))
+  val ifApiResponse = IfEmployments(List(createValidEmployment()))
   val apiResponse = Seq(Employment.create(ifApiResponse.employments.head).get)
   val ifUrl =
     s"host/individuals/employments/paye/nino/$nino?startDate=2019-01-01&endDate=2020-01-01&fields=some(vals(val1),val2)"
