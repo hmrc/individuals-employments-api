@@ -30,9 +30,9 @@ import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 import java.util.UUID
 import javax.inject.{Inject, Named, Singleton}
-import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.ExecutionContext
 
-abstract class EmploymentsController(employmentsService: EmploymentsService, cc: ControllerComponents)
+abstract class EmploymentsController(employmentsService: EmploymentsService, cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends CommonController(cc) with PrivilegedAuthentication {
 
   val hmctsClientId: String
@@ -81,7 +81,7 @@ class SandboxEmploymentsController @Inject()(
   sandboxEmploymentsService: SandboxEmploymentsService,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
-  cc: ControllerComponents)
+  cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends EmploymentsController(sandboxEmploymentsService, cc) {
 
   override val environment: String = SANDBOX
@@ -92,7 +92,7 @@ class LiveEmploymentsController @Inject()(
   liveEmploymentsService: LiveEmploymentsService,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
-  cc: ControllerComponents)
+  cc: ControllerComponents)(implicit ec: ExecutionContext)
     extends EmploymentsController(liveEmploymentsService, cc) {
 
   override val environment: String = PRODUCTION

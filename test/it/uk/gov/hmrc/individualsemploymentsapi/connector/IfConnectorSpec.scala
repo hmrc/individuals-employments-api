@@ -76,12 +76,12 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
   }
 
-  override def beforeEach() {
+  override def beforeEach() : Unit = {
     wireMockServer.start()
     configureFor(stubHost, stubPort)
   }
 
-  override def afterEach() {
+  override def afterEach() : Unit = {
     wireMockServer.stop()
   }
 

@@ -45,12 +45,12 @@ class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
 
   val shortLivedCache = fakeApplication.injector.instanceOf[ShortLivedCache]
 
-  override def beforeEach() {
+  override def beforeEach() : Unit = {
     super.beforeEach()
     await(shortLivedCache.collection.drop().toFuture())
   }
 
-  override def afterEach() {
+  override def afterEach() : Unit = {
     super.afterEach()
     await(shortLivedCache.collection.drop().toFuture())
   }
@@ -85,7 +85,7 @@ class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
 
   private def retrieveRawCachedValue(id: String) = {
     await(shortLivedCache.collection.find(Filters.equal("id", toBson(id)))
-      .headOption
+      .headOption()
       .map {
         case Some(entry) => entry.data.value
         case None => None

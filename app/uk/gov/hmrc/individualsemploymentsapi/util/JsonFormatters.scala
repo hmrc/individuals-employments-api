@@ -25,7 +25,7 @@ import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.{ErrorInvalidR
 import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.{Address, Employer, Employment, PayFrequency}
-
+import scala.language.postfixOps
 import scala.util.{Failure, Try}
 
 object JsonFormatters {
@@ -66,11 +66,11 @@ object JsonFormatters {
     class InvalidEnumException(className: String, input: String)
         extends RuntimeException(s"Enumeration expected of type: '$className', but it does not contain '$input'")
 
-    def enumReads[E <: Enumeration](enum: E): Reads[E#Value] = new Reads[E#Value] {
+    def enumReads[E <: Enumeration](anEnum: E): Reads[E#Value] = new Reads[E#Value] {
       def reads(json: JsValue): JsResult[E#Value] = json match {
         case JsString(s) =>
-          Try(JsSuccess(enum.withName(s))) recoverWith {
-            case _: NoSuchElementException => Failure(new InvalidEnumException(enum.getClass.getSimpleName, s))
+          Try(JsSuccess(anEnum.withName(s))) recoverWith {
+            case _: NoSuchElementException => Failure(new InvalidEnumException(anEnum.getClass.getSimpleName, s))
           } get
         case _ => JsError("String value expected")
       }
@@ -80,8 +80,8 @@ object JsonFormatters {
       def writes(v: E#Value): JsValue = JsString(v.toString)
     }
 
-    implicit def enumFormat[E <: Enumeration](enum: E): Format[E#Value] =
-      Format(enumReads(enum), enumWrites)
+    implicit def enumFormat[E <: Enumeration](anEnum: E): Format[E#Value] =
+      Format(enumReads(anEnum), enumWrites)
 
   }
 

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.individualsemploymentsapi.connector
 
 import java.util.UUID
-
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, Upstream4xxResponse}
@@ -26,11 +25,10 @@ import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundE
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.ninoMatchJsonFormat
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class IndividualsMatchingApiConnector @Inject()(serviceConfig: ServicesConfig, http: HttpClient) {
+class IndividualsMatchingApiConnector @Inject()(serviceConfig: ServicesConfig, http: HttpClient)(implicit ec : ExecutionContext) {
 
   private[connector] val serviceUrl = serviceConfig.baseUrl("individuals-matching-api")
 

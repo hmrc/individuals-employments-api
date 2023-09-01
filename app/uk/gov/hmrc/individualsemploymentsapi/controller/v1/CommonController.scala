@@ -30,10 +30,9 @@ import uk.gov.hmrc.individualsemploymentsapi.util.Dates._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-abstract class CommonController @Inject()(cc: ControllerComponents) extends BackendController(cc) {
+abstract class CommonController @Inject()(cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
 
   val logger: Logger = Logger(getClass)
 
@@ -65,7 +64,8 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
                   (f: Iterable[String] => Future[Result])
                   (implicit hc: HeaderCarrier,
                    request: RequestHeader,
-                   auditHelper: AuditHelper): Future[Result] = {
+                   auditHelper: AuditHelper,
+                   ec: ExecutionContext): Future[Result] = {
 
     if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
 
@@ -84,7 +84,7 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
   }
 
   def requiresPrivilegedAuthentication(scope: String)(body: => Future[Result])(
-    implicit hc: HeaderCarrier): Future[Result] =
+    implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
     if (environment == SANDBOX) body
     else authorised(Enrolment(scope))(body)
 }

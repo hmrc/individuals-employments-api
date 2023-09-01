@@ -17,7 +17,6 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v1
 
 import java.util.UUID
-
 import org.joda.time.{Interval, LocalDate}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verifyNoInteractions, when}
@@ -38,7 +37,7 @@ import uk.gov.hmrc.individualsemploymentsapi.sandbox.v1.SandboxData.{Employments
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.{LiveEmploymentsService, SandboxEmploymentsService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
 class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
@@ -50,6 +49,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     val mockLiveEmploymentsService = mock[LiveEmploymentsService]
     val mockAuthConnector = mock[AuthConnector]
     val hmctsClientId = "hmctsClientId"
+    implicit val ec: ExecutionContextExecutor = ExecutionContext.global
 
     val sandboxEmploymentsController = new SandboxEmploymentsController(
       mockSandboxEmploymentsService,
