@@ -17,7 +17,6 @@
 package uk.gov.hmrc.individualsemploymentsapi.service.v1
 
 import java.util.UUID
-
 import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.{Interval, LocalDate}
 import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
@@ -29,8 +28,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.Future.{failed, successful}
 
 trait EmploymentsService {
@@ -74,7 +72,7 @@ class LiveEmploymentsService @Inject()(
   individualsMatchingApiConnector: IndividualsMatchingApiConnector,
   desConnector: DesConnector,
   @Named("retryDelay") retryDelay: Int,
-  cacheService: CacheService)
+  cacheService: CacheService)(implicit ec: ExecutionContext)
     extends EmploymentsService {
 
   private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { e: DesEmployment =>
