@@ -2,9 +2,6 @@ import play.sbt.routes.RoutesKeys
 import sbt.Keys.compile
 import sbt.Tests.{Group, SubProcess}
 import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
-import uk.gov.hmrc.ExternalService
-import uk.gov.hmrc.ServiceManagerPlugin.Keys.itDependenciesList
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "individuals-employments-api"
 val hmrc = "uk.gov.hmrc"
@@ -35,8 +32,6 @@ lazy val scoverageSettings = {
 
 lazy val appDependencies: Seq[ModuleID] = AppDependencies.compile ++ AppDependencies.test()
 lazy val plugins: Seq[Plugins] = Seq.empty
-lazy val externalServices =
-  List(ExternalService("AUTH"), ExternalService("INDIVIDUALS_MATCHING_API"), ExternalService("DES"))
 def intTestFilter(name: String): Boolean = name startsWith "it"
 def unitFilter(name: String): Boolean = name startsWith "unit"
 def componentFilter(name: String): Boolean = name startsWith "component"
@@ -63,7 +58,6 @@ lazy val microservice =
     .settings(unmanagedResourceDirectories in Compile += baseDirectory.value / "resources")
     .configs(IntegrationTest)
     .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
-    .settings(itDependenciesList := externalServices)
     .settings(
       Keys.fork in IntegrationTest := false,
       unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base => Seq(base / "test")).value,
@@ -89,7 +83,7 @@ lazy val microservice =
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
   tests.map { test =>
-    new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
+    Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
   }
 
 lazy val compileAll = taskKey[Unit]("Compiles sources in all configurations.")
