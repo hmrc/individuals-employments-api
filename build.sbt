@@ -1,49 +1,21 @@
-import play.sbt.routes.RoutesKeys
-import sbt.Keys.compile
 import sbt.IntegrationTest
 import sbt.Keys.{testGrouping, testOptions, unmanagedSourceDirectories}
 import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, defaultSettings, scalaSettings}
+import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 
 val appName = "individuals-employments-api"
-val hmrc = "uk.gov.hmrc"
 
-TwirlKeys.templateImports := Seq.empty
-RoutesKeys.routesImport := Seq(
-  "uk.gov.hmrc.individualsemploymentsapi.Binders._"
-)
-
-lazy val playSettings: Seq[Setting[_]] = Seq(
-  routesImport ++= Seq(
-    "uk.gov.hmrc.domain._",
-    "uk.gov.hmrc.individualsemploymentsapi.domain._",
-    "uk.gov.hmrc.individualsemploymentsapi.Binders._"))
-
-lazy val appDependencies: Seq[ModuleID] = AppDependencies.compile ++ AppDependencies.test()
-lazy val plugins: Seq[Plugins] = Seq.empty
-def intTestFilter(name: String): Boolean = name startsWith "it"
-def unitFilter(name: String): Boolean = name startsWith "unit"
-def componentFilter(name: String): Boolean = name startsWith "component"
 lazy val ComponentTest = config("component") extend Test
 
 lazy val microservice =
   Project(appName, file("."))
-    .enablePlugins(Seq(
-      play.sbt.PlayScala,
-      SbtAutoBuildPlugin,
-      SbtGitVersioning,
-      SbtDistributablesPlugin) ++ plugins: _*)
-    .settings(playSettings: _*)
-    .settings(scalaSettings: _*)
+    .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
     .settings(onLoadMessage := "")
     .settings(CodeCoverageSettings.settings *)
     .settings(scalaVersion := "2.13.8")
-    .settings(defaultSettings(): _*)
     .settings(
-      libraryDependencies ++= (AppDependencies.compile ++ AppDependencies.test()),
-      testOptions in Test := Seq(Tests.Filter(unitFilter)),
-      retrieveManaged := true,
-      evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
+      libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test(),
+      routesImport ++= Seq("uk.gov.hmrc.individualsemploymentsapi.Binders._")
     )
     .settings(Compile / unmanagedResourceDirectories += baseDirectory.value / "resources")
     .configs(IntegrationTest)
@@ -51,7 +23,7 @@ lazy val microservice =
     .settings(
       IntegrationTest / Keys.fork := false,
       IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "test")).value,
-      IntegrationTest / testOptions := Seq(Tests.Filter(intTestFilter),
+      IntegrationTest / testOptions := Seq(Tests.Filter((name: String) => name.startsWith("it"))),
       addTestReportOption(IntegrationTest, "int-test-reports"),
       IntegrationTest / testGrouping := oneForkedJvmPerTest((IntegrationTest / definedTests).value),
       IntegrationTest / parallelExecution := false,
@@ -67,9 +39,9 @@ lazy val microservice =
         "target/int-test-reports/html-report")
     )
     .configs(ComponentTest)
-    .settings(inConfig(ComponentTest)(Defaults.testSettings): _*)
+    .settings(inConfig(ComponentTest)(Defaults.testSettings) *)
     .settings(
-      ComponentTest / testOptions  := Seq(Tests.Filter(componentFilter)),
+      ComponentTest / testOptions := Seq(Tests.Filter((name: String) => name.startsWith("component"))),
       ComponentTest / unmanagedSourceDirectories := (ComponentTest / baseDirectory)(base => Seq(base / "test")).value,
       ComponentTest / testGrouping := oneForkedJvmPerTest((ComponentTest / definedTests).value),
       ComponentTest / parallelExecution := false,
@@ -84,35 +56,24 @@ lazy val microservice =
         "-h",
         "target/component-test-reports/html-report")
     )
-    .settings(resolvers ++= Seq(
-      Resolver.jcenterRepo
-    ))
     .settings(scalacOptions += "-Wconf:src=routes/.*:s")
     .settings(PlayKeys.playDefaultPort := 9651)
     .settings(majorVersion := 0)
+    .settings(Test / testOptions := Seq(Tests.Filter((name: String) => name.startsWith("unit"))))
     // Disable default sbt Test options (might change with new versions of bootstrap)
     .settings(Test / testOptions -= Tests
       .Argument("-o", "-u", "target/test-reports", "-h", "target/test-reports/html-report"))
     // Suppress successful events in Scalatest in standard output (-o)
     // Options described here: https://www.scalatest.org/user_guide/using_scalatest_with_sbt
-    .settings(
-      Test / testOptions += Tests.Argument(
-        TestFrameworks.ScalaTest,
-        "-oNCHPQR",
-        "-u",
-        "target/test-reports",
-        "-h",
-        "target/test-reports/html-report"))
+    .settings(Test / testOptions += Tests.Argument(
+      TestFrameworks.ScalaTest,
+      "-oNCHPQR",
+      "-u",
+      "target/test-reports",
+      "-h",
+      "target/test-reports/html-report"))
 
 def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
   tests.map { test =>
     Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
   }
-
-lazy val compileAll = taskKey[Unit]("Compiles sources in all configurations.")
-
-compileAll := {
-  val a = (compile in Test).value
-  val b = (compile in IntegrationTest).value
-  ()
-}
