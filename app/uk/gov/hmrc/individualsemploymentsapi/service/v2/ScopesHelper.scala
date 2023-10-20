@@ -16,14 +16,13 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import java.util.UUID
-
-import javax.inject.Inject
-import play.api.hal.Hal.{linksSeq, state}
+import play.api.hal.Hal.linksSeq
 import play.api.hal.{HalLink, HalResource}
-import play.api.libs.json.JsValue
 import uk.gov.hmrc.individualsemploymentsapi.config.EndpointConfig
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryParameterException
+
+import java.util.UUID
+import javax.inject.Inject
 
 class ScopesHelper @Inject()(scopesService: ScopesService) {
 
@@ -39,7 +38,7 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     else ""}"
   }
 
-  private[service] def verifyRequiredParameters(scopes: List[String], endpoint: String, parameters: Map[String, String]): Iterable[String] = {
+  private def verifyRequiredParameters(scopes: List[String], endpoint: String, parameters: Map[String, String]): Iterable[String] = {
     val filterParameterMappings = scopesService.getFilterToken(scopes, endpoint)
     if(filterParameterMappings.isEmpty)
       Seq()
@@ -77,42 +76,12 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     }
   }
 
-
-  /**
-    * @param endpoint The endpoint that the user has called
-    * @param scopes The list of scopes associated with the user
-    * @param data The data to be returned from the endpoint
-    * @return A HalResource containing data, and a list of valid links determined by the provided scopes
-    */
-  def getHalResponse(endpoint: String, scopes: List[String], data: Option[JsValue]): HalResource = {
-
-    val internalEndpoints = scopesService
-      .getInternalEndpoints(scopes)
-      .map(link => HalLink(rel = link.name, href = link.link, name = Some(link.title)))
-      .toList
-
-    val externalEndpoints = scopesService
-      .getExternalEndpoints(scopes)
-      .map(link => HalLink(rel = link.name, href = link.link, name = Some(link.title)))
-      .toList
-
-    val hateoasLinks = internalEndpoints ++ externalEndpoints ++
-      Seq(HalLink("self", scopesService.getEndpointLink(endpoint).get))
-
-    state(data) ++ linksSeq(hateoasLinks)
-  }
-
   def getHalLinks(matchId: UUID,
                   excludeList: Option[List[String]],
                   scopes: Iterable[String],
-                  allowedList: Option[List[String]],
-                  excludeInternal: Boolean = false): HalResource = {
+                  allowedList: Option[List[String]]): HalResource = {
 
-    val links = excludeInternal match {
-      case true  => getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getExternalEndpoints(scopes))
-      case false => getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getInternalEndpoints(scopes)) ++
-        getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getExternalEndpoints(scopes))
-    }
+    val links = getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getInternalEndpoints(scopes))
 
     linksSeq(links)
   }
