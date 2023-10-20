@@ -43,16 +43,26 @@ lazy val microservice =
       retrieveManaged := true,
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false)
     )
-    .settings(unmanagedResourceDirectories in Compile += baseDirectory.value / "resources")
+    .settings(Compile / unmanagedResourceDirectories += baseDirectory.value / "resources")
     .configs(IntegrationTest)
     .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
     .settings(
-      Keys.fork in IntegrationTest := false,
-      unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(base => Seq(base / "test")).value,
-      testOptions in IntegrationTest := Seq(Tests.Filter(intTestFilter)),
+      IntegrationTest / Keys.fork := false,
+      IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "test")).value,
+      IntegrationTest / testOptions := Seq(Tests.Filter((name: String) => name startsWith "it")),
       addTestReportOption(IntegrationTest, "int-test-reports"),
-      testGrouping in IntegrationTest := oneForkedJvmPerTest((definedTests in IntegrationTest).value),
-      parallelExecution in IntegrationTest := false
+      IntegrationTest / testGrouping := oneForkedJvmPerTest((IntegrationTest / definedTests).value),
+      IntegrationTest / parallelExecution := false,
+      // Disable default sbt Test options (might change with new versions of bootstrap)
+      IntegrationTest / testOptions -= Tests
+        .Argument("-o", "-u", "target/int-test-reports", "-h", "target/int-test-reports/html-report"),
+      IntegrationTest / testOptions += Tests.Argument(
+        TestFrameworks.ScalaTest,
+        "-oNCHPQR",
+        "-u",
+        "target/int-test-reports",
+        "-h",
+        "target/int-test-reports/html-report")
     )
     .configs(ComponentTest)
     .settings(inConfig(ComponentTest)(Defaults.testSettings): _*)
