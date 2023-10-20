@@ -33,6 +33,7 @@ lazy val microservice =
       SbtDistributablesPlugin) ++ plugins: _*)
     .settings(playSettings: _*)
     .settings(scalaSettings: _*)
+    .settings(onLoadMessage := "")
     .settings(CodeCoverageSettings.settings *)
     .settings(scalaVersion := "2.13.8")
     .settings(defaultSettings(): _*)
