@@ -16,10 +16,8 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service.v1
 
-import java.util.UUID
-import javax.inject.{Inject, Named, Singleton}
 import org.joda.time.{Interval, LocalDate}
-import uk.gov.hmrc.http.{HeaderCarrier, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
 import uk.gov.hmrc.individualsemploymentsapi.domain
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
@@ -28,8 +26,10 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
-import scala.concurrent.{ExecutionContext, Future}
+import java.util.UUID
+import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.Future.{failed, successful}
+import scala.concurrent.{ExecutionContext, Future}
 
 trait EmploymentsService {
 
@@ -94,6 +94,6 @@ class LiveEmploymentsService @Inject()(
     }
 
   private def withRetry[T](body: => Future[T]): Future[T] = body recoverWith {
-    case Upstream5xxResponse(_, 503, 503, _) => Thread.sleep(retryDelay); body
+    case UpstreamErrorResponse(_, 503, 503, _) => Thread.sleep(retryDelay); body
   }
 }

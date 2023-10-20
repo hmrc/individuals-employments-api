@@ -32,7 +32,7 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class CommonController @Inject()(cc: ControllerComponents)(implicit ec: ExecutionContext) extends BackendController(cc) {
+abstract class CommonController @Inject()(cc: ControllerComponents) extends BackendController(cc) {
 
   val logger: Logger = Logger(getClass)
 
