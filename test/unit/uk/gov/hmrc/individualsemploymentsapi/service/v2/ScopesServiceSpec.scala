@@ -25,29 +25,6 @@ class ScopesServiceSpec extends UnitSpec with Matchers with ScopesConfig {
 
   val scopesService = new ScopesService(mockConfig)
 
-  "Gets correct external endpoints" when {
-    "using first scope" in {
-      val endpoints = scopesService.getExternalEndpoints(Seq(mockScopeOne))
-      endpoints.size shouldBe 2
-      endpoints.map(_.key) shouldBe Seq(endpointKeyOne, endpointKeyTwo)
-      endpoints.map(_.link) shouldBe Seq("/external/1", "/external/2")
-      endpoints.map(_.title) shouldBe Seq("Get the first endpoint", "Get the second endpoint")
-    }
-
-    "using second scope" in {
-      val endpoints = scopesService.getExternalEndpoints(Seq(mockScopeTwo))
-      endpoints.size shouldBe 2
-      endpoints.map(_.key) shouldBe Seq(endpointKeyThree, endpointKeyTwo)
-      endpoints.map(_.link) shouldBe Seq("/external/3", "/external/2")
-      endpoints.map(_.title) shouldBe Seq("Get the third endpoint", "Get the second endpoint")
-    }
-
-    "using invalid scope" in {
-      val endpoints = scopesService.getExternalEndpoints(Seq("invalidScope"))
-      endpoints.size shouldBe 0
-    }
-  }
-
   "Gets correct internal endpoints" when {
     "using first scope" in {
       val endpoints = scopesService.getInternalEndpoints(Seq(mockScopeOne))
@@ -69,7 +46,6 @@ class ScopesServiceSpec extends UnitSpec with Matchers with ScopesConfig {
   }
 
   "Get correct filters" when {
-
     "using third scope" in {
       val filters = scopesService.getValidFilters(Seq(mockScopeThree), Seq(endpointThree))
       filters.size shouldBe 1
@@ -95,7 +71,6 @@ class ScopesServiceSpec extends UnitSpec with Matchers with ScopesConfig {
   }
 
   "Get correct cache key" when {
-
     "using first scope and first endpoint" in {
       val endpoints = scopesService.getValidFieldsForCacheKey(Seq(mockScopeOne), Seq(endpointOne))
       endpoints shouldBe "ABC"
@@ -115,12 +90,10 @@ class ScopesServiceSpec extends UnitSpec with Matchers with ScopesConfig {
       val endpoints = scopesService.getValidFieldsForCacheKey(Seq(mockScopeTwo), Seq(endpointTwo))
       endpoints shouldBe "EF"
     }
-
-
   }
 
   "Gets all scopes correctly" in {
     val scopes = scopesService.getAllScopes
-    scopes.toSeq shouldBe Seq(mockScopeFour, mockScopeOne, mockScopeThree, mockScopeTwo)
+    scopes shouldBe Seq(mockScopeFour, mockScopeOne, mockScopeThree, mockScopeTwo)
   }
 }

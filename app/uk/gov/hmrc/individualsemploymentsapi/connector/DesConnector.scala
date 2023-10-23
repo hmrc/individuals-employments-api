@@ -37,7 +37,7 @@ class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
   private val desBearerToken = servicesConfig.getString("microservice.services.des.authorization-token")
   private val desEnvironment = servicesConfig.getString("microservice.services.des.environment")
 
-  def headers = Seq(
+  private def headers = Seq(
     HeaderNames.authorisation -> s"Bearer $desBearerToken",
     "Environment"             -> desEnvironment,
     "Source"                  -> "MDTP"
@@ -52,11 +52,10 @@ class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
     val employmentsUrl = s"$serviceUrl/individuals/nino/$nino/employments/income?from=$fromDate&to=$toDate"
 
     http.GET[DesEmployments](employmentsUrl, Seq(), headers).map(_.employments).recoverWith {
-      case Upstream4xxResponse(_, 404, _, _) => Future.successful(Seq.empty)
-      case Upstream4xxResponse(msg, 429, _, _) => {
+      case UpstreamErrorResponse(_, 404, _, _) => Future.successful(Seq.empty)
+      case UpstreamErrorResponse(msg, 429, _, _) =>
         logger.warn(s"DES Rate limited: $msg")
         Future.failed(new TooManyRequestException(msg))
-      }
     }
   }
 }
