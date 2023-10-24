@@ -83,7 +83,6 @@ class VersioningSpec extends BaseSpec {
         """)
     }
 
-
     Scenario("Requests with an accept header version 2.0") {
       val header = FakeRequest().withHeaders(acceptHeaderVP2)
       val result = RequestHeaderUtils.getVersion(header)

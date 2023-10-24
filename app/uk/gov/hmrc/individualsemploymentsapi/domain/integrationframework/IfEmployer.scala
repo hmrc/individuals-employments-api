@@ -20,9 +20,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads.{maxLength, minLength}
 import play.api.libs.json.{Format, JsPath}
 
-case class IfEmployer(
-  name: Option[String],
-  address: Option[IfAddress])
+case class IfEmployer(name: Option[String], address: Option[IfAddress])
 
 object IfEmployer {
   implicit val employerFormat: Format[IfEmployer] = Format(

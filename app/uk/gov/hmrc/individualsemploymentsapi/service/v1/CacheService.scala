@@ -22,15 +22,12 @@ import uk.gov.hmrc.individualsemploymentsapi.cache.v1.{CacheRepositoryConfigurat
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CacheService @Inject()(
-                              cachingClient: ShortLivedCache,
-                              conf: CacheRepositoryConfiguration)(implicit ec: ExecutionContext) {
+class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheRepositoryConfiguration)(
+  implicit ec: ExecutionContext) {
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
-  def get[T: Format](cacheId: String,
-                     fallbackFunction: => Future[T]): Future[T] = {
-
+  def get[T: Format](cacheId: String, fallbackFunction: => Future[T]): Future[T] =
     if (cacheEnabled)
       cachingClient.fetchAndGetEntry[T](cacheId) flatMap {
         case Some(value) =>
@@ -44,5 +41,4 @@ class CacheService @Inject()(
       fallbackFunction
     }
 
-  }
 }

@@ -31,28 +31,31 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class EmploymentsController @Inject()(employmentsService: EmploymentsService,
-                                      scopeService: ScopesService,
-                                      scopesHelper: ScopesHelper,
-                                      val authConnector: AuthConnector,
-                                      implicit val auditHelper: AuditHelper,
-                                      cc: ControllerComponents)
-                                    (implicit val ec: ExecutionContext)
-  extends CommonController(cc) with PrivilegedAuthentication {
+class EmploymentsController @Inject()(
+  employmentsService: EmploymentsService,
+  scopeService: ScopesService,
+  scopesHelper: ScopesHelper,
+  val authConnector: AuthConnector,
+  implicit val auditHelper: AuditHelper,
+  cc: ControllerComponents)(implicit val ec: ExecutionContext)
+    extends CommonController(cc) with PrivilegedAuthentication {
 
   def root(matchId: String): Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getAllScopes, matchId) { authScopes =>
-
       withValidUuid(matchId, "matchId") { matchIdUuid =>
         val correlationId = validateCorrelationId(request)
 
         employmentsService.resolve(matchIdUuid) map { _ =>
-
           val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
           val response = scopesHelper.getHalLinks(matchIdUuid, None, authScopes, None) ++ selfLink
 
-          auditHelper.auditApiResponse(correlationId.toString, matchId,
-            authScopes.mkString(","), request, response.toString, None)
+          auditHelper.auditApiResponse(
+            correlationId.toString,
+            matchId,
+            authScopes.mkString(","),
+            request,
+            response.toString,
+            None)
 
           Ok(response)
 
@@ -62,25 +65,29 @@ class EmploymentsController @Inject()(employmentsService: EmploymentsService,
     } recover withAudit(maybeCorrelationId(request), matchId, "/individuals/employments")
   }
 
-  def paye(matchId: String, interval: Interval, payeReference: Option[String]): Action[AnyContent] = Action.async { implicit request =>
+  def paye(matchId: String, interval: Interval, payeReference: Option[String]): Action[AnyContent] = Action.async {
+    implicit request =>
+      authenticate(scopeService.getEndPointScopes("paye"), matchId.toString) { authScopes =>
+        withValidUuid(matchId, "matchId") { matchIdUuid =>
+          val correlationId = validateCorrelationId(request)
 
-    authenticate(scopeService.getEndPointScopes("paye"), matchId.toString) { authScopes =>
+          employmentsService.paye(matchIdUuid, interval, payeReference, "paye", authScopes).map { employments =>
+            val selfLink =
+              HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
+            val response = state(Json.obj("employments" -> Json.toJson(employments))) ++ selfLink
 
-      withValidUuid(matchId, "matchId") { matchIdUuid =>
-        val correlationId = validateCorrelationId(request)
+            auditHelper.auditApiResponse(
+              correlationId.toString,
+              matchId,
+              authScopes.mkString(","),
+              request,
+              selfLink.toString,
+              Some(employments))
 
-        employmentsService.paye(matchIdUuid, interval, payeReference, "paye", authScopes).map { employments =>
-
-          val selfLink = HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
-          val response = state(Json.obj("employments" -> Json.toJson(employments))) ++ selfLink
-
-          auditHelper.auditApiResponse(correlationId.toString, matchId, authScopes.mkString(","),
-            request, selfLink.toString, Some(employments))
-
-          Ok(response)
+            Ok(response)
+          }
         }
-      }
 
-    } recover withAudit(maybeCorrelationId(request), matchId.toString, "/individuals/employments/paye")
+      } recover withAudit(maybeCorrelationId(request), matchId.toString, "/individuals/employments/paye")
   }
 }

@@ -61,7 +61,7 @@ object Employment {
     payments: Option[Seq[Payment]]): Option[Employment] =
     (startDate, endDate, payFrequency, employer, payments) match {
       case (None, None, None, None, None) => None
-      case _                        => Some(new Employment(startDate, endDate, payFrequency, employer, payments))
+      case _                              => Some(new Employment(startDate, endDate, payFrequency, employer, payments))
     }
 
   def create(ifEmployment: IfEmployment): Option[Employment] = {
@@ -74,7 +74,7 @@ object Employment {
 
     (startDate, endDate, payFrequency, employer, payments) match {
       case (None, None, None, None, None) => None
-      case _                        => Some(new Employment(startDate, endDate, payFrequency, employer, payments))
+      case _                              => Some(new Employment(startDate, endDate, payFrequency, employer, payments))
     }
   }
 }

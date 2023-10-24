@@ -27,7 +27,6 @@ import uk.gov.hmrc.play.bootstrap.http.RequestHandler
 
 import scala.util.Try
 
-
 class VersioningRequestHandler @Inject()(
   webCommands: WebCommands,
   optDevContext: OptionalDevContext,

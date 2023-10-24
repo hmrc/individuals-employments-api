@@ -13,6 +13,7 @@ lazy val microservice =
     .settings(onLoadMessage := "")
     .settings(CodeCoverageSettings.settings *)
     .settings(scalaVersion := "2.13.8")
+    .settings(scalafmtOnCompile := true)
     .settings(
       libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test(),
       routesImport ++= Seq("uk.gov.hmrc.individualsemploymentsapi.Binders._")

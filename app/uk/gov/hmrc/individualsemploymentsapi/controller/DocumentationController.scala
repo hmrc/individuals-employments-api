@@ -30,10 +30,9 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class DocumentationController @Inject()(
-  cc: ControllerComponents,
-  assets: Assets,
-  config: Configuration)(implicit materializer: Materializer, executionContext: ExecutionContext)
+class DocumentationController @Inject()(cc: ControllerComponents, assets: Assets, config: Configuration)(
+  implicit materializer: Materializer,
+  executionContext: ExecutionContext)
     extends BackendController(cc) {
 
   private val v1WhitelistedApplicationIDs = config

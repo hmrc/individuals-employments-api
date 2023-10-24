@@ -18,20 +18,19 @@ package uk.gov.hmrc.individualsemploymentsapi.util
 
 import play.api.mvc.QueryStringBindable
 
-class StringQueryStringBinder(implicit stringBinder : QueryStringBindable[String]) extends QueryStringBindable[String] {
+class StringQueryStringBinder(implicit stringBinder: QueryStringBindable[String]) extends QueryStringBindable[String] {
 
   private val handledKeys = Seq("matchId")
 
-  override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, String]] = {
+  override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, String]] =
     if (handledKeys.contains(key)) {
       Option(params.get(key).flatMap(_.headOption) match {
         case Some(x) => Right(x)
-        case None => Left(s"$key is required")
+        case None    => Left(s"$key is required")
       })
     } else {
       stringBinder.bind(key, params)
     }
-  }
 
   override def unbind(key: String, value: String): String = s"$key=$value"
 }

@@ -26,7 +26,7 @@ class DesEmploymentSpec extends AnyWordSpec with Matchers {
   "Des employments" should {
     "map over correctly to employments" in {
       val payments: Seq[DesPayment] = Seq(
-        DesPayment(LocalDate.parse("2018-12-1"),11.11, Some(2), Some(3))
+        DesPayment(LocalDate.parse("2018-12-1"), 11.11, Some(2), Some(3))
       )
       val desEmployment = DesEmployment(payments)
 

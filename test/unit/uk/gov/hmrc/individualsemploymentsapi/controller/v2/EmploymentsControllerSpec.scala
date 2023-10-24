@@ -129,8 +129,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         "message" -> "The resource can not be found"
       )
 
-      verify(employmentsController.auditHelper, times(1)).
-        auditApiFailure(any(), any(), any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1)).auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "Return an invalid request when missing a CorrelationId" in new Setup {
@@ -145,8 +144,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       status(eventualResult) shouldBe BAD_REQUEST
       contentAsJson(eventualResult) shouldBe Json.obj(
-        "code" -> "INVALID_REQUEST",
-        "message"     -> "CorrelationId is required"
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "CorrelationId is required"
       )
 
       verify(employmentsController.auditHelper, times(1))
@@ -166,8 +165,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       status(eventualResult) shouldBe BAD_REQUEST
       contentAsJson(eventualResult) shouldBe Json.obj(
-        "code" -> "INVALID_REQUEST",
-        "message"     -> "Malformed CorrelationId"
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "Malformed CorrelationId"
       )
 
       verify(employmentsController.auditHelper, times(1))
@@ -198,11 +197,10 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         )
       )
 
-      verify(employmentsController.auditHelper, times(1)).
-        auditApiResponse(any(), any(), any(), any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1))
+        .auditApiResponse(any(), any(), any(), any(), any(), any())(any())
 
-      verify(employmentsController.auditHelper, times(1)).
-        auditAuthScopes(any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(any())
     }
 
     "fail with status 401 when the bearer token does not have enrolment test-scope" in new Setup {
@@ -254,7 +252,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
-        employmentsController.paye(invalidMatchId.toString, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
+        employmentsController.paye(invalidMatchId.toString, interval, None)(
+          FakeRequest().withHeaders(validCorrelationHeader))
 
       status(eventualResult) shouldBe NOT_FOUND
 
@@ -263,8 +262,7 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         "message" -> "The resource can not be found"
       )
 
-      verify(employmentsController.auditHelper, times(1)).
-        auditApiFailure(any(), any(), any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1)).auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "return 200 OK" in new Setup {
@@ -308,11 +306,10 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         )
       )
 
-      verify(employmentsController.auditHelper, times(1)).
-        auditApiResponse(any(), any(), any(), any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1))
+        .auditApiResponse(any(), any(), any(), any(), any(), any())(any())
 
-      verify(employmentsController.auditHelper, times(1)).
-        auditAuthScopes(any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(any())
     }
 
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
@@ -322,13 +319,13 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       when(mockAuthConnector.authorise(any(), any())(any(), any())).thenReturn(Future.failed(InsufficientEnrolments()))
 
       val result =
-        employmentsController.paye(sampleMatchId.toString, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
+        employmentsController.paye(sampleMatchId.toString, interval, None)(
+          FakeRequest().withHeaders(validCorrelationHeader))
 
       status(result) shouldBe UNAUTHORIZED
       verifyNoInteractions(mockEmploymentsService)
 
-      verify(employmentsController.auditHelper, times(1)).
-        auditApiFailure(any(), any(), any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1)).auditApiFailure(any(), any(), any(), any(), any())(any())
     }
 
   }

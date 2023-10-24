@@ -23,11 +23,7 @@ import uk.gov.hmrc.individualsemploymentsapi.service.v2.{ScopesHelper, ScopesSer
 import unit.uk.gov.hmrc.individualsemploymentsapi.service.ScopesConfig
 import utils.UnitSpec
 
-class ScopesHelperSpec
-    extends UnitSpec
-    with ScopesConfig
-    with BeforeAndAfterEach
-    with Matchers {
+class ScopesHelperSpec extends UnitSpec with ScopesConfig with BeforeAndAfterEach with Matchers {
 
   "Scopes helper" should {
 
@@ -35,7 +31,8 @@ class ScopesHelperSpec
     val scopesHelper = new ScopesHelper(scopesService)
 
     "return correct query string" in {
-      val scopeOneResult = scopesHelper.getQueryStringFor(List(mockScopeOne), List(endpointOne, endpointTwo, endpointThree))
+      val scopeOneResult =
+        scopesHelper.getQueryStringFor(List(mockScopeOne), List(endpointOne, endpointTwo, endpointThree))
       scopeOneResult shouldBe "path(to(a,b,c,d))"
 
       val scopeOneEndpointOneResult = scopesHelper.getQueryStringFor(List(mockScopeOne), List(endpointOne))
@@ -47,10 +44,12 @@ class ScopesHelperSpec
       val scopeOneEndpointThreeResult = scopesHelper.getQueryStringFor(List(mockScopeOne), List(endpointThree))
       scopeOneEndpointThreeResult shouldBe ""
 
-      val scopeTwoResult = scopesHelper.getQueryStringFor(List(mockScopeTwo), List(endpointOne, endpointTwo, endpointThree))
+      val scopeTwoResult =
+        scopesHelper.getQueryStringFor(List(mockScopeTwo), List(endpointOne, endpointTwo, endpointThree))
       scopeTwoResult shouldBe "path(to(e,f,g,h,i))"
 
-      val twoScopesResult = scopesHelper.getQueryStringFor(List(mockScopeOne, mockScopeTwo), List(endpointOne, endpointTwo, endpointThree))
+      val twoScopesResult =
+        scopesHelper.getQueryStringFor(List(mockScopeOne, mockScopeTwo), List(endpointOne, endpointTwo, endpointThree))
       twoScopesResult shouldBe "path(to(a,b,c,d,e,f,g,h,i))"
     }
 
@@ -78,8 +77,9 @@ class ScopesHelperSpec
 
     "should get replaced query string when filters are required" in {
       val employerRef = "247/ZT6767895A"
-      val result = scopesHelper.getParameterisedQueryStringFor(List(mockScopeFour), endpointFour, Map(("token", employerRef)))
-      result shouldBe s"path(to(j))&filter=contains(path/to/j,'${employerRef}')"
+      val result =
+        scopesHelper.getParameterisedQueryStringFor(List(mockScopeFour), endpointFour, Map(("token", employerRef)))
+      result shouldBe s"path(to(j))&filter=contains(path/to/j,'$employerRef')"
     }
   }
 }

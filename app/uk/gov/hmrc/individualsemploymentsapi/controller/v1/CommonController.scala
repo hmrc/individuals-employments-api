@@ -59,13 +59,11 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
   def authPredicate(scopes: Iterable[String]): Predicate =
     scopes.map(Enrolment(_): Predicate).reduce(_ or _)
 
-  def authenticate(endpointScopes: Iterable[String],
-                   matchId: String)
-                  (f: Iterable[String] => Future[Result])
-                  (implicit hc: HeaderCarrier,
-                   request: RequestHeader,
-                   auditHelper: AuditHelper,
-                   ec: ExecutionContext): Future[Result] = {
+  def authenticate(endpointScopes: Iterable[String], matchId: String)(f: Iterable[String] => Future[Result])(
+    implicit hc: HeaderCarrier,
+    request: RequestHeader,
+    auditHelper: AuditHelper,
+    ec: ExecutionContext): Future[Result] = {
 
     if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
 
@@ -83,8 +81,8 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
     }
   }
 
-  def requiresPrivilegedAuthentication(scope: String)(body: => Future[Result])(
-    implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+  def requiresPrivilegedAuthentication(scope: String)(
+    body: => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
     if (environment == SANDBOX) body
     else authorised(Enrolment(scope))(body)
 }

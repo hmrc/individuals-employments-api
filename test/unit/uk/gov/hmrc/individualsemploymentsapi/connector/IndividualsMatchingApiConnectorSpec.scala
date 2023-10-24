@@ -47,7 +47,7 @@ class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEa
     }
   }
 
-  override def beforeEach() : Unit = {
+  override def beforeEach(): Unit = {
     wireMockServer.start()
     configureFor(stubHost, stubPort)
   }
@@ -82,8 +82,7 @@ class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEa
 
   }
 
-  override def afterEach() : Unit = {
+  override def afterEach(): Unit =
     wireMockServer.stop()
-  }
 
 }

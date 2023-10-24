@@ -206,7 +206,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the paye endpoint is invoked with an invalid match id")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
+      val response = invokeEndpoint(
+        s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
 
       Then("the response status should be 404 (not found)")
       response.code shouldBe NOT_FOUND
@@ -303,7 +304,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IfStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, validData)
 
       When("the paye endpoint is invoked with a valid match id")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
+      val response = invokeEndpoint(
+        s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
 
       Then("the response status should be 200 (ok)")
       response.code shouldBe OK
@@ -334,7 +336,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IfStub.enforceRateLimit(nino, fromDate, toDate)
 
       When("the PAYE endpoint is invoked with a valid match ID")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
+      val response = invokeEndpoint(
+        s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
 
       Then("The response status is 429 Too Many Requests")
       response.code shouldBe TOO_MANY_REQUESTS
@@ -364,9 +367,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     }
   }
 
-
-  def testAuthorisation(endpoint:String): Unit = {
-
+  def testAuthorisation(endpoint: String): Unit =
     Scenario(s"user does not have valid scopes for endpoint $endpoint") {
       Given("A valid auth token but invalid scopes")
       AuthStub.willNotAuthorizePrivilegedAuthTokenNoScopes(authToken)
@@ -379,15 +380,12 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       Then("The response status should be 401")
       response.code shouldBe UNAUTHORIZED
       Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "UNAUTHORIZED",
-        "message" ->"Insufficient Enrolments"
+        "code"    -> "UNAUTHORIZED",
+        "message" -> "Insufficient Enrolments"
       )
     }
-  }
 
-  def testErrorHandling( endpoint: String,
-                         nino: String,
-                         rootScope: List[String]): Unit = {
+  def testErrorHandling(endpoint: String, nino: String, rootScope: List[String]): Unit = {
 
     val invalidEmployment = IfEmployments(
       Seq(
@@ -414,18 +412,17 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       And("IF will return invalid response")
       IfStub.searchEmploymentIncomeForPeriodReturns(nino, fromDate, toDate, invalidEmployment)
 
-      When(
-        s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
+      When(s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
 
-      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
-        .headers(requestHeaders(acceptHeaderVP2))
-        .asString
+      val response =
+        Http(s"$serviceUrl/$endpoint?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
+          .headers(requestHeaders(acceptHeaderVP2))
+          .asString
 
       Then("The response status should be 500 with a generic error message")
       response.code shouldBe INTERNAL_SERVER_ERROR
-      Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "INTERNAL_SERVER_ERROR",
-        "message" -> "Something went wrong.")
+      Json.parse(response.body) shouldBe Json
+        .obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Something went wrong.")
     }
 
     Scenario(s"IF returns an Internal Server Error") {
@@ -439,17 +436,16 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       And("IF will return Internal Server Error")
       IfStub.saCustomResponse(nino, INTERNAL_SERVER_ERROR, fromDate, toDate, Json.obj("reason" -> "Server error"))
 
-      When(
-        s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
-      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
-        .headers(requestHeaders(acceptHeaderVP2))
-        .asString
+      When(s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
+      val response =
+        Http(s"$serviceUrl/$endpoint?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
+          .headers(requestHeaders(acceptHeaderVP2))
+          .asString
 
       Then("The response status should be 500 with a generic error message")
       response.code shouldBe INTERNAL_SERVER_ERROR
-      Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "INTERNAL_SERVER_ERROR",
-        "message" -> "Something went wrong.")
+      Json.parse(response.body) shouldBe Json
+        .obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Something went wrong.")
     }
 
     Scenario(s"IF returns a Bad Request Error") {
@@ -461,24 +457,28 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       IndividualsMatchingApiStub.hasMatchingRecord(matchId, nino)
 
       And("IF will return Internal Server Error")
-      IfStub.saCustomResponse(nino, UNPROCESSABLE_ENTITY, fromDate,  toDate, Json.obj("reason" ->
-        "There are 1 or more unknown data items in the 'fields' query string"))
+      IfStub.saCustomResponse(
+        nino,
+        UNPROCESSABLE_ENTITY,
+        fromDate,
+        toDate,
+        Json.obj(
+          "reason" ->
+            "There are 1 or more unknown data items in the 'fields' query string"))
 
-      When(
-        s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
-      val response = Http(s"$serviceUrl/${endpoint}?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
-        .headers(requestHeaders(acceptHeaderVP2))
-        .asString
+      When(s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
+      val response =
+        Http(s"$serviceUrl/$endpoint?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
+          .headers(requestHeaders(acceptHeaderVP2))
+          .asString
 
       Then("The response status should be 500 with a generic error message")
       response.code shouldBe INTERNAL_SERVER_ERROR
-      Json.parse(response.body) shouldBe Json.obj(
-        "code" -> "INTERNAL_SERVER_ERROR",
-        "message" -> "Something went wrong.")
+      Json.parse(response.body) shouldBe Json
+        .obj("code" -> "INTERNAL_SERVER_ERROR", "message" -> "Something went wrong.")
     }
 
   }
-
 
   private def invokeEndpoint(endpoint: String) =
     Http(endpoint)

@@ -32,18 +32,18 @@ object Employer {
       (JsPath \ "payeReference").readNullable[EmpRef] and
         (JsPath \ "name").readNullable[String] and
         (JsPath \ "address").readNullable[Address]
-      ) (Employer.apply _),
+    )(Employer.apply _),
     (
       (JsPath \ "payeReference").writeNullable[EmpRef] and
         (JsPath \ "name").writeNullable[String] and
         (JsPath \ "address").writeNullable[Address]
-      ) (unlift(Employer.unapply))
+    )(unlift(Employer.unapply))
   )
 
   def create(payeReference: Option[EmpRef], name: Option[String], address: Option[Address]): Option[Employer] =
     (payeReference, name, address) match {
       case (None, None, None) => None
-      case _ => Some(new Employer(payeReference, name, address))
+      case _                  => Some(new Employer(payeReference, name, address))
     }
 
   def create(ifEmployment: IfEmployment): Option[Employer] = {
@@ -56,7 +56,7 @@ object Employer {
 
     (empRef, name, address) match {
       case (None, None, None) => None
-      case _ => Employer.create(empRef, name, address)
+      case _                  => Employer.create(empRef, name, address)
     }
   }
 

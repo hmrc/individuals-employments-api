@@ -24,11 +24,7 @@ import play.api.libs.json.JodaWrites._
 import play.api.libs.json.JodaReads._
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfPayment
 
-case class Payment(
-  paymentDate: Option[LocalDate],
-  taxablePayment: Option[Double]) {
-
-}
+case class Payment(paymentDate: Option[LocalDate], taxablePayment: Option[Double]) {}
 
 object Payment {
 
@@ -36,11 +32,11 @@ object Payment {
     (
       (JsPath \ "date").readNullable[LocalDate] and
         (JsPath \ "paidTaxablePay").readNullable[Double]
-      )(Payment.apply _),
+    )(Payment.apply _),
     (
       (JsPath \ "date").writeNullable[LocalDate] and
         (JsPath \ "paidTaxablePay").writeNullable[Double]
-      )(unlift(Payment.unapply))
+    )(unlift(Payment.unapply))
   )
 
   def create(ifPayment: IfPayment): Option[Payment] = {

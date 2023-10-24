@@ -36,7 +36,7 @@ class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
   val testValue = TestClass("one", "two")
 
   protected def databaseName: String = "test-" + this.getClass.getSimpleName
-  protected def mongoUri: String     = s"mongodb://localhost:27017/$databaseName"
+  protected def mongoUri: String = s"mongodb://localhost:27017/$databaseName"
 
   override lazy val fakeApplication = new GuiceApplicationBuilder()
     .configure("mongodb.uri" -> mongoUri, "cache.ttlInSeconds" -> cacheTtl)
@@ -46,14 +46,14 @@ class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
   val shortLivedCache = fakeApplication.injector.instanceOf[ShortLivedCache]
   implicit val ec = fakeApplication.injector.instanceOf[ExecutionContext]
 
-  override def beforeEach() : Unit = {
+  override def beforeEach(): Unit = {
 
     super.beforeEach()
     await(shortLivedCache.collection.drop().toFuture())
 
   }
 
-  override def afterEach() : Unit = {
+  override def afterEach(): Unit = {
 
     super.afterEach()
     await(shortLivedCache.collection.drop().toFuture())
@@ -99,14 +99,15 @@ class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
     }
   }
 
-  private def retrieveRawCachedValue(id: String) = {
-    await(shortLivedCache.collection.find(Filters.equal("id", toBson(id)))
-      .headOption()
-      .map {
-        case Some(entry) => entry.data.value
-        case None => None
-      })
-  }
+  private def retrieveRawCachedValue(id: String) =
+    await(
+      shortLivedCache.collection
+        .find(Filters.equal("id", toBson(id)))
+        .headOption()
+        .map {
+          case Some(entry) => entry.data.value
+          case None        => None
+        })
 
   case class TestClass(one: String, two: String)
 

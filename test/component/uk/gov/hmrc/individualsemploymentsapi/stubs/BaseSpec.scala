@@ -35,7 +35,7 @@ trait BaseSpec
 
   implicit override lazy val app: Application = GuiceApplicationBuilder()
     .configure(
-      "auditing.enabled"                                 -> false,
+      "auditing.enabled"                                       -> false,
       "auditing.traceRequests"                                 -> false,
       "microservice.services.auth.port"                        -> AuthStub.port,
       "microservice.services.individuals-matching-api.port"    -> IndividualsMatchingApiStub.port,

@@ -53,7 +53,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
   override lazy val fakeApplication = new GuiceApplicationBuilder()
     .bindings(bindModules: _*)
     .configure(
-      "microservice.services.integration-framework.host"         -> "127.0.0.1",
+      "microservice.services.integration-framework.host"                -> "127.0.0.1",
       "microservice.services.integration-framework.port"                -> "11122",
       "microservice.services.integration-framework.authorization-token" -> integrationFrameworkAuthorizationToken,
       "microservice.services.integration-framework.environment"         -> integrationFrameworkEnvironment
@@ -76,14 +76,13 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
   }
 
-  override def beforeEach() : Unit = {
+  override def beforeEach(): Unit = {
     wireMockServer.start()
     configureFor(stubHost, stubPort)
   }
 
-  override def afterEach() : Unit = {
+  override def afterEach(): Unit =
     wireMockServer.stop()
-  }
 
   val noEmploymentData = IfEmployments(Seq())
   val singleEmploymentData = IfEmployments(Seq(createValidEmployment()))
@@ -113,8 +112,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
       }
 
-      verify(underTest.auditHelper, times(1)).
-        auditIfApiFailure(any(), any(), any(), any(), any())(any())
+      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "Fail when IF returns a bad request" in new Setup {
@@ -135,8 +133,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
       }
 
-      verify(underTest.auditHelper, times(1)).
-        auditIfApiFailure(any(), any(), any(), any(), any())(any())
+      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "return an empty dataset for NO_DATA_FOUND" in new Setup {
@@ -147,13 +144,12 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         get(urlPathMatching(s"/individuals/employment/nino/$nino"))
           .willReturn(aResponse().withStatus(404).withBody("NO_DATA_FOUND")))
 
-      val result = await(underTest.fetchEmployments(nino, interval, None, matchId)
-      (hc, FakeRequest().withHeaders(sampleCorrelationIdHeader), ec))
+      val result = await(underTest
+        .fetchEmployments(nino, interval, None, matchId)(hc, FakeRequest().withHeaders(sampleCorrelationIdHeader), ec))
 
       result shouldBe List()
 
-      verify(underTest.auditHelper, times(1)).
-        auditIfApiFailure(any(), any(), any(), any(), any())(any())
+      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "Fail when IF returns a NOT_FOUND" in new Setup {
@@ -174,8 +170,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
       }
 
-      verify(underTest.auditHelper, times(1)).
-        auditIfApiFailure(any(), any(), any(), any(), any())(any())
+      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "for no employment data" should {
@@ -202,8 +197,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
           )
         )
 
-        verify(underTest.auditHelper, times(1)).
-          auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
         result shouldBe noEmploymentData.employments
       }
@@ -233,8 +227,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
           )
         )
 
-        verify(underTest.auditHelper, times(1)).
-          auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
         result shouldBe singleEmploymentData.employments
       }
@@ -264,8 +257,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
           )
         )
 
-        verify(underTest.auditHelper, times(1)).
-          auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
         result shouldBe multiEmploymentData.employments
       }

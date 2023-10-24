@@ -42,18 +42,16 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
   private val integrationFrameworkEnvironment =
     servicesConfig.getString("microservice.services.integration-framework.environment")
 
-  def fetchEmployments(nino: Nino, interval: Interval, filter: Option[String], matchId: String)
-                      (implicit hc: HeaderCarrier,
-                       request: RequestHeader,
-                       ec: ExecutionContext): Future[Seq[IfEmployment]] = {
+  def fetchEmployments(nino: Nino, interval: Interval, filter: Option[String], matchId: String)(
+    implicit hc: HeaderCarrier,
+    request: RequestHeader,
+    ec: ExecutionContext): Future[Seq[IfEmployment]] = {
 
     val startDate: LocalDate = interval.getStart.toLocalDate
     val endDate: LocalDate = interval.getEnd.toLocalDate
 
     val employmentsUrl =
-      s"$baseUrl/individuals/employment/nino/$nino?startDate=$startDate&endDate=$endDate${
-        filter.map(f => s"&fields=$f").getOrElse("")
-      }"
+      s"$baseUrl/individuals/employment/nino/$nino?startDate=$startDate&endDate=$endDate${filter.map(f => s"&fields=$f").getOrElse("")}"
 
     callPaye(employmentsUrl, matchId)
   }
@@ -74,31 +72,42 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient, va
     "CorrelationId"           -> extractCorrelationId(requestHeader)
   )
 
-  private def callPaye(url: String, matchId: String)
-                      (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
-    recover[IfEmployment](http.GET[IfEmployments](url, Seq(), setHeaders(request)) map { response =>
+  private def callPaye(
+    url: String,
+    matchId: String)(implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
+    recover[IfEmployment](
+      http.GET[IfEmployments](url, Seq(), setHeaders(request)) map { response =>
         auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, response)
 
         response.employments
       },
-      extractCorrelationId(request), matchId, request, url)
+      extractCorrelationId(request),
+      matchId,
+      request,
+      url
+    )
 
-  private def recover[A](x: Future[Seq[A]],
-                         correlationId: String,
-                         matchId: String,
-                         request: RequestHeader,
-                         requestUrl: String)
-                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[A]] = x.recoverWith {
+  private def recover[A](
+    x: Future[Seq[A]],
+    correlationId: String,
+    matchId: String,
+    request: RequestHeader,
+    requestUrl: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Seq[A]] = x.recoverWith {
     case validationError: JsValidationException =>
       logger.warn("Integration Framework JsValidationException encountered")
-      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Error parsing IF response: ${validationError.errors}")
+      auditHelper.auditIfApiFailure(
+        correlationId,
+        matchId,
+        request,
+        requestUrl,
+        s"Error parsing IF response: ${validationError.errors}")
       Future.failed(new InternalServerException("Something went wrong."))
     case UpstreamErrorResponse(msg, 404, _, _) =>
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
 
       msg.contains("NO_DATA_FOUND") match {
         case true => Future.successful(Seq.empty)
-        case _    =>
+        case _ =>
           logger.warn("Integration Framework NotFoundException encountered")
           Future.failed(new NotFoundException(msg))
       }
