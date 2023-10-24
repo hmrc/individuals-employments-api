@@ -32,7 +32,8 @@ import java.util.UUID
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.ExecutionContext
 
-abstract class EmploymentsController(employmentsService: EmploymentsService, cc: ControllerComponents)(implicit ec: ExecutionContext)
+abstract class EmploymentsController(employmentsService: EmploymentsService, cc: ControllerComponents)(
+  implicit ec: ExecutionContext)
     extends CommonController(cc) with PrivilegedAuthentication {
 
   val hmctsClientId: String

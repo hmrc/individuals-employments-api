@@ -53,10 +53,10 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
       successful(ErrorInvalidRequest(s"$uuidName format is invalid").toHttpResponse)
     }
 
-  private[controller] def withAudit(correlationId: Option[String], matchId: String, url: String)
-                                   (implicit request: RequestHeader,
-                                    auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
-    case _: MatchNotFoundException   => {
+  private[controller] def withAudit(correlationId: Option[String], matchId: String, url: String)(
+    implicit request: RequestHeader,
+    auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
+    case _: MatchNotFoundException => {
       logger.warn("Controllers MatchNotFoundException encountered")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, "Not Found")
       ErrorNotFound.toHttpResponse
@@ -65,16 +65,16 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorUnauthorized("Insufficient Enrolments").toHttpResponse
     }
-    case e: AuthorisationException   => {
+    case e: AuthorisationException => {
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorUnauthorized(e.getMessage).toHttpResponse
     }
-    case tmr: TooManyRequestException  => {
+    case tmr: TooManyRequestException => {
       logger.warn("Controllers TooManyRequestException encountered")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, tmr.getMessage)
       ErrorTooManyRequests.toHttpResponse
     }
-    case br: BadRequestException  => {
+    case br: BadRequestException => {
       auditHelper.auditApiFailure(correlationId, matchId, request, url, br.getMessage)
       ErrorInvalidRequest(br.getMessage).toHttpResponse
     }
@@ -102,25 +102,23 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
   def authPredicate(scopes: Iterable[String]): Predicate =
     scopes.map(Enrolment(_): Predicate).reduce(_ or _)
 
-  def authenticate(endpointScopes: Iterable[String],
-                   matchId: String)
-                  (f: Iterable[String] => Future[Result])
-                  (implicit hc: HeaderCarrier,
-                   request: RequestHeader,
-                   auditHelper: AuditHelper,
-                    ec: ExecutionContext): Future[Result] = {
+  def authenticate(endpointScopes: Iterable[String], matchId: String)(f: Iterable[String] => Future[Result])(
+    implicit hc: HeaderCarrier,
+    request: RequestHeader,
+    auditHelper: AuditHelper,
+    ec: ExecutionContext): Future[Result] = {
 
     if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
 
-      authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) {
-        scopes => {
-          auditHelper.auditAuthScopes(matchId, scopes.enrolments.map(e => e.key).mkString(","), request)
-          f(scopes.enrolments.map(e => e.key))
-        }
+    authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) { scopes =>
+      {
+        auditHelper.auditAuthScopes(matchId, scopes.enrolments.map(e => e.key).mkString(","), request)
+        f(scopes.enrolments.map(e => e.key))
       }
+    }
   }
 
-  def requiresPrivilegedAuthentication(scope: String)(body: => Future[Result])(
-    implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = authorised(Enrolment(scope))(body)
+  def requiresPrivilegedAuthentication(scope: String)(
+    body: => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+    authorised(Enrolment(scope))(body)
 }
-

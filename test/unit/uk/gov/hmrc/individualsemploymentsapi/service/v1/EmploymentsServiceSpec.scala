@@ -64,9 +64,8 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
 
   implicit val hc: HeaderCarrier = new HeaderCarrier
 
-  override def beforeEach() : Unit = {
+  override def beforeEach(): Unit =
     Mockito.reset(individualsMatchingApiConnector, desConnector)
-  }
 
   "Live Employments Service paye function based on match id" should {
 

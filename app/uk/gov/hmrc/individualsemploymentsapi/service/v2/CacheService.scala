@@ -27,15 +27,12 @@ import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheRepositoryConfigurat
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CacheService @Inject()(
-                              cachingClient: ShortLivedCache,
-                              conf: CacheRepositoryConfiguration)(implicit ec: ExecutionContext) {
+class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheRepositoryConfiguration)(
+  implicit ec: ExecutionContext) {
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
-  def get[T: Format](cacheId: CacheIdBase,
-                     fallbackFunction: => Future[T]): Future[T] = {
-
+  def get[T: Format](cacheId: CacheIdBase, fallbackFunction: => Future[T]): Future[T] =
     if (cacheEnabled)
       cachingClient.fetchAndGetEntry[T](cacheId.id) flatMap {
         case Some(value) =>
@@ -49,7 +46,6 @@ class CacheService @Inject()(
       fallbackFunction
     }
 
-  }
 }
 
 // Cache ID implementations
@@ -70,11 +66,12 @@ trait CacheIdBase {
     BaseEncoding.base64().encode(toEncode.getBytes(Charsets.UTF_8))
 }
 
-case class CacheId(matchId: UUID, interval: Interval, fields: String, empRef: Option[String] = None) extends CacheIdBase {
+case class CacheId(matchId: UUID, interval: Interval, fields: String, empRef: Option[String] = None)
+    extends CacheIdBase {
 
   val empRefKey: String = empRef match {
     case Some(value) => s"-${encodeVal(value)}"
-    case None => ""
+    case None        => ""
   }
 
   lazy val id: String = s"$matchId-${interval.getStart}-${interval.getEnd}-$fields$empRefKey"

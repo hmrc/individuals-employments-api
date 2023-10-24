@@ -33,7 +33,7 @@ class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
 
   val logger: Logger = Logger(getClass)
 
-  private val serviceUrl     = servicesConfig.baseUrl("des")
+  private val serviceUrl = servicesConfig.baseUrl("des")
   private val desBearerToken = servicesConfig.getString("microservice.services.des.authorization-token")
   private val desEnvironment = servicesConfig.getString("microservice.services.des.environment")
 
@@ -47,8 +47,8 @@ class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
     implicit hc: HeaderCarrier,
     ec: ExecutionContext): Future[Seq[DesEmployment]] = {
 
-    val fromDate       = interval.getStart.toLocalDate
-    val toDate         = interval.getEnd.toLocalDate
+    val fromDate = interval.getStart.toLocalDate
+    val toDate = interval.getEnd.toLocalDate
     val employmentsUrl = s"$serviceUrl/individuals/nino/$nino/employments/income?from=$fromDate&to=$toDate"
 
     http.GET[DesEmployments](employmentsUrl, Seq(), headers).map(_.employments).recoverWith {

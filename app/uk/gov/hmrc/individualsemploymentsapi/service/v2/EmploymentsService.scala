@@ -47,31 +47,34 @@ class EmploymentsService @Inject()(
   def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
     individualsMatchingApiConnector.resolve(matchId)
 
-  def paye(matchId: UUID, interval: Interval, payeReference: Option[String], endpoint: String, scopes: Iterable[String])
-                   (implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]] =
-    resolve(matchId).flatMap {
-      ninoMatch =>
-        val params = payeReference.map(s => ("payeReference", s)).toMap
-        val fieldsQuery       = scopesHelper.getParameterisedQueryStringFor(scopes.toList, endpoint, params)
-        val fieldKeys         = scopesService.getValidFieldsForCacheKey(scopes.toList, endpoints)
-        cacheService
-          .get(
-            cacheId = CacheId(matchId, interval, fieldKeys, payeReference),
-            fallbackFunction = withRetry {
-              ifConnector.fetchEmployments(
-                ninoMatch.nino,
-                interval,
-                Option(fieldsQuery).filter(_.nonEmpty),
-                matchId.toString
-              )
-            }
-          )
-          .map {
-            _.map(Employment.create).filter(_.isDefined).map(_.get)
+  def paye(
+    matchId: UUID,
+    interval: Interval,
+    payeReference: Option[String],
+    endpoint: String,
+    scopes: Iterable[String])(implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]] =
+    resolve(matchId).flatMap { ninoMatch =>
+      val params = payeReference.map(s => ("payeReference", s)).toMap
+      val fieldsQuery = scopesHelper.getParameterisedQueryStringFor(scopes.toList, endpoint, params)
+      val fieldKeys = scopesService.getValidFieldsForCacheKey(scopes.toList, endpoints)
+      cacheService
+        .get(
+          cacheId = CacheId(matchId, interval, fieldKeys, payeReference),
+          fallbackFunction = withRetry {
+            ifConnector.fetchEmployments(
+              ninoMatch.nino,
+              interval,
+              Option(fieldsQuery).filter(_.nonEmpty),
+              matchId.toString
+            )
           }
-          .map {
-            _.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse
-          }
+        )
+        .map {
+          _.map(Employment.create).filter(_.isDefined).map(_.get)
+        }
+        .map {
+          _.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse
+        }
     }
 
   private def withRetry[T](body: => Future[T]): Future[T] = body recoverWith {

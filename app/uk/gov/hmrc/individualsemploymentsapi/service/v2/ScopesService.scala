@@ -51,28 +51,26 @@ class ScopesService @Inject()(configuration: Configuration) {
 
   def getAllScopes: List[String] = apiConfig.scopes.map(_.name).sorted
 
-  def getValidFilters(scopes: Iterable[String],
-                      endpoints: Iterable[String]): Iterable[String] = {
+  def getValidFilters(scopes: Iterable[String], endpoints: Iterable[String]): Iterable[String] = {
     val filterKeys = scopes.flatMap(getScopeFilterKeys).toList
-    endpoints.flatMap(apiConfig.getInternalEndpoint).flatMap(endpoint =>
-      endpoint.filters.filter(filterMap =>
-        filterKeys.contains(filterMap._1))
-      .values)
+    endpoints
+      .flatMap(apiConfig.getInternalEndpoint)
+      .flatMap(endpoint => endpoint.filters.filter(filterMap => filterKeys.contains(filterMap._1)).values)
   }
 
-  private def getValidFilterKeys(scopes: Iterable[String],
-                                 endpoints: List[String]): Iterable[String] = {
+  private def getValidFilterKeys(scopes: Iterable[String], endpoints: List[String]): Iterable[String] = {
     val filterKeys = scopes.flatMap(getScopeFilterKeys).toList
-    endpoints.flatMap(apiConfig.getInternalEndpoint).flatMap(endpoint =>
-      endpoint.filters.filter(filterMap =>
-        filterKeys.contains(filterMap._1))
-        .keys)
+    endpoints
+      .flatMap(apiConfig.getInternalEndpoint)
+      .flatMap(endpoint => endpoint.filters.filter(filterMap => filterKeys.contains(filterMap._1)).keys)
   }
 
   def getFilterToken(scopes: List[String], endpoint: String): Map[String, String] = {
     val regex = "<([a-zA-Z]*)>".r("token")
-    def getTokenFromText(filterText:String):Option[String]  = regex.findFirstMatchIn(filterText).map(m => m.group("token"))
-    def getFilterText(filterKey:String):Option[String] = apiConfig.getInternalEndpoint(endpoint).flatMap(c => c.filters.get(filterKey))
+    def getTokenFromText(filterText: String): Option[String] =
+      regex.findFirstMatchIn(filterText).map(m => m.group("token"))
+    def getFilterText(filterKey: String): Option[String] =
+      apiConfig.getInternalEndpoint(endpoint).flatMap(c => c.filters.get(filterKey))
     val filterKeys = getValidFilterKeys(scopes, List(endpoint))
     filterKeys.flatMap(key => getFilterText(key).flatMap(getTokenFromText).map(token => (key, token)).toList).toMap
   }
@@ -99,7 +97,7 @@ class ScopesService @Inject()(configuration: Configuration) {
     apiConfig.internalEndpoints
       .filter(endpoint => endpoint.fields.keySet.exists(scopeKeys.contains))
       .map(endpoint => endpoint.name)
-        .flatMap(endpoint => apiConfig.getInternalEndpoint(endpoint))
+      .flatMap(endpoint => apiConfig.getInternalEndpoint(endpoint))
   }
 
   def getEndPointScopes(endpointKey: String): Iterable[String] = {
@@ -110,6 +108,7 @@ class ScopesService @Inject()(configuration: Configuration) {
 
     apiConfig.scopes
       .filter(_.fields.toSet.intersect(keys.toSet).nonEmpty)
-      .map(_.name).sorted
+      .map(_.name)
+      .sorted
   }
 }

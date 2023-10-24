@@ -27,13 +27,12 @@ import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 class JsonFormattersSpec extends AnyWordSpec with Matchers {
   "Error invalid request format" should {
     "read correctly" in {
-      val result = Json.fromJson[ErrorInvalidRequest](Json.parse(
-        """
-          |{
-          |    "code":"INVALID_REQUEST",
-          |    "message" : "test"
-          |}
-          |""".stripMargin))
+      val result = Json.fromJson[ErrorInvalidRequest](Json.parse("""
+                                                                   |{
+                                                                   |    "code":"INVALID_REQUEST",
+                                                                   |    "message" : "test"
+                                                                   |}
+                                                                   |""".stripMargin))
 
       result.get shouldBe ErrorInvalidRequest("test")
     }
@@ -41,13 +40,12 @@ class JsonFormattersSpec extends AnyWordSpec with Matchers {
       val error = ErrorInvalidRequest("test")
       val result = Json.toJson(error)
 
-      result shouldBe Json.parse(
-        """
-          |{
-          |    "code":"INVALID_REQUEST",
-          |    "message" : "test"
-          |}
-          |""".stripMargin)
+      result shouldBe Json.parse("""
+                                   |{
+                                   |    "code":"INVALID_REQUEST",
+                                   |    "message" : "test"
+                                   |}
+                                   |""".stripMargin)
     }
   }
 
