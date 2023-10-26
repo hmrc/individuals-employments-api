@@ -4,8 +4,7 @@ import sbt.*
 object AppDependencies {
 
   val hmrc = "uk.gov.hmrc"
-  val hmrcMongo = "uk.gov.hmrc.mongo"
-  val akka = "com.typesafe.akka"
+  val hmrcMongo = s"$hmrc.mongo"
   val mongoVersion = "0.73.0"
   val bootstrapVersion = "7.15.0"
 
@@ -14,7 +13,6 @@ object AppDependencies {
     hmrc                %% "bootstrap-backend-play-28" % bootstrapVersion,
     hmrc                %% "domain"                    % "8.3.0-play-28",
     hmrc                %% "play-hal"                  % "3.4.0-play-28",
-    hmrc                %% "play-hmrc-api"             % "7.1.0-play-28",
     hmrc                %% "json-encryption"           % "5.1.0-play-28",
     "com.typesafe.play" %% "play-json-joda"            % "2.9.2",
     hmrcMongo           %% "hmrc-mongo-play-28"        % mongoVersion
