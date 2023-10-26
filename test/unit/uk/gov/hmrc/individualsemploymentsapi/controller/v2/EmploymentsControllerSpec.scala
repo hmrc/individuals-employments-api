@@ -32,9 +32,9 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.controller.v2.EmploymentsController
-import uk.gov.hmrc.individualsemploymentsapi.domain.{NinoMatch, PayFrequencyCode}
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfAddress, IfEmployer, IfEmployment, IfEmploymentDetail}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
+import uk.gov.hmrc.individualsemploymentsapi.domain.{NinoMatch, PayFrequencyCode}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, ScopesHelper, ScopesService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase

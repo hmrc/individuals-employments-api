@@ -16,10 +16,9 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.util
 
-import java.util.UUID
-
 import play.api.mvc.QueryStringBindable
 
+import java.util.UUID
 import scala.util.Try
 
 class MatchUuidQueryStringBinder extends QueryStringBindable[UUID] {

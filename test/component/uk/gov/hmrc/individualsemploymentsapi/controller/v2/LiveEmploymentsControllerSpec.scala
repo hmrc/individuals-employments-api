@@ -16,13 +16,13 @@
 
 package component.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
-import java.util.UUID
-
 import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec, IfStub, IndividualsMatchingApiStub}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import scalaj.http.Http
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfEmployer, IfEmployment, IfEmployments}
+
+import java.util.UUID
 
 class LiveEmploymentsControllerSpec extends BaseSpec {
 

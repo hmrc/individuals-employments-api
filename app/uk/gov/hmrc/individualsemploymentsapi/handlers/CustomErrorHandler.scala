@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.handlers
 
-import javax.inject.Inject
 import play.api.Configuration
 import play.api.http.Status.{BAD_REQUEST, NOT_FOUND}
 import play.api.libs.json.Json
@@ -28,6 +27,7 @@ import uk.gov.hmrc.play.bootstrap.backend.http.{ErrorResponse, JsonErrorHandler}
 import uk.gov.hmrc.play.bootstrap.config.HttpAuditEvent
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CustomErrorHandler @Inject()(

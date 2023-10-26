@@ -16,7 +16,6 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.connector
 
-import java.util.UUID
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
@@ -29,6 +28,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext
 
 class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEach {

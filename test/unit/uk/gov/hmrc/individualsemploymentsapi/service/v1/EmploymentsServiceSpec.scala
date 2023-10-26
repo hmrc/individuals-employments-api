@@ -16,8 +16,6 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v1
 
-import java.util.UUID
-
 import org.joda.time.LocalDate
 import org.joda.time.LocalDate.parse
 import org.mockito.ArgumentMatchers.any
@@ -38,6 +36,7 @@ import uk.gov.hmrc.individualsemploymentsapi.service.v1.{CacheService, LiveEmplo
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.Intervals
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.successful

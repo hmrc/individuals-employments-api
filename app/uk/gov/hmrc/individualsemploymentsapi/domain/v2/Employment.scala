@@ -17,13 +17,13 @@
 package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
 import org.joda.time.LocalDate
-import play.api.libs.json.{Format, JsPath}
-import play.api.libs.json.JodaWrites._
-import play.api.libs.json.JodaReads._
-import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.EnumJson
-import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployment
 import play.api.libs.functional.syntax._
+import play.api.libs.json.JodaReads._
+import play.api.libs.json.JodaWrites._
+import play.api.libs.json.{Format, JsPath}
+import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployment
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.PayFrequency.PayFrequency
+import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.EnumJson
 
 case class Employment(
   startDate: Option[LocalDate],

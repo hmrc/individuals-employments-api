@@ -16,8 +16,6 @@
 
 package it.uk.gov.hmrc.individualsemploymentsapi.cache.v2
 
-import java.util.UUID
-
 import org.mongodb.scala.model.Filters
 import org.scalatest.BeforeAndAfterEach
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -26,6 +24,7 @@ import uk.gov.hmrc.individualsemploymentsapi.cache.v2.ShortLivedCache
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext
 
 class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {

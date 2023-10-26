@@ -17,8 +17,7 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmploymentDetail
-import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfAddress
+import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfAddress, IfEmploymentDetail}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.UnitSpec
 
 class IfEmploymentDetailSpec extends UnitSpec {

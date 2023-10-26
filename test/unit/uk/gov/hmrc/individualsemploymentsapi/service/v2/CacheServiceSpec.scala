@@ -16,8 +16,6 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import java.util.UUID
-
 import com.google.common.base.Charsets
 import com.google.common.io.BaseEncoding
 import org.joda.time.{Interval, LocalDate}
@@ -32,6 +30,7 @@ import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheRepositoryConfigurat
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheId, CacheIdBase, CacheService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {

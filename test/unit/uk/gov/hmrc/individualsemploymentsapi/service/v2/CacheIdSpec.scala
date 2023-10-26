@@ -16,12 +16,12 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import java.util.UUID
-
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.CacheId
 import utils.Intervals
+
+import java.util.UUID
 
 class CacheIdSpec extends AnyWordSpec with Matchers with Intervals {
 
