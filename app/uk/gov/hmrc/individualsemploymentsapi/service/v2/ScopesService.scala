@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import javax.inject.Inject
 import play.api.Configuration
 import uk.gov.hmrc.individualsemploymentsapi.config.{ApiConfig, InternalEndpointConfig}
+
+import javax.inject.Inject
 
 class ScopesService @Inject()(configuration: Configuration) {
 

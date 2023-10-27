@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service.v1
 
-import javax.inject.Inject
 import play.api.libs.json.Format
 import uk.gov.hmrc.individualsemploymentsapi.cache.v1.{CacheRepositoryConfiguration, ShortLivedCache}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheRepositoryConfiguration)(

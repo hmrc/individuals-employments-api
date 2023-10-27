@@ -22,8 +22,8 @@ import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureResponse
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import javax.inject.Inject
 
+import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
 class AuditHelper @Inject()(auditConnector: AuditConnector)(implicit ec: ExecutionContext) {

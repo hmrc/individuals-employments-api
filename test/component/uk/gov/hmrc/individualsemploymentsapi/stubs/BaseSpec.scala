@@ -16,8 +16,6 @@
 
 package component.uk.gov.hmrc.individualsemploymentsapi.stubs
 
-import java.util.concurrent.TimeUnit
-
 import org.scalatest._
 import org.scalatest.featurespec.AnyFeatureSpec
 import org.scalatest.matchers.should.Matchers
@@ -27,6 +25,7 @@ import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.mvc.Http.MimeTypes.JSON
 
+import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
 
 trait BaseSpec

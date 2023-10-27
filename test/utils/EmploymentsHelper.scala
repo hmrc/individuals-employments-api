@@ -16,7 +16,7 @@
 
 package utils
 
-import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfAddress, IfEmployer, IfEmployment, IfEmploymentDetail, IfPayment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework._
 
 trait EmploymentsHelper {
 

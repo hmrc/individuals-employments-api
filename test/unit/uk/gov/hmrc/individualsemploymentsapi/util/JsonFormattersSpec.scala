@@ -16,13 +16,13 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.util
 
-import java.util.UUID
-
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.{JsString, Json}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ErrorInvalidRequest
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
+
+import java.util.UUID
 
 class JsonFormattersSpec extends AnyWordSpec with Matchers {
   "Error invalid request format" should {

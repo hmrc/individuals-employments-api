@@ -16,8 +16,14 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain
 
-import java.util.UUID
-
+import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.domain.Nino
 
+import java.util.UUID
+
 case class NinoMatch(matchId: UUID, nino: Nino)
+
+object NinoMatch {
+  implicit val format: OFormat[NinoMatch] = Json.format[NinoMatch]
+
+}

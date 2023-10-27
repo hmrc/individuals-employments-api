@@ -16,11 +16,11 @@
 
 package component.uk.gov.hmrc.individualsemploymentsapi
 
-import java.util.UUID
-
 import component.uk.gov.hmrc.individualsemploymentsapi.stubs.BaseSpec
 import play.api.http.Status._
 import scalaj.http.Http
+
+import java.util.UUID
 
 class IntervalValidationSpec extends BaseSpec {
 

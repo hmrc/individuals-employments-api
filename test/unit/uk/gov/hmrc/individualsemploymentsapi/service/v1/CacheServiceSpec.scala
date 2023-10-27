@@ -16,8 +16,6 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v1
 
-import java.util.UUID
-
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions}
@@ -29,6 +27,7 @@ import uk.gov.hmrc.individualsemploymentsapi.cache.v1.{CacheRepositoryConfigurat
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.CacheService
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 

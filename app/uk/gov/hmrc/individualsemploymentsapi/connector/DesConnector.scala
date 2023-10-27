@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.connector
 
-import javax.inject.{Inject, Singleton}
 import org.joda.time.Interval
 import play.api.Logger
 import uk.gov.hmrc.domain.Nino
@@ -26,6 +25,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmplo
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton

@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.error
 
-import play.api.http.Status.{NOT_FOUND, _}
+import play.api.http.Status._
 import play.api.libs.json.Json.toJson
 import play.api.mvc.Result
 import play.api.mvc.Results.Status

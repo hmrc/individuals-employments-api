@@ -16,15 +16,14 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import java.util.UUID
-
 import com.google.common.base.Charsets
 import com.google.common.io.BaseEncoding
-import javax.inject.Inject
 import org.joda.time.Interval
 import play.api.libs.json.Format
 import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheRepositoryConfiguration, ShortLivedCache}
 
+import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheRepositoryConfiguration)(
