@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.des
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import uk.gov.hmrc.domain.EmpRef
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
 

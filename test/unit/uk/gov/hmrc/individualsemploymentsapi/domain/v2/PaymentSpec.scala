@@ -16,7 +16,7 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfPayment
@@ -25,7 +25,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Payment
 class PaymentSpec extends AnyFlatSpec with Matchers {
 
   "Employer" should "derive itself from some parameters" in {
-    val someDate = Some(new LocalDate(2016, 1, 1))
+    val someDate = Some(LocalDate.of(2016, 1, 1))
     val someTaxeablePayement = Some(123.321)
 
     val payment = Payment(someDate, someTaxeablePayement)

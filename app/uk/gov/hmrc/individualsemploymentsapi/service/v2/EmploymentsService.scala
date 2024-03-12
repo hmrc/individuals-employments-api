@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service.v2
 
-import org.joda.time.{Interval, LocalDate}
+import java.time.LocalDate
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{IfConnector, IndividualsMatchingApiConnector}
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
+import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 
 import java.util.UUID
 import javax.inject.{Inject, Named, Singleton}

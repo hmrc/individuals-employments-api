@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.des
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 
 case class DesPayment(
   paymentDate: LocalDate,

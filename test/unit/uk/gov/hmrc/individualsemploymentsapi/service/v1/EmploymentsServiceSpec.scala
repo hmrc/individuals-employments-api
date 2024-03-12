@@ -16,8 +16,8 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v1
 
-import org.joda.time.LocalDate
-import org.joda.time.LocalDate.parse
+import java.time.LocalDate
+import java.time.LocalDate.parse
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito
 import org.mockito.Mockito._

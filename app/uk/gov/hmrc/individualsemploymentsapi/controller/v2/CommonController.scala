@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
-import org.joda.time.DateTime
 import play.api.Logger
 import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
 import uk.gov.hmrc.auth.core.authorise.Predicate
@@ -29,6 +28,7 @@ import uk.gov.hmrc.individualsemploymentsapi.util.Dates.toFormattedLocalDate
 import uk.gov.hmrc.individualsemploymentsapi.util.UuidValidator
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.Future.successful
@@ -41,7 +41,7 @@ abstract class CommonController @Inject()(cc: ControllerComponents) extends Back
   private def getQueryParam[T](name: String)(implicit request: Request[T]) =
     request.queryString.get(name).flatMap(_.headOption)
 
-  private[controller] def urlWithInterval[T](url: String, fromDate: DateTime)(implicit request: Request[T]) = {
+  private[controller] def urlWithInterval[T](url: String, fromDate: LocalDateTime)(implicit request: Request[T]) = {
     val urlWithFromDate = s"$url&fromDate=${toFormattedLocalDate(fromDate)}"
     getQueryParam("toDate") map (toDate => s"$urlWithFromDate&toDate=$toDate") getOrElse urlWithFromDate
   }

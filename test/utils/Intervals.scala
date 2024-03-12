@@ -16,15 +16,18 @@
 
 package utils
 
-import org.joda.time.LocalDateTime.parse
-import org.joda.time.{Interval, LocalDateTime}
+import uk.gov.hmrc.individualsemploymentsapi.util.Interval
+
+import java.time.LocalDateTime
 
 trait Intervals {
-
-  protected def toInterval(fromDate: String, toDate: String): Interval =
+  protected def toInterval(fromDate: String, toDate: String): Interval = {
+    def parse(date: String): LocalDateTime =
+      if (date.contains("T")) LocalDateTime.parse(date) else LocalDateTime.parse(s"${date}T00:00:00")
     toInterval(parse(fromDate), parse(toDate))
+  }
 
   protected def toInterval(fromDate: LocalDateTime, toDate: LocalDateTime): Interval =
-    new Interval(fromDate.toDate.getTime, toDate.toDate.getTime)
+    Interval(fromDate, toDate)
 
 }

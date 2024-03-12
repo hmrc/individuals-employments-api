@@ -16,7 +16,7 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.domain.EmpRef
@@ -47,8 +47,8 @@ class EmploymentSpec extends AnyFlatSpec with Matchers {
         )),
       employment = Some(
         IfEmploymentDetail(
-          startDate = Some(new LocalDate(2016, 1, 1).toString()),
-          endDate = Some(new LocalDate(2016, 12, 31).toString()),
+          startDate = Some(LocalDate.of(2016, 1, 1).toString),
+          endDate = Some(LocalDate.of(2016, 12, 31).toString),
           payFrequency = Some(PayFrequencyCode.M1.toString),
           payrollId = None,
           address = None
@@ -58,8 +58,8 @@ class EmploymentSpec extends AnyFlatSpec with Matchers {
     )
 
     val employment = Employment.create(
-      Some(new LocalDate(2016, 1, 1)),
-      Some(new LocalDate(2016, 12, 31)),
+      Some(LocalDate.of(2016, 1, 1)),
+      Some(LocalDate.of(2016, 12, 31)),
       Some(PayFrequency.withName("CALENDAR_MONTHLY")),
       Employer.create(
         Some(EmpRef("247", "A1987CB")),

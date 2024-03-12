@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.{Duration, FiniteDuration, _}
 import scala.concurrent.{Await, Future}
 
-trait UnitSpec extends AnyWordSpec with Matchers {
+trait UnitSpec extends AnyWordSpec with Matchers with Intervals {
 
   implicit val defaultTimeout: FiniteDuration = 5.seconds
 

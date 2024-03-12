@@ -16,7 +16,7 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
-import org.joda.time.{Interval, LocalDate}
+import java.time.{LocalDate, LocalTime}
 import org.mockito.ArgumentMatchers.{any, refEq, eq => eqTo}
 import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito
@@ -37,6 +37,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 import uk.gov.hmrc.individualsemploymentsapi.domain.{NinoMatch, PayFrequencyCode}
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, ScopesHelper, ScopesService}
+import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.AuthHelper
 
@@ -60,8 +61,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       )),
     employment = Some(
       IfEmploymentDetail(
-        startDate = Some(new LocalDate(2016, 1, 1).toString()),
-        endDate = Some(new LocalDate(2016, 6, 30).toString()),
+        startDate = Some(LocalDate.of(2016, 1, 1).toString),
+        endDate = Some(LocalDate.of(2016, 6, 30).toString),
         payFrequency = Some(PayFrequencyCode.W4.toString),
         payrollId = Some("payroll-id"),
         address = Some(
@@ -238,9 +239,9 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
   "Employments controller paye function" should {
 
-    val fromDate = new LocalDate("2017-03-02").toDateTimeAtStartOfDay
-    val toDate = new LocalDate("2017-05-31").toDateTimeAtStartOfDay
-    val interval = new Interval(fromDate, toDate)
+    val fromDate = LocalDate.parse("2017-03-02").atTime(LocalTime.MIN)
+    val toDate = LocalDate.parse("2017-05-31").atTime(LocalTime.MIN)
+    val interval = Interval(fromDate, toDate)
 
     "return 404 (not found) for an invalid matchId" in new Setup {
 
