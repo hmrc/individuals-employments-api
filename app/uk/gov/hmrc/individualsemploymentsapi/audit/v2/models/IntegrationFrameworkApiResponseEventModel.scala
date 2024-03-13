@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.audit.v2.models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
 
 case class IntegrationFrameworkApiResponseEventModel(
@@ -32,5 +32,6 @@ case class IntegrationFrameworkApiResponseEventModel(
   integrationFrameworkEmployments: IfEmployments)
 
 object IntegrationFrameworkApiResponseEventModel {
-  implicit val formatIfApiResponseEventModel = Json.format[IntegrationFrameworkApiResponseEventModel]
+  implicit val formatIfApiResponseEventModel: Format[IntegrationFrameworkApiResponseEventModel] =
+    Json.format[IntegrationFrameworkApiResponseEventModel]
 }
