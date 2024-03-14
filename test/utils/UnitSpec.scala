@@ -16,8 +16,8 @@
 
 package utils
 
-import akka.stream.Materializer
-import akka.util.ByteString
+import org.apache.pekko.stream.Materializer
+import org.apache.pekko.util.ByteString
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.inject.guice.GuiceableModule
@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.{Duration, FiniteDuration, _}
 import scala.concurrent.{Await, Future}
 
-trait UnitSpec extends AnyWordSpec with Matchers {
+trait UnitSpec extends AnyWordSpec with Matchers with Intervals {
 
   implicit val defaultTimeout: FiniteDuration = 5.seconds
 

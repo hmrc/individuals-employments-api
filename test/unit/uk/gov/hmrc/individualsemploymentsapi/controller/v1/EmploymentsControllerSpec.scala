@@ -16,7 +16,7 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v1
 
-import org.joda.time.{Interval, LocalDate}
+import java.time.{LocalDate, LocalTime}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
@@ -34,6 +34,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.v1.SandboxData.{Employments, sandboxMatchId}
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.{LiveEmploymentsService, SandboxEmploymentsService}
+import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import java.util.UUID
@@ -127,9 +128,9 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
   "Employments controller paye function" should {
 
-    val fromDate = new LocalDate("2017-03-02").toDateTimeAtStartOfDay
-    val toDate = new LocalDate("2017-05-31").toDateTimeAtStartOfDay
-    val interval = new Interval(fromDate, toDate)
+    val fromDate = LocalDate.parse("2017-03-02").atTime(LocalTime.MIN)
+    val toDate = LocalDate.parse("2017-05-31").atTime(LocalTime.MIN)
+    val interval = Interval(fromDate, toDate)
 
     "return 404 (not found) for an invalid matchId" in new Setup {
       val invalidMatchId = UUID.randomUUID()

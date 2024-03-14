@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.sandbox.v1
 
-import org.joda.time.LocalDate
-import org.joda.time.LocalDate.parse
+import java.time.LocalDate
+import java.time.LocalDate.parse
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
 import uk.gov.hmrc.individualsemploymentsapi.domain.{PayFrequencyCode, des}
@@ -35,11 +35,11 @@ object SandboxData {
   object Employments {
     val acme = DesEmployment(
       Seq(
-        DesPayment(new LocalDate(2016, 1, 28), 0),
-        DesPayment(new LocalDate(2016, 2, 28), 0),
-        DesPayment(new LocalDate(2016, 3, 28), 0),
-        DesPayment(new LocalDate(2016, 4, 28), 0),
-        DesPayment(new LocalDate(2016, 5, 28), 0)
+        DesPayment(LocalDate.of(2016, 1, 28), 0),
+        DesPayment(LocalDate.of(2016, 2, 28), 0),
+        DesPayment(LocalDate.of(2016, 3, 28), 0),
+        DesPayment(LocalDate.of(2016, 4, 28), 0),
+        DesPayment(LocalDate.of(2016, 5, 28), 0)
       ),
       Some("Acme"),
       Some(
@@ -53,8 +53,8 @@ object SandboxData {
         )),
       Some("123"),
       Some("AI45678"),
-      Some(new LocalDate(2016, 1, 1)),
-      Some(new LocalDate(2016, 6, 30)),
+      Some(LocalDate.of(2016, 1, 1)),
+      Some(LocalDate.of(2016, 6, 30)),
       Some(PayFrequencyCode.W4),
       Some(
         DesAddress(
@@ -69,8 +69,8 @@ object SandboxData {
     )
     val disney = DesEmployment(
       Seq(
-        DesPayment(new LocalDate(2017, 2, 19), 0),
-        DesPayment(new LocalDate(2017, 2, 28), 0)
+        DesPayment(LocalDate.of(2017, 2, 19), 0),
+        DesPayment(LocalDate.of(2017, 2, 28), 0)
       ),
       Some("Disney"),
       Some(

@@ -16,12 +16,13 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.util
 
-import org.joda.time.DateTime
-import org.joda.time.LocalDate.parse
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.ValidationException
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates
+
+import java.time.LocalDate.parse
+import java.time.{LocalDate, LocalTime}
 
 class DatesSpec extends AnyFlatSpec with Matchers {
 
@@ -40,7 +41,7 @@ class DatesSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "format date time instances" in {
-    Dates.toFormattedLocalDate(DateTime.parse("2017-12-31")) shouldBe "2017-12-31"
+    Dates.toFormattedLocalDate(LocalDate.parse("2017-12-31").atTime(LocalTime.MIN)) shouldBe "2017-12-31"
   }
 
 }

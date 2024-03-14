@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service.v1
 
-import org.joda.time.{Interval, LocalDate}
+import java.time.{LocalDate, LocalTime}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
 import uk.gov.hmrc.individualsemploymentsapi.domain
@@ -24,6 +24,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, Individual}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
+import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 import java.util.UUID
@@ -58,8 +59,8 @@ class SandboxEmploymentsService extends EmploymentsService {
       case Some(i) =>
         val employments = i.employments.flatMap(Employment.from)
         val employmentsWithinInterval = employments.filter { e =>
-          e.startDate.forall(d => d.toDateTimeAtStartOfDay.isBefore(interval.getEnd)) &&
-          e.endDate.forall(d => d.toDateTimeAtStartOfDay.isAfter(interval.getStart))
+          e.startDate.forall(_.atTime(LocalTime.MIN).isBefore(interval.getEnd)) &&
+          e.endDate.forall(_.atTime(LocalTime.MIN).isAfter(interval.getStart))
         }
 
         Future.successful(employmentsWithinInterval.sortBy(_.endDate.getOrElse(interval.getEnd.toLocalDate)).reverse)

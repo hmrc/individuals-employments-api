@@ -1,4 +1,3 @@
-import sbt.IntegrationTest
 import sbt.Keys.{testGrouping, testOptions, unmanagedSourceDirectories}
 import sbt.Tests.{Group, SubProcess}
 import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
@@ -6,6 +5,7 @@ import uk.gov.hmrc.DefaultBuildSettings.addTestReportOption
 val appName = "individuals-employments-api"
 
 lazy val ComponentTest = config("component") extend Test
+lazy val ItTest = config("it") extend Test
 
 lazy val microservice =
   Project(appName, file("."))
@@ -13,26 +13,26 @@ lazy val microservice =
     .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
     .settings(onLoadMessage := "")
     .settings(CodeCoverageSettings.settings *)
-    .settings(scalaVersion := "2.13.8")
+    .settings(scalaVersion := "2.13.12")
     .settings(scalafmtOnCompile := true)
     .settings(
       libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test(),
       routesImport ++= Seq("uk.gov.hmrc.individualsemploymentsapi.Binders._")
     )
     .settings(Compile / unmanagedResourceDirectories += baseDirectory.value / "resources")
-    .configs(IntegrationTest)
-    .settings(inConfig(IntegrationTest)(Defaults.itSettings) *)
+    .configs(ItTest)
+    .settings(inConfig(ItTest)(Defaults.testSettings) *)
     .settings(
-      IntegrationTest / Keys.fork := false,
-      IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "test")).value,
-      IntegrationTest / testOptions := Seq(Tests.Filter((name: String) => name.startsWith("it"))),
-      addTestReportOption(IntegrationTest, "int-test-reports"),
-      IntegrationTest / testGrouping := oneForkedJvmPerTest((IntegrationTest / definedTests).value),
-      IntegrationTest / parallelExecution := false,
+      ItTest / Keys.fork := false,
+      ItTest / unmanagedSourceDirectories := (ItTest / baseDirectory)(base => Seq(base / "test")).value,
+      ItTest / testOptions := Seq(Tests.Filter((name: String) => name.startsWith("it"))),
+      addTestReportOption(ItTest, "int-test-reports"),
+      ItTest / testGrouping := oneForkedJvmPerTest((ItTest / definedTests).value),
+      ItTest / parallelExecution := false,
       // Disable default sbt Test options (might change with new versions of bootstrap)
-      IntegrationTest / testOptions -= Tests
+      ItTest / testOptions -= Tests
         .Argument("-o", "-u", "target/int-test-reports", "-h", "target/int-test-reports/html-report"),
-      IntegrationTest / testOptions += Tests.Argument(
+      ItTest / testOptions += Tests.Argument(
         TestFrameworks.ScalaTest,
         "-oNCHPQR",
         "-u",

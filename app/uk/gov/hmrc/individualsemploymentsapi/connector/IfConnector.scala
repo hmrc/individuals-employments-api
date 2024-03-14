@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.connector
 
-import org.joda.time.{Interval, LocalDate}
+import java.time.LocalDate
 import play.api.Logger
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.domain.Nino
@@ -25,6 +25,7 @@ import uk.gov.hmrc.http.UpstreamErrorResponse.Upstream5xxResponse
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HeaderNames, HttpClient, InternalServerException, JsValidationException, NotFoundException, TooManyRequestException, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfEmployment, IfEmployments}
+import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.util.UUID

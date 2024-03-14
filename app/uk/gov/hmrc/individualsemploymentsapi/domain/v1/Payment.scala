@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.v1
 
-import org.joda.time.LocalDate
+import java.time.LocalDate
 import uk.gov.hmrc.domain.EmpRef
 
 case class Payment(

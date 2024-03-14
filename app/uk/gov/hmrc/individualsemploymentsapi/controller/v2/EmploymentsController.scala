@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
-import org.joda.time.Interval
 import play.api.hal.Hal._
 import play.api.hal.HalLink
 import play.api.libs.json.Json
@@ -25,6 +24,7 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, ScopesHelper, ScopesService}
+import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.{maybeCorrelationId, validateCorrelationId}
 
 import javax.inject.{Inject, Singleton}

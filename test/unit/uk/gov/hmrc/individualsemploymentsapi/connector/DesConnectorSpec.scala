@@ -19,8 +19,8 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.connector
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
-import org.joda.time.LocalDateTime.parse
-import org.joda.time.{Interval, LocalDate, LocalDateTime}
+
+import java.time.LocalDate
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -30,10 +30,11 @@ import uk.gov.hmrc.individualsemploymentsapi.connector.DesConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
+import utils.Intervals
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSugar {
+class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSugar with Intervals {
   val stubPort = sys.env.getOrElse("WIREMOCK", "11122").toInt
   val stubHost = "localhost"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
@@ -176,11 +177,4 @@ class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSuga
     }
 
   }
-
-  private def toInterval(fromDate: String, toDate: String): Interval =
-    toInterval(parse(fromDate), parse(toDate))
-
-  private def toInterval(fromDate: LocalDateTime, toDate: LocalDateTime): Interval =
-    new Interval(fromDate.toDate.getTime, toDate.toDate.getTime)
-
 }

@@ -18,7 +18,8 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 
 import com.google.common.base.Charsets
 import com.google.common.io.BaseEncoding
-import org.joda.time.{Interval, LocalDate}
+
+import java.time.{LocalDate, LocalTime}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.BDDMockito.given
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions}
@@ -28,6 +29,7 @@ import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheRepositoryConfiguration, ShortLivedCache}
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{CacheId, CacheIdBase, CacheService}
+import uk.gov.hmrc.individualsemploymentsapi.util.{Dates, Interval}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import java.util.UUID
@@ -85,29 +87,25 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
     "produce a cache id based on matchId and scopes" in {
 
       val matchId = UUID.randomUUID()
-      val fromDateString = "2017-03-02"
-      val toDateString = "2017-05-31"
 
-      val interval = new Interval(
-        new LocalDate(fromDateString).toDateTimeAtStartOfDay,
-        new LocalDate(toDateString).toDateTimeAtStartOfDay)
+      val interval = Interval(
+        LocalDate.parse("2017-03-02").atTime(LocalTime.MIN),
+        LocalDate.parse("2017-05-31").atTime(LocalTime.MIN))
 
       val fields = "ABDFH"
 
       CacheId(matchId, interval, fields).id shouldBe
-        s"$matchId-${interval.getStart}-${interval.getEnd}-ABDFH"
+        s"$matchId-${interval.getStart.format(Dates.jsonFormat)}-${interval.getEnd.format(Dates.jsonFormat)}-ABDFH"
 
     }
 
     "produce cacheId based on matchid, scopes, and employer ref" in {
 
       val matchId = UUID.randomUUID()
-      val fromDateString = "2017-03-02"
-      val toDateString = "2017-05-31"
 
-      val interval = new Interval(
-        new LocalDate(fromDateString).toDateTimeAtStartOfDay,
-        new LocalDate(toDateString).toDateTimeAtStartOfDay)
+      val interval = Interval(
+        LocalDate.parse("2017-03-02").atTime(LocalTime.MIN),
+        LocalDate.parse("2017-05-31").atTime(LocalTime.MIN))
 
       val fields = "ABDFH"
 
@@ -116,7 +114,7 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
       val encodedFilter = BaseEncoding.base64().encode(filters.get.getBytes(Charsets.UTF_8))
 
       CacheId(matchId, interval, fields, filters).id shouldBe
-        s"$matchId-${interval.getStart}-${interval.getEnd}-ABDFH-$encodedFilter"
+        s"$matchId-${interval.getStart.format(Dates.jsonFormat)}-${interval.getEnd.format(Dates.jsonFormat)}-ABDFH-$encodedFilter"
     }
 
   }

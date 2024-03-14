@@ -18,9 +18,9 @@ package uk.gov.hmrc.individualsemploymentsapi.service.v2
 
 import com.google.common.base.Charsets
 import com.google.common.io.BaseEncoding
-import org.joda.time.Interval
 import play.api.libs.json.Format
 import uk.gov.hmrc.individualsemploymentsapi.cache.v2.{CacheRepositoryConfiguration, ShortLivedCache}
+import uk.gov.hmrc.individualsemploymentsapi.util.{Dates, Interval}
 
 import java.util.UUID
 import javax.inject.Inject
@@ -73,6 +73,8 @@ case class CacheId(matchId: UUID, interval: Interval, fields: String, empRef: Op
     case None        => ""
   }
 
-  lazy val id: String = s"$matchId-${interval.getStart}-${interval.getEnd}-$fields$empRefKey"
+  lazy val id: String = {
+    s"$matchId-${interval.getStart.format(Dates.jsonFormat)}-${interval.getEnd.format(Dates.jsonFormat)}-$fields$empRefKey"
+  }
 
 }

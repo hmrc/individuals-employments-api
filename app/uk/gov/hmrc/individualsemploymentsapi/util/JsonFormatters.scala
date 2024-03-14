@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.util
 
-import org.joda.time.LocalDate
 import play.api.libs.json._
-import uk.gov.hmrc.http.controllers.RestFormats
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
 import uk.gov.hmrc.individualsemploymentsapi.domain.des._
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.{Address, Employer, Employment, PayFrequency}
@@ -30,7 +28,6 @@ import scala.util.{Failure, Try}
 
 object JsonFormatters {
 
-  implicit val dateFormat: Format[LocalDate] = RestFormats.localDateFormats
   implicit val addressJsonFormat: OFormat[Address] = Json.format[Address]
   implicit val employerJsonFormat: OFormat[Employer] = Json.format[Employer]
   implicit val payFrequencyJsonFormat: Format[PayFrequency.Value] = EnumJson.enumFormat(PayFrequency)
