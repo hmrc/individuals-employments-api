@@ -28,9 +28,10 @@ import uk.gov.hmrc.individualsemploymentsapi.service.v1.{EmploymentsService, Liv
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
+import java.time.LocalDate
 import java.util.UUID
 import javax.inject.{Inject, Named, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 abstract class EmploymentsController(employmentsService: EmploymentsService, cc: ControllerComponents)(
   implicit ec: ExecutionContext)
@@ -53,12 +54,16 @@ abstract class EmploymentsController(employmentsService: EmploymentsService, cc:
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
     requiresPrivilegedAuthentication("read:individuals-employments-paye") {
-      employmentsService.paye(matchId, interval).map { employments =>
-        val selfLink =
-          HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
-        val filtered = filterPayrollData(employments)
-        val employmentsJsObject = Json.obj("employments" -> Json.toJson(filtered))
-        Ok(state(employmentsJsObject) ++ selfLink)
+      if (interval.getStart isBefore LocalDate.parse("2018-01-01").atStartOfDay()) {
+        Future.successful(BadRequest("Cannot query dates before 2018"))
+      } else {
+        employmentsService.paye(matchId, interval).map { employments =>
+          val selfLink =
+            HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
+          val filtered = filterPayrollData(employments)
+          val employmentsJsObject = Json.obj("employments" -> Json.toJson(filtered))
+          Ok(state(employmentsJsObject) ++ selfLink)
+        }
       }
     }.recover(recovery)
   }
