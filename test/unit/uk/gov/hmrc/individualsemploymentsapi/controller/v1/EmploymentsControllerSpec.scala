@@ -266,6 +266,14 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       )
     }
 
+    "fail with 400 if fromDate is before 2018" in new Setup {
+      val matchId: UUID = UUID.randomUUID()
+      val interval: Interval =
+        Interval(LocalDate.parse("2017-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
+      val res: Future[Result] = liveEmploymentsController.paye(matchId, interval)(FakeRequest())
+      status(res) shouldBe BAD_REQUEST
+    }
+
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
       when(
         mockAuthConnector

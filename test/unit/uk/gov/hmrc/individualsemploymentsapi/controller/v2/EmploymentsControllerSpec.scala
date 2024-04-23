@@ -313,6 +313,14 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(any())
     }
 
+    "fail with 400 if fromDate is before 2018" in new Setup {
+      val interval: Interval =
+        Interval(LocalDate.parse("2017-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
+      val result: Future[Result] = employmentsController.paye(sampleMatchId.toString, interval, None)(
+        FakeRequest().withHeaders(validCorrelationHeader))
+      status(result) shouldBe BAD_REQUEST
+    }
+
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
 
       Mockito.reset(employmentsController.auditHelper)
