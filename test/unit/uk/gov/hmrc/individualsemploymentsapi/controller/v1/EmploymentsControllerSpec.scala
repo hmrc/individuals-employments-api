@@ -164,8 +164,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         ),
         "employments" -> Json.arr(
           Json.obj(
-            "startDate" -> "2016-01-01",
-            "endDate"   -> "2016-06-30",
+            "startDate" -> "2018-01-01",
+            "endDate"   -> "2018-06-30",
             "employer" -> Json.obj(
               "payeReference" -> "123/AI45678",
               "name"          -> "Acme",
@@ -209,8 +209,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         ),
         "employments" -> Json.arr(
           Json.obj(
-            "startDate" -> "2016-01-01",
-            "endDate"   -> "2016-06-30",
+            "startDate" -> "2018-01-01",
+            "endDate"   -> "2018-06-30",
             "employer" -> Json.obj(
               "payeReference" -> "123/AI45678",
               "name"          -> "Acme",
@@ -246,8 +246,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         ),
         "employments" -> Json.arr(
           Json.obj(
-            "startDate" -> "2016-01-01",
-            "endDate"   -> "2016-06-30",
+            "startDate" -> "2018-01-01",
+            "endDate"   -> "2018-06-30",
             "employer" -> Json.obj(
               "payeReference" -> "123/AI45678",
               "name"          -> "Acme",
