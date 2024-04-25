@@ -31,27 +31,27 @@ class SandboxEmploymentsServiceSpec extends SpecBase with Intervals {
   "Sandbox employments service paye function" should {
 
     "return employments for the entire available history ordered by date descending" in {
-      val res = await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2016-01-01", "2017-03-01")))
+      val res = await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2018-01-01", "2019-03-01")))
       val expected = Seq(Employment.from(Employments.disney).get, Employment.from(Employments.acme).get)
 
       res shouldBe expected
     }
 
     "return employments for a limited period" in {
-      val res = await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2016-01-01", "2016-07-01")))
+      val res = await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2018-01-01", "2018-07-01")))
 
       res shouldBe Employment.from(Employments.acme).toSeq
     }
 
     "return correct employments when range includes a period of no payments" in {
-      val res = await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2016-04-30", "2017-02-15")))
+      val res = await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2018-04-30", "2019-02-15")))
       val expected = Seq(Employment.from(Employments.disney).get, Employment.from(Employments.acme).get)
 
       res shouldBe expected
     }
 
     "return no employments when the individual has no employment for a given period" in {
-      await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2016-08-01", "2016-09-01"))) shouldBe Nil
+      await(sandboxEmploymentsService.paye(sandboxMatchId, toInterval("2018-08-01", "2018-09-01"))) shouldBe Nil
     }
 
   }

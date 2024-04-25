@@ -27,8 +27,9 @@ import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, Sco
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.{maybeCorrelationId, validateCorrelationId}
 
+import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class EmploymentsController @Inject()(
@@ -70,24 +71,26 @@ class EmploymentsController @Inject()(
       authenticate(scopeService.getEndPointScopes("paye"), matchId.toString) { authScopes =>
         withValidUuid(matchId, "matchId") { matchIdUuid =>
           val correlationId = validateCorrelationId(request)
+          if (interval.getStart isBefore LocalDate.of(2018, 1, 1).atStartOfDay()) {
+            Future.successful(BadRequest("Cannot query dates before 2018"))
+          } else {
+            employmentsService.paye(matchIdUuid, interval, payeReference, "paye", authScopes).map { employments =>
+              val selfLink =
+                HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
+              val response = state(Json.obj("employments" -> Json.toJson(employments))) ++ selfLink
 
-          employmentsService.paye(matchIdUuid, interval, payeReference, "paye", authScopes).map { employments =>
-            val selfLink =
-              HalLink("self", urlWithInterval(s"/individuals/employments/paye?matchId=$matchId", interval.getStart))
-            val response = state(Json.obj("employments" -> Json.toJson(employments))) ++ selfLink
+              auditHelper.auditApiResponse(
+                correlationId.toString,
+                matchId,
+                authScopes.mkString(","),
+                request,
+                selfLink.toString,
+                Some(employments))
 
-            auditHelper.auditApiResponse(
-              correlationId.toString,
-              matchId,
-              authScopes.mkString(","),
-              request,
-              selfLink.toString,
-              Some(employments))
-
-            Ok(response)
+              Ok(response)
+            }
           }
         }
-
       } recover withAudit(maybeCorrelationId(request), matchId.toString, "/individuals/employments/paye")
   }
 }

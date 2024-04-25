@@ -134,7 +134,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
     Scenario("invalid match id") {
       When("the root entry point to the API is invoked with an invalid match id")
       val response =
-        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366&fromDate=2017-01-01")
+        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=0a184ef3-fd75-4d4d-b6a3-f886cc39a366&fromDate=2019-01-01")
 
       Then("the response status should be 404 (not found)")
       assertResponseIs(
@@ -152,7 +152,7 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
     Scenario("valid request to the sandbox implementation") {
       When("I request the root entry point to the API")
       val response =
-        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01")
+        invokeEndpoint(s"$serviceUrl/sandbox/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2019-01-01")
 
       Then("The response status should be 200 (ok)")
       assertResponseIs(
@@ -162,13 +162,13 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
           {
             "_links":{
               "self":{
-                "href":"/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2017-01-01"
+                "href":"/individuals/employments/paye?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430&fromDate=2019-01-01"
               }
             },
             "employments":[
               {
-                "startDate":"2017-01-02",
-                "endDate":"2017-03-01",
+                "startDate":"2019-01-02",
+                "endDate":"2019-03-01",
                 "employer":{
                   "payeReference":"123/DI45678",
                   "name":"Disney",

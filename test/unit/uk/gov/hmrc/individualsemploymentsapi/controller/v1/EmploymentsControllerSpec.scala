@@ -16,12 +16,11 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v1
 
-import java.time.{LocalDate, LocalTime}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
-import play.api.mvc.ControllerComponents
+import play.api.mvc.{ControllerComponents, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
@@ -37,6 +36,7 @@ import uk.gov.hmrc.individualsemploymentsapi.service.v1.{LiveEmploymentsService,
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
+import java.time.LocalDate
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
@@ -128,8 +128,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
   "Employments controller paye function" should {
 
-    val fromDate = LocalDate.parse("2017-03-02").atTime(LocalTime.MIN)
-    val toDate = LocalDate.parse("2017-05-31").atTime(LocalTime.MIN)
+    val fromDate = LocalDate.parse("2018-03-02").atStartOfDay()
+    val toDate = LocalDate.parse("2018-05-31").atStartOfDay()
     val interval = Interval(fromDate, toDate)
 
     "return 404 (not found) for an invalid matchId" in new Setup {
@@ -159,13 +159,13 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       contentAsJson(res) shouldBe Json.obj(
         "_links" -> Json.obj(
           "self" -> Json.obj(
-            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-03-02"
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2018-03-02"
           )
         ),
         "employments" -> Json.arr(
           Json.obj(
-            "startDate" -> "2016-01-01",
-            "endDate"   -> "2016-06-30",
+            "startDate" -> "2018-01-01",
+            "endDate"   -> "2018-06-30",
             "employer" -> Json.obj(
               "payeReference" -> "123/AI45678",
               "name"          -> "Acme",
@@ -204,13 +204,13 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       contentAsJson(res) shouldBe Json.obj(
         "_links" -> Json.obj(
           "self" -> Json.obj(
-            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-03-02"
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2018-03-02"
           )
         ),
         "employments" -> Json.arr(
           Json.obj(
-            "startDate" -> "2016-01-01",
-            "endDate"   -> "2016-06-30",
+            "startDate" -> "2018-01-01",
+            "endDate"   -> "2018-06-30",
             "employer" -> Json.obj(
               "payeReference" -> "123/AI45678",
               "name"          -> "Acme",
@@ -241,13 +241,13 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       contentAsJson(res) shouldBe Json.obj(
         "_links" -> Json.obj(
           "self" -> Json.obj(
-            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-03-02"
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2018-03-02"
           )
         ),
         "employments" -> Json.arr(
           Json.obj(
-            "startDate" -> "2016-01-01",
-            "endDate"   -> "2016-06-30",
+            "startDate" -> "2018-01-01",
+            "endDate"   -> "2018-06-30",
             "employer" -> Json.obj(
               "payeReference" -> "123/AI45678",
               "name"          -> "Acme",
@@ -264,6 +264,14 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
           )
         )
       )
+    }
+
+    "fail with 400 if fromDate is before 2018" in new Setup {
+      val matchId: UUID = UUID.randomUUID()
+      val interval: Interval =
+        Interval(LocalDate.parse("2017-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
+      val res: Future[Result] = liveEmploymentsController.paye(matchId, interval)(FakeRequest())
+      status(res) shouldBe BAD_REQUEST
     }
 
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {

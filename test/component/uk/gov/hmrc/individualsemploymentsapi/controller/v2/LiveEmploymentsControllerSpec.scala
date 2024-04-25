@@ -28,8 +28,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
   private val matchId = UUID.randomUUID().toString
   private val nino = "AB123456C"
-  val fromDate = "2017-01-01"
-  val toDate = "2017-09-25"
+  val fromDate = "2019-01-01"
+  val toDate = "2019-09-25"
   private val employerRef = "247ZT6767895A"
 
   private val allScopes = List(
@@ -282,7 +282,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, allScopes)
 
       When("the paye endpoint is invoked with an invalid match id")
-      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=2017-09-40")
+      val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=2019-09-40")
 
       Then("the response status should be 400 (invalid request)")
       response.code shouldBe BAD_REQUEST
@@ -312,7 +312,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       Json.parse(response.body) shouldBe Json.obj(
         "_links" -> Json.obj(
           "self" -> Json.obj(
-            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-01-01&toDate=2017-09-25"
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2019-01-01&toDate=2019-09-25"
           )
         ),
         "employments" -> Json.arr(

@@ -23,7 +23,7 @@ import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
-import play.api.mvc.ControllerComponents
+import play.api.mvc.{ControllerComponents, Result}
 import play.api.test.Helpers._
 import play.api.test._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -61,8 +61,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       )),
     employment = Some(
       IfEmploymentDetail(
-        startDate = Some(LocalDate.of(2016, 1, 1).toString),
-        endDate = Some(LocalDate.of(2016, 6, 30).toString),
+        startDate = Some(LocalDate.of(2019, 1, 1).toString),
+        endDate = Some(LocalDate.of(2019, 6, 30).toString),
         payFrequency = Some(PayFrequencyCode.W4.toString),
         payrollId = Some("payroll-id"),
         address = Some(
@@ -239,8 +239,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
   "Employments controller paye function" should {
 
-    val fromDate = LocalDate.parse("2017-03-02").atTime(LocalTime.MIN)
-    val toDate = LocalDate.parse("2017-05-31").atTime(LocalTime.MIN)
+    val fromDate = LocalDate.parse("2018-03-02").atTime(LocalTime.MIN)
+    val toDate = LocalDate.parse("2018-05-31").atTime(LocalTime.MIN)
     val interval = Interval(fromDate, toDate)
 
     "return 404 (not found) for an invalid matchId" in new Setup {
@@ -283,13 +283,13 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       contentAsJson(res) shouldBe Json.obj(
         "_links" -> Json.obj(
           "self" -> Json.obj(
-            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-03-02"
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2018-03-02"
           )
         ),
         "employments" -> Json.arr(
           Json.obj(
-            "startDate"    -> "2016-01-01",
-            "endDate"      -> "2016-06-30",
+            "startDate"    -> "2019-01-01",
+            "endDate"      -> "2019-06-30",
             "payFrequency" -> "FOUR_WEEKLY",
             "employer" -> Json.obj(
               "payeReference" -> "247/A1987CB",
@@ -311,6 +311,14 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
         .auditApiResponse(any(), any(), any(), any(), any(), any())(any())
 
       verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(any())
+    }
+
+    "fail with 400 if fromDate is before 2018" in new Setup {
+      val interval: Interval =
+        Interval(LocalDate.parse("2017-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
+      val result: Future[Result] = employmentsController.paye(sampleMatchId.toString, interval, None)(
+        FakeRequest().withHeaders(validCorrelationHeader))
+      status(result) shouldBe BAD_REQUEST
     }
 
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {

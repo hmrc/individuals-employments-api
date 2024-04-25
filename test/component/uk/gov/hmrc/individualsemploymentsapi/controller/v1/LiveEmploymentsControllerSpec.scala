@@ -119,8 +119,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
   Feature("Paye endpoint") {
 
-    val fromDate = "2017-01-01"
-    val toDate = "2017-09-25"
+    val fromDate = "2019-01-01"
+    val toDate = "2019-09-25"
 
     Scenario("invalid token") {
       Given("an invalid token")
@@ -205,7 +205,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       Json.parse(response.body) shouldBe Json.obj(
         "_links" -> Json.obj(
           "self" -> Json.obj(
-            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2017-01-01&toDate=2017-09-25"
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2019-01-01&toDate=2019-09-25"
           )
         ),
         "employments" -> Json.arr(
