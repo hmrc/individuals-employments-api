@@ -27,13 +27,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class IndividualsMatchingApiConnector @Inject()(serviceConfig: ServicesConfig, http: HttpClient)(
-  implicit ec: ExecutionContext) {
+class IndividualsMatchingApiConnector @Inject() (serviceConfig: ServicesConfig, http: HttpClient)(implicit
+  ec: ExecutionContext
+) {
 
   private[connector] val serviceUrl = serviceConfig.baseUrl("individuals-matching-api")
 
   def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
-    http.GET[NinoMatch](s"$serviceUrl/match-record/$matchId") recover {
-      case UpstreamErrorResponse(_, 404, _, _) => throw new MatchNotFoundException
+    http.GET[NinoMatch](s"$serviceUrl/match-record/$matchId") recover { case UpstreamErrorResponse(_, 404, _, _) =>
+      throw new MatchNotFoundException
     }
 }

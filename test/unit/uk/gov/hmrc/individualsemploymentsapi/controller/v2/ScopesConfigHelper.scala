@@ -24,7 +24,8 @@ trait ScopesConfigHelper {
     (s"api-config.scopes.test-scope.fields", List("A", "B", "C")),
     (
       s"api-config.endpoints.internal.paye.endpoint",
-      "/individuals/employments/paye?matchId=<matchId>{&startDate,endDate}"),
+      "/individuals/employments/paye?matchId=<matchId>{&startDate,endDate}"
+    ),
     (s"api-config.endpoints.internal.paye.title", "Get an individual's PAYE employment data"),
     (s"api-config.endpoints.internal.paye.fields", Seq("A", "B", "C")),
     (s"api-config.fields.A", "employments/employer/name"),

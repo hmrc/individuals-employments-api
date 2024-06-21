@@ -24,7 +24,8 @@ case class Address(
   line3: Option[String],
   line4: Option[String],
   line5: Option[String],
-  postcode: Option[String])
+  postcode: Option[String]
+)
 
 object Address {
   implicit def ifAddressToAddressOpt(address: Option[IfAddress]): Option[Address] =

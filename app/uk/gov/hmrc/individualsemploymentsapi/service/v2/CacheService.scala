@@ -26,8 +26,9 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheRepositoryConfiguration)(
-  implicit ec: ExecutionContext) {
+class CacheService @Inject() (cachingClient: ShortLivedCache, conf: CacheRepositoryConfiguration)(implicit
+  ec: ExecutionContext
+) {
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
@@ -41,7 +42,8 @@ class CacheService @Inject()(cachingClient: ShortLivedCache, conf: CacheReposito
             cachingClient.cache(cacheId.id, result)
             result
           }
-      } else {
+      }
+    else {
       fallbackFunction
     }
 
@@ -73,8 +75,7 @@ case class CacheId(matchId: UUID, interval: Interval, fields: String, empRef: Op
     case None        => ""
   }
 
-  lazy val id: String = {
+  lazy val id: String =
     s"$matchId-${interval.getStart.format(Dates.jsonFormat)}-${interval.getEnd.format(Dates.jsonFormat)}-$fields$empRefKey"
-  }
 
 }

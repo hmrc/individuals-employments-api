@@ -32,13 +32,14 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmploymentsController @Inject()(
+class EmploymentsController @Inject() (
   employmentsService: EmploymentsService,
   scopeService: ScopesService,
   scopesHelper: ScopesHelper,
   val authConnector: AuthConnector,
   implicit val auditHelper: AuditHelper,
-  cc: ControllerComponents)(implicit val ec: ExecutionContext)
+  cc: ControllerComponents
+)(implicit val ec: ExecutionContext)
     extends CommonController(cc) with PrivilegedAuthentication {
 
   def root(matchId: String): Action[AnyContent] = Action.async { implicit request =>
@@ -56,7 +57,8 @@ class EmploymentsController @Inject()(
             authScopes.mkString(","),
             request,
             response.toString,
-            None)
+            None
+          )
 
           Ok(response)
 
@@ -85,7 +87,8 @@ class EmploymentsController @Inject()(
                 authScopes.mkString(","),
                 request,
                 selfLink.toString,
-                Some(employments))
+                Some(employments)
+              )
 
               Ok(response)
             }

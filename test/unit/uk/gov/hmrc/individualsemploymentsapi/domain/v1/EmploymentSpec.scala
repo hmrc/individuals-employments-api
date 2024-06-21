@@ -53,8 +53,10 @@ class EmploymentSpec extends AnyFlatSpec with Matchers {
               line4 = None,
               line5 = None,
               postcode = Some("AB1 2CD")
-            ))
-        )),
+            )
+          )
+        )
+      ),
       Some(PayFrequency.withName("CALENDAR_MONTHLY")),
       None,
       None

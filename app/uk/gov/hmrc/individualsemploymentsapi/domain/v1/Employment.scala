@@ -26,7 +26,8 @@ case class Employment(
   employer: Option[Employer],
   payFrequency: Option[PayFrequency],
   employeeAddress: Option[Address],
-  payrollId: Option[String])
+  payrollId: Option[String]
+)
 
 object Employment {
 

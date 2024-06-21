@@ -39,9 +39,8 @@ class PayFrequencySpec extends AnyFlatSpec with Matchers {
       (MA, ANNUALLY)
     )
 
-    fixtures foreach {
-      case (ifPayFrequency, hmrcPayFrequency) =>
-        PayFrequency.from(ifPayFrequency) shouldBe Some(hmrcPayFrequency)
+    fixtures foreach { case (ifPayFrequency, hmrcPayFrequency) =>
+      PayFrequency.from(ifPayFrequency) shouldBe Some(hmrcPayFrequency)
     }
   }
 

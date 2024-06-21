@@ -50,7 +50,8 @@ object SandboxData {
           line4 = Some("AcmeVille"),
           line5 = Some("Acme State"),
           postalCode = Some("AI22 9LL")
-        )),
+        )
+      ),
       Some("123"),
       Some("AI45678"),
       Some(LocalDate.of(2018, 1, 1)),
@@ -64,7 +65,8 @@ object SandboxData {
           line4 = None,
           line5 = None,
           postalCode = Some("AA11 1AA")
-        )),
+        )
+      ),
       Some("payroll-id")
     )
     val disney = DesEmployment(
@@ -81,7 +83,8 @@ object SandboxData {
           line4 = Some("Sometown"),
           line5 = Some("Old County"),
           postalCode = Some("TF22 3BC")
-        )),
+        )
+      ),
       Some("123"),
       Some("DI45678"),
       Some(parse("2019-01-02")),
@@ -95,7 +98,8 @@ object SandboxData {
           line4 = None,
           line5 = None,
           postalCode = None
-        )),
+        )
+      ),
       Some("another-payroll-id")
     )
   }

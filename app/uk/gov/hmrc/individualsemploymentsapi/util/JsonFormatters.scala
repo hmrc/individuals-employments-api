@@ -67,8 +67,8 @@ object JsonFormatters {
     private def enumReads[E <: Enumeration](anEnum: E): Reads[E#Value] = new Reads[E#Value] {
       def reads(json: JsValue): JsResult[E#Value] = json match {
         case JsString(s) =>
-          Try(JsSuccess(anEnum.withName(s))) recoverWith {
-            case _: NoSuchElementException => Failure(new InvalidEnumException(anEnum.getClass.getSimpleName, s))
+          Try(JsSuccess(anEnum.withName(s))) recoverWith { case _: NoSuchElementException =>
+            Failure(new InvalidEnumException(anEnum.getClass.getSimpleName, s))
           } get
         case _ => JsError("String value expected")
       }

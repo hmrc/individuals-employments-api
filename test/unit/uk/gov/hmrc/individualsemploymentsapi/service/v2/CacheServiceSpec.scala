@@ -90,7 +90,8 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
       val interval = Interval(
         LocalDate.parse("2017-03-02").atTime(LocalTime.MIN),
-        LocalDate.parse("2017-05-31").atTime(LocalTime.MIN))
+        LocalDate.parse("2017-05-31").atTime(LocalTime.MIN)
+      )
 
       val fields = "ABDFH"
 
@@ -105,7 +106,8 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
       val interval = Interval(
         LocalDate.parse("2017-03-02").atTime(LocalTime.MIN),
-        LocalDate.parse("2017-05-31").atTime(LocalTime.MIN))
+        LocalDate.parse("2017-05-31").atTime(LocalTime.MIN)
+      )
 
       val fields = "ABDFH"
 

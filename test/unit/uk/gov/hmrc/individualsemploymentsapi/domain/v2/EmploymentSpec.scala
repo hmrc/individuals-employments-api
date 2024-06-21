@@ -43,8 +43,10 @@ class EmploymentSpec extends AnyFlatSpec with Matchers {
             IfAddress(
               line1 = Some("line 1"),
               postcode = Some("AB1 2CD")
-            ))
-        )),
+            )
+          )
+        )
+      ),
       employment = Some(
         IfEmploymentDetail(
           startDate = Some(LocalDate.of(2016, 1, 1).toString),
@@ -52,7 +54,8 @@ class EmploymentSpec extends AnyFlatSpec with Matchers {
           payFrequency = Some(PayFrequencyCode.M1.toString),
           payrollId = None,
           address = None
-        )),
+        )
+      ),
       payments = Some(Seq(ifPayment)),
       employerRef = Some("247/A1987CB")
     )
@@ -72,7 +75,8 @@ class EmploymentSpec extends AnyFlatSpec with Matchers {
             line4 = None,
             line5 = None,
             postcode = Some("AB1 2CD")
-          ))
+          )
+        )
       ),
       Some(Seq(Payment.create(ifPayment)).flatten)
     )

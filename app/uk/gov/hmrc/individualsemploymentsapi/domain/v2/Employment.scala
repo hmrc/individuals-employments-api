@@ -28,7 +28,8 @@ case class Employment(
   endDate: Option[LocalDate],
   payFrequency: Option[PayFrequency],
   employer: Option[Employer],
-  payments: Option[Seq[Payment]])
+  payments: Option[Seq[Payment]]
+)
 
 object Employment {
 
@@ -56,7 +57,8 @@ object Employment {
     endDate: Option[LocalDate],
     payFrequency: Option[PayFrequency],
     employer: Option[Employer],
-    payments: Option[Seq[Payment]]): Option[Employment] =
+    payments: Option[Seq[Payment]]
+  ): Option[Employment] =
     (startDate, endDate, payFrequency, employer, payments) match {
       case (None, None, None, None, None) => None
       case _                              => Some(new Employment(startDate, endDate, payFrequency, employer, payments))

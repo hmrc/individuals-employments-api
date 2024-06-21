@@ -30,7 +30,8 @@ case class ApiResponseEventModel(
   applicationId: String,
   scopes: String,
   returnLinks: String,
-  employments: Option[Seq[Employment]])
+  employments: Option[Seq[Employment]]
+)
 
 object ApiResponseEventModel {
   implicit val formatApiResponseEventModel: Format[ApiResponseEventModel] = Json.format[ApiResponseEventModel]

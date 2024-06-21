@@ -25,10 +25,12 @@ object IndividualsMatchingApiStub extends MockHost(21000) {
   def willRespondWith(matchId: String, responseCode: Int, responseBody: String = "") =
     mock.register(
       get(urlEqualTo(s"/match-record/$matchId"))
-        .willReturn(aResponse().withStatus(responseCode).withBody(responseBody)))
+        .willReturn(aResponse().withStatus(responseCode).withBody(responseBody))
+    )
 
   def hasMatchingRecord(matchId: String, nino: String): Unit =
     mock.register(
       get(s"/match-record/$matchId")
-        .willReturn(okJson(Json.obj("matchId" -> matchId, "nino" -> nino).toString)))
+        .willReturn(okJson(Json.obj("matchId" -> matchId, "nino" -> nino).toString))
+    )
 }

@@ -82,16 +82,19 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
       val employmentWithLastPaymentInFebruary =
         aDesEmployment(
           leavingDate = None,
-          payments = Seq(DesPayment(parse("2016-12-28"), 10), DesPayment(parse("2017-02-28"), 10)))
+          payments = Seq(DesPayment(parse("2016-12-28"), 10), DesPayment(parse("2017-02-28"), 10))
+        )
 
       mockIndividualsMatchingApiConnectorToReturn(successful(ninoMatch))
       mockDesConnectorToReturn(
-        successful(Seq(employmentEndingJanuary, employmentEndingMarch, employmentWithLastPaymentInFebruary)))
+        successful(Seq(employmentEndingJanuary, employmentEndingMarch, employmentWithLastPaymentInFebruary))
+      )
 
       await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq(
         Employment.from(employmentEndingMarch).get,
         Employment.from(employmentWithLastPaymentInFebruary).get,
-        Employment.from(employmentEndingJanuary).get)
+        Employment.from(employmentEndingJanuary).get
+      )
     }
 
     "return the employments sorted by last payment date when an employment exists with no payments" in {
@@ -141,13 +144,15 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
         line4 = Some("Surrey"),
         line5 = Some("UK"),
         postalCode = Some("AI22 9LL")
-      )),
+      )
+    ),
     districtNumber: Option[String] = Some("123"),
     schemeReference: Option[String] = Some("AI45678"),
     startDate: Option[LocalDate] = Some(parse("2016-01-01")),
     leavingDate: Option[LocalDate] = Some(parse("2020-02-29")),
     frequency: Option[DesPayFrequency] = Some(M1),
-    payments: Seq[DesPayment] = Seq.empty) =
+    payments: Seq[DesPayment] = Seq.empty
+  ) =
     DesEmployment(
       payments,
       employerName,
@@ -156,5 +161,6 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
       schemeReference,
       startDate,
       leavingDate,
-      frequency)
+      frequency
+    )
 }

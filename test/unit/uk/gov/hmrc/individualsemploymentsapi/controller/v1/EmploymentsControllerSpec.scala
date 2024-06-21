@@ -56,7 +56,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       mockSandboxEmploymentsService,
       mockAuthConnector,
       hmctsClientId,
-      controllerComponent)
+      controllerComponent
+    )
     val liveEmploymentsController =
       new LiveEmploymentsController(mockLiveEmploymentsService, mockAuthConnector, hmctsClientId, controllerComponent)
 
@@ -105,7 +106,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments" in new Setup {
       when(
         mockAuthConnector
-          .authorise(eqTo(Enrolment("read:individuals-employments")), eqTo(EmptyRetrieval))(any(), any()))
+          .authorise(eqTo(Enrolment("read:individuals-employments")), eqTo(EmptyRetrieval))(any(), any())
+      )
         .thenReturn(Future.failed(InsufficientEnrolments()))
 
       val result = liveEmploymentsController.root(randomMatchId)(FakeRequest())
@@ -277,7 +279,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
       when(
         mockAuthConnector
-          .authorise(eqTo(Enrolment("read:individuals-employments-paye")), eqTo(EmptyRetrieval))(any(), any()))
+          .authorise(eqTo(Enrolment("read:individuals-employments-paye")), eqTo(EmptyRetrieval))(any(), any())
+      )
         .thenReturn(Future.failed(InsufficientEnrolments()))
 
       val result =
@@ -290,7 +293,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     "not require bearer token authentication" in new Setup {
       when(mockSandboxEmploymentsService.paye(eqTo(sandboxMatchId), eqTo(interval))(any()))
         .thenReturn(
-          Future.successful(Seq(Employment.from(Employments.acme), Employment.from(Employments.disney)).flatten))
+          Future.successful(Seq(Employment.from(Employments.acme), Employment.from(Employments.disney)).flatten)
+        )
 
       val eventualResult =
         sandboxEmploymentsController.paye(sandboxMatchId, interval)(FakeRequest())

@@ -30,13 +30,13 @@ case class DesEmployment(
   employmentLeavingDate: Option[LocalDate] = None,
   employmentPayFrequency: Option[PayFrequencyCode.Value] = None,
   employeeAddress: Option[DesAddress] = None,
-  payrollId: Option[String] = None) {
+  payrollId: Option[String] = None
+) {
 
-  val employerPayeReference: Option[EmpRef] = {
+  val employerPayeReference: Option[EmpRef] =
     (employerDistrictNumber, employerSchemeReference) match {
       case (Some(districtNumber), Some(schemeReference)) => Some(EmpRef(districtNumber, schemeReference))
       case _                                             => None
     }
-  }
 
 }

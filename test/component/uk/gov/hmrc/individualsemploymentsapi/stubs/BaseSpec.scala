@@ -56,7 +56,8 @@ trait BaseSpec
 
   protected def requestHeaders(
     acceptHeader: (String, String) = acceptHeaderVP1,
-    correlationHeader: (String, String) = validCorrelationHeader) =
+    correlationHeader: (String, String) = validCorrelationHeader
+  ) =
     Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader, correlationHeader)
 
   override protected def beforeEach(): Unit =

@@ -29,7 +29,7 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
+class DesConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient) {
 
   val logger: Logger = Logger(getClass)
 
@@ -43,9 +43,10 @@ class DesConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClient) {
     "Source"                  -> "MDTP"
   )
 
-  def fetchEmployments(nino: Nino, interval: Interval)(
-    implicit hc: HeaderCarrier,
-    ec: ExecutionContext): Future[Seq[DesEmployment]] = {
+  def fetchEmployments(nino: Nino, interval: Interval)(implicit
+    hc: HeaderCarrier,
+    ec: ExecutionContext
+  ): Future[Seq[DesEmployment]] = {
 
     val fromDate = interval.getStart.toLocalDate
     val toDate = interval.getEnd.toLocalDate

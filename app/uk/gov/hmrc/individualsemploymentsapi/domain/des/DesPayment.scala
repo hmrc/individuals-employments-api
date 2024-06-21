@@ -22,4 +22,5 @@ case class DesPayment(
   paymentDate: LocalDate,
   totalPayInPeriod: Double,
   weekPayNumber: Option[Int] = None,
-  monthPayNumber: Option[Int] = None)
+  monthPayNumber: Option[Int] = None
+)
