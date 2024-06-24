@@ -49,10 +49,10 @@ object Employer {
   def create(ifEmployment: IfEmployment): Option[Employer] = {
     val name = ifEmployment.employer.flatMap(e => e.name)
     val address = ifEmployment.employer.flatMap(e => e.address)
-    val empRef = ifEmployment.employerRef.map(x => {
+    val empRef = ifEmployment.employerRef.map { x =>
       val splits = x.split('/')
       EmpRef(splits(0), splits(1))
-    })
+    }
 
     (empRef, name, address) match {
       case (None, None, None) => None

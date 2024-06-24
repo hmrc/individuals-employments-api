@@ -17,7 +17,7 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
 import java.time.{LocalDate, LocalTime}
-import org.mockito.ArgumentMatchers.{any, refEq, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo, refEq}
 import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
@@ -50,15 +50,18 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
     employer = Some(
       IfEmployer(
         name = Some("Acme"),
-        address = Some(IfAddress(
-          line1 = Some("Acme Inc Building"),
-          line2 = Some("Acme Inc Campus"),
-          line3 = Some("Acme Street"),
-          line4 = Some("AcmeVille"),
-          line5 = Some("Acme State"),
-          postcode = Some("AI22 9LL")
-        ))
-      )),
+        address = Some(
+          IfAddress(
+            line1 = Some("Acme Inc Building"),
+            line2 = Some("Acme Inc Campus"),
+            line3 = Some("Acme Street"),
+            line4 = Some("AcmeVille"),
+            line5 = Some("Acme State"),
+            postcode = Some("AI22 9LL")
+          )
+        )
+      )
+    ),
     employment = Some(
       IfEmploymentDetail(
         startDate = Some(LocalDate.of(2019, 1, 1).toString),
@@ -73,7 +76,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
             line4 = None,
             line5 = None,
             postcode = Some("AA11 1AA")
-          ))
+          )
+        )
       )
     ),
     payments = None,
@@ -103,7 +107,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       scopesHelper,
       mockAuthConnector,
       auditHelper,
-      controllerComponent)
+      controllerComponent
+    )
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -254,7 +259,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       val eventualResult =
         employmentsController.paye(invalidMatchId.toString, interval, None)(
-          FakeRequest().withHeaders(validCorrelationHeader))
+          FakeRequest().withHeaders(validCorrelationHeader)
+        )
 
       status(eventualResult) shouldBe NOT_FOUND
 
@@ -317,7 +323,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       val interval: Interval =
         Interval(LocalDate.parse("2017-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
       val result: Future[Result] = employmentsController.paye(sampleMatchId.toString, interval, None)(
-        FakeRequest().withHeaders(validCorrelationHeader))
+        FakeRequest().withHeaders(validCorrelationHeader)
+      )
       status(result) shouldBe BAD_REQUEST
     }
 
@@ -329,7 +336,8 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
 
       val result =
         employmentsController.paye(sampleMatchId.toString, interval, None)(
-          FakeRequest().withHeaders(validCorrelationHeader))
+          FakeRequest().withHeaders(validCorrelationHeader)
+        )
 
       status(result) shouldBe UNAUTHORIZED
       verifyNoInteractions(mockEmploymentsService)

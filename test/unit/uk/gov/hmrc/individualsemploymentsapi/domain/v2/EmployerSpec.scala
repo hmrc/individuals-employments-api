@@ -34,7 +34,8 @@ class EmployerSpec extends AnyFlatSpec with Matchers {
         line4 = None,
         line5 = None,
         postcode = Some("AB1 2CD")
-      ))
+      )
+    )
     val employer = Employer(someEmpRef, someName, someAddress)
     Employer(someEmpRef, someName, someAddress) shouldBe employer
   }

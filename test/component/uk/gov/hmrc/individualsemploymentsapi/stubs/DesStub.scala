@@ -29,18 +29,21 @@ object DesStub extends MockHost(22003) {
     nino: String,
     fromDate: String,
     toDate: String,
-    desEmployments: DesEmployments) =
+    desEmployments: DesEmployments
+  ) =
     mock.register(
       get(urlPathEqualTo(s"/individuals/nino/$nino/employments/income"))
         .withQueryParam("from", equalTo(fromDate))
         .withQueryParam("to", equalTo(toDate))
-        .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(desEmployments).toString())))
+        .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(desEmployments).toString()))
+    )
 
   def enforceRateLimit(nino: String, fromDate: String, toDate: String): Unit =
     mock.register(
       get(urlPathEqualTo(s"/individuals/nino/$nino/employments/income"))
         .withQueryParam("from", equalTo(fromDate))
         .withQueryParam("to", equalTo(toDate))
-        .willReturn(aResponse().withStatus(TOO_MANY_REQUESTS)))
+        .willReturn(aResponse().withStatus(TOO_MANY_REQUESTS))
+    )
 
 }

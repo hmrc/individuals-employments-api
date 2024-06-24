@@ -22,4 +22,5 @@ case class DesAddress(
   line3: Option[String] = None,
   line4: Option[String] = None,
   line5: Option[String] = None,
-  postalCode: Option[String] = None)
+  postalCode: Option[String] = None
+)

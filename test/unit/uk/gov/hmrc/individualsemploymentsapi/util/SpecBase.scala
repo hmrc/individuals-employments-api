@@ -34,7 +34,8 @@ trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
                                       | metrics.enabled = true
                                       | auditing.enabled = false
           """.stripMargin)
-        ) withFallback extraConfig)
+        ) withFallback extraConfig
+      )
       .build()
 
   override lazy val fakeApplication: Application = buildFakeApplication(additionalConfig)

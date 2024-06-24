@@ -42,7 +42,8 @@ class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEa
     implicit val hc = HeaderCarrier()
     val individualsMatchingApiConnector = new IndividualsMatchingApiConnector(
       fakeApplication.injector.instanceOf[ServicesConfig],
-      fakeApplication.injector.instanceOf[HttpClient]) {
+      fakeApplication.injector.instanceOf[HttpClient]
+    ) {
       override val serviceUrl = "http://127.0.0.1:11121"
     }
   }
@@ -59,7 +60,8 @@ class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEa
     def stubWithResponseStatus(responseStatus: Int, body: String = ""): Unit =
       stubFor(
         get(urlPathMatching(s"/match-record/$matchId"))
-          .willReturn(aResponse().withStatus(responseStatus).withBody(body)))
+          .willReturn(aResponse().withStatus(responseStatus).withBody(body))
+      )
 
     "fail when upstream service fails" in new Fixture {
       stubWithResponseStatus(INTERNAL_SERVER_ERROR)
@@ -76,7 +78,8 @@ class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEa
             "matchId":"${matchId.toString}",
             "nino":"AB123456C"
           }
-        """)
+        """
+      )
       await(individualsMatchingApiConnector.resolve(matchId)) shouldBe domain.NinoMatch(matchId, Nino("AB123456C"))
     }
 

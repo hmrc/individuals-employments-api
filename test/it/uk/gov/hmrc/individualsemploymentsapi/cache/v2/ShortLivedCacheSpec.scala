@@ -106,7 +106,8 @@ class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
         .map {
           case Some(entry) => entry.data.value
           case None        => None
-        })
+        }
+    )
 
   case class TestClass(one: String, two: String)
 

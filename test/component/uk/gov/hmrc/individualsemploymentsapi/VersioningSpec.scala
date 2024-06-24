@@ -47,7 +47,8 @@ class VersioningSpec extends BaseSpec {
         sandboxMatchEndpointWithSandboxMatchId,
         AUTHORIZATION -> authToken,
         ACCEPT        -> "application/vnd.hmrc.10.0+json",
-        validCorrelationHeader)
+        validCorrelationHeader
+      )
 
       Then("The response status should be 404")
       response.code shouldBe NOT_FOUND
@@ -61,14 +62,14 @@ class VersioningSpec extends BaseSpec {
           sandboxMatchEndpointWithSandboxMatchId,
           AUTHORIZATION -> authToken,
           acceptHeaderVP1,
-          validCorrelationHeader)
+          validCorrelationHeader
+        )
 
       Then("The response status should be 200")
       response.code shouldBe OK
 
       Then("And the response body should be for api version P1.0")
-      parse(response.body) shouldBe parse(
-        """
+      parse(response.body) shouldBe parse("""
           {
             "_links":{
               "paye":{

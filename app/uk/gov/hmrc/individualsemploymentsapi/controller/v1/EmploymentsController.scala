@@ -33,9 +33,9 @@ import java.util.UUID
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class EmploymentsController(employmentsService: EmploymentsService, cc: ControllerComponents)(
-  implicit ec: ExecutionContext)
-    extends CommonController(cc) with PrivilegedAuthentication {
+abstract class EmploymentsController(employmentsService: EmploymentsService, cc: ControllerComponents)(implicit
+  ec: ExecutionContext
+) extends CommonController(cc) with PrivilegedAuthentication {
 
   val hmctsClientId: String
 
@@ -45,7 +45,8 @@ abstract class EmploymentsController(employmentsService: EmploymentsService, cc:
         val payeLink = HalLink(
           "paye",
           s"/individuals/employments/paye?matchId=$matchId{&fromDate,toDate}",
-          title = Option("View individual's employments"))
+          title = Option("View individual's employments")
+        )
         val selfLink = HalLink("self", s"/individuals/employments/?matchId=$matchId")
         Ok(links(payeLink, selfLink))
       }
@@ -74,7 +75,7 @@ abstract class EmploymentsController(employmentsService: EmploymentsService, cc:
   private def filterPayrollData(employments: Seq[Employment])(implicit request: Request[AnyContent]): Seq[Employment] =
     request.headers.get("X-Client-ID") match {
       case Some(clientId) if clientId == hmctsClientId => employments
-      case Some(_)                                     => employments.map(_.copy(payrollId = None, employeeAddress = None))
+      case Some(_) => employments.map(_.copy(payrollId = None, employeeAddress = None))
       case None =>
         logger.warn("Missing X-Client-Id header")
         employments.map(_.copy(payrollId = None, employeeAddress = None))
@@ -83,22 +84,24 @@ abstract class EmploymentsController(employmentsService: EmploymentsService, cc:
 }
 
 @Singleton
-class SandboxEmploymentsController @Inject()(
+class SandboxEmploymentsController @Inject() (
   sandboxEmploymentsService: SandboxEmploymentsService,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
-  cc: ControllerComponents)(implicit ec: ExecutionContext)
+  cc: ControllerComponents
+)(implicit ec: ExecutionContext)
     extends EmploymentsController(sandboxEmploymentsService, cc) {
 
   override val environment: String = SANDBOX
 }
 
 @Singleton
-class LiveEmploymentsController @Inject()(
+class LiveEmploymentsController @Inject() (
   liveEmploymentsService: LiveEmploymentsService,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
-  cc: ControllerComponents)(implicit ec: ExecutionContext)
+  cc: ControllerComponents
+)(implicit ec: ExecutionContext)
     extends EmploymentsController(liveEmploymentsService, cc) {
 
   override val environment: String = PRODUCTION

@@ -66,6 +66,7 @@ trait UnitSpec extends AnyWordSpec with Matchers with Intervals {
     serviceName: String,
     runFrom: String = "SNAPSHOT_JAR",
     classifier: Option[String] = None,
-    version: Option[String] = None)
+    version: Option[String] = None
+  )
 
 }

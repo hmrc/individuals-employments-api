@@ -28,6 +28,7 @@ object DesEmployments {
         payment.paymentDate,
         desEmployment.employerPayeReference,
         payment.monthPayNumber,
-        payment.weekPayNumber)
+        payment.weekPayNumber
+      )
     }
 }

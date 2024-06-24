@@ -69,11 +69,12 @@ class SandboxEmploymentsService extends EmploymentsService {
 }
 
 @Singleton
-class LiveEmploymentsService @Inject()(
+class LiveEmploymentsService @Inject() (
   individualsMatchingApiConnector: IndividualsMatchingApiConnector,
   desConnector: DesConnector,
   @Named("retryDelay") retryDelay: Int,
-  cacheService: CacheService)(implicit ec: ExecutionContext)
+  cacheService: CacheService
+)(implicit ec: ExecutionContext)
     extends EmploymentsService {
 
   private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { e: DesEmployment =>
@@ -86,9 +87,12 @@ class LiveEmploymentsService @Inject()(
   override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =
     resolve(matchId).flatMap { ninoMatch =>
       cacheService
-        .get(s"$matchId-${interval.getStart}-${interval.getEnd}", withRetry {
-          desConnector.fetchEmployments(ninoMatch.nino, interval)
-        })
+        .get(
+          s"$matchId-${interval.getStart}-${interval.getEnd}",
+          withRetry {
+            desConnector.fetchEmployments(ninoMatch.nino, interval)
+          }
+        )
         .map { employments =>
           employments.sortBy(sortByLeavingDateOrLastPaymentDate(interval)).reverse flatMap Employment.from
         }

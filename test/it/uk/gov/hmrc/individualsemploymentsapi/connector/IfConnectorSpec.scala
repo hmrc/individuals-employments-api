@@ -65,7 +65,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
   trait Setup {
 
     val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
-    val sampleCorrelationIdHeader = ("CorrelationId" -> sampleCorrelationId)
+    val sampleCorrelationIdHeader = "CorrelationId" -> sampleCorrelationId
 
     implicit val hc = HeaderCarrier()
 
@@ -100,7 +100,8 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
       stubFor(
         get(urlPathMatching(s"/individuals/employment/nino/$nino"))
-          .willReturn(aResponse().withStatus(500)))
+          .willReturn(aResponse().withStatus(500))
+      )
 
       intercept[InternalServerException] {
         await(
@@ -121,7 +122,8 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
       stubFor(
         get(urlPathMatching(s"/individuals/employment/nino/$nino"))
-          .willReturn(aResponse().withStatus(400)))
+          .willReturn(aResponse().withStatus(400))
+      )
 
       intercept[InternalServerException] {
         await(
@@ -142,10 +144,13 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
       stubFor(
         get(urlPathMatching(s"/individuals/employment/nino/$nino"))
-          .willReturn(aResponse().withStatus(404).withBody("NO_DATA_FOUND")))
+          .willReturn(aResponse().withStatus(404).withBody("NO_DATA_FOUND"))
+      )
 
-      val result = await(underTest
-        .fetchEmployments(nino, interval, None, matchId)(hc, FakeRequest().withHeaders(sampleCorrelationIdHeader), ec))
+      val result = await(
+        underTest
+          .fetchEmployments(nino, interval, None, matchId)(hc, FakeRequest().withHeaders(sampleCorrelationIdHeader), ec)
+      )
 
       result shouldBe List()
 
@@ -158,7 +163,8 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
       stubFor(
         get(urlPathMatching(s"/individuals/employment/nino/$nino"))
-          .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
+          .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND"))
+      )
 
       intercept[NotFoundException] {
         await(
@@ -185,9 +191,12 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
             .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
             .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
             .withHeader("CorrelationId", equalTo(sampleCorrelationId))
-            .willReturn(aResponse()
-              .withStatus(200)
-              .withBody(Json.toJson(noEmploymentData).toString())))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withBody(Json.toJson(noEmploymentData).toString())
+            )
+        )
 
         val result = await(
           underTest.fetchEmployments(nino, interval, None, matchId)(
@@ -215,9 +224,12 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
             .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
             .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
             .withHeader("CorrelationId", equalTo(sampleCorrelationId))
-            .willReturn(aResponse()
-              .withStatus(200)
-              .withBody(Json.toJson(singleEmploymentData).toString())))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withBody(Json.toJson(singleEmploymentData).toString())
+            )
+        )
 
         val result = await(
           underTest.fetchEmployments(nino, interval, None, matchId)(
@@ -245,9 +257,12 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
             .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
             .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
             .withHeader("CorrelationId", equalTo(sampleCorrelationId))
-            .willReturn(aResponse()
-              .withStatus(200)
-              .withBody(Json.toJson(multiEmploymentData).toString())))
+            .willReturn(
+              aResponse()
+                .withStatus(200)
+                .withBody(Json.toJson(multiEmploymentData).toString())
+            )
+        )
 
         val result = await(
           underTest.fetchEmployments(nino, interval, None, matchId)(

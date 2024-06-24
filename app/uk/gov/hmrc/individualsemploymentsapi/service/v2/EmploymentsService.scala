@@ -29,13 +29,14 @@ import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmploymentsService @Inject()(
+class EmploymentsService @Inject() (
   individualsMatchingApiConnector: IndividualsMatchingApiConnector,
   ifConnector: IfConnector,
   scopesHelper: ScopesHelper,
   scopesService: ScopesService,
   @Named("retryDelay") retryDelay: Int,
-  cacheService: CacheService)(implicit val ec: ExecutionContext) {
+  cacheService: CacheService
+)(implicit val ec: ExecutionContext) {
 
   private implicit val localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ isBefore _)
 
@@ -53,7 +54,8 @@ class EmploymentsService @Inject()(
     interval: Interval,
     payeReference: Option[String],
     endpoint: String,
-    scopes: Iterable[String])(implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]] =
+    scopes: Iterable[String]
+  )(implicit hc: HeaderCarrier, request: RequestHeader): Future[Seq[Employment]] =
     resolve(matchId).flatMap { ninoMatch =>
       val params = payeReference.map(s => ("payeReference", s)).toMap
       val fieldsQuery = scopesHelper.getParameterisedQueryStringFor(scopes.toList, endpoint, params)

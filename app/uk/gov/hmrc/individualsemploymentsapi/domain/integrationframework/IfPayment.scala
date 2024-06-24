@@ -28,7 +28,8 @@ case class IfPayment(
   paidTaxablePay: Option[Double],
   paidNonTaxOrNICPayment: Option[Double],
   week: Option[Int],
-  month: Option[Int])
+  month: Option[Int]
+)
 
 object IfPayment {
 

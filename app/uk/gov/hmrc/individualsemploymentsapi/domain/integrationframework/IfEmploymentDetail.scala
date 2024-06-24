@@ -27,7 +27,8 @@ case class IfEmploymentDetail(
   endDate: Option[String],
   payFrequency: Option[String],
   payrollId: Option[String],
-  address: Option[IfAddress])
+  address: Option[IfAddress]
+)
 
 object IfEmploymentDetail {
 
@@ -44,7 +45,8 @@ object IfEmploymentDetail {
       (JsPath \ "startDate").readNullable[String](pattern(datePattern, "Date format is incorrect")) and
         (JsPath \ "endDate").readNullable[String](pattern(datePattern, "Date format is incorrect")) and
         (JsPath \ "payFrequency").readNullable[String](
-          pattern(payFrequencyPattern, "Pay frequency must be one of: W1, W2, W4, M1, M3, M6, MA, IO, IR")) and
+          pattern(payFrequencyPattern, "Pay frequency must be one of: W1, W2, W4, M1, M3, M6, MA, IO, IR")
+        ) and
         (JsPath \ "payrollId").readNullable[String](minLength[String](0) keepAnd maxLength[String](100)) and
         (JsPath \ "address").readNullable[IfAddress]
     )(IfEmploymentDetail.apply _),

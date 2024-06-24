@@ -54,13 +54,15 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         employer = Some(
           IfEmployer(
             name = Some("employer name"),
-            None,
+            None
           )
         ),
         None,
         None,
         None
-      )))
+      )
+    )
+  )
 
   Feature("Root (hateoas) entry point is accessible") {
 
@@ -207,7 +209,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
       When("the paye endpoint is invoked with an invalid match id")
       val response = invokeEndpoint(
-        s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
+        s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef"
+      )
 
       Then("the response status should be 404 (not found)")
       response.code shouldBe NOT_FOUND
@@ -305,7 +308,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
       When("the paye endpoint is invoked with a valid match id")
       val response = invokeEndpoint(
-        s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
+        s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef"
+      )
 
       Then("the response status should be 200 (ok)")
       response.code shouldBe OK
@@ -318,7 +322,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         "employments" -> Json.arr(
           Json.obj(
             "employer" -> Json.obj("name" -> "employer name")
-          ))
+          )
+        )
       )
     }
 
@@ -337,7 +342,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
 
       When("the PAYE endpoint is invoked with a valid match ID")
       val response = invokeEndpoint(
-        s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef")
+        s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate&payeReference=$employerRef"
+      )
 
       Then("The response status is 429 Too Many Requests")
       response.code shouldBe TOO_MANY_REQUESTS
@@ -399,7 +405,9 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
           None,
           None,
           None
-        )))
+        )
+      )
+    )
 
     Scenario(s"valid request but invalid IF response") {
 
@@ -464,7 +472,9 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         toDate,
         Json.obj(
           "reason" ->
-            "There are 1 or more unknown data items in the 'fields' query string"))
+            "There are 1 or more unknown data items in the 'fields' query string"
+        )
+      )
 
       When(s"I make a call to ${if (endpoint.isEmpty) "root" else endpoint} endpoint")
       val response =

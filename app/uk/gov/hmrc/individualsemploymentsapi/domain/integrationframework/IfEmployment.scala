@@ -24,7 +24,8 @@ case class IfEmployment(
   employer: Option[IfEmployer],
   employment: Option[IfEmploymentDetail],
   payments: Option[Seq[IfPayment]],
-  employerRef: Option[String])
+  employerRef: Option[String]
+)
 
 object IfEmployment {
   implicit val employmentFormat: Format[IfEmployment] = Format(

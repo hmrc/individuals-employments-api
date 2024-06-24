@@ -27,15 +27,15 @@ import uk.gov.hmrc.play.bootstrap.http.RequestHandler
 import javax.inject.Inject
 import scala.util.Try
 
-class VersioningRequestHandler @Inject()(
+class VersioningRequestHandler @Inject() (
   webCommands: WebCommands,
   optDevContext: OptionalDevContext,
   router: Router,
   errorHandler: HttpErrorHandler,
   httpConfiguration: HttpConfiguration,
   filters: HttpFilters,
-  config: Configuration)
-    extends RequestHandler(webCommands, optDevContext, router, errorHandler, httpConfiguration, filters) {
+  config: Configuration
+) extends RequestHandler(webCommands, optDevContext, router, errorHandler, httpConfiguration, filters) {
 
   private lazy val unversionedContexts = Try {
     config

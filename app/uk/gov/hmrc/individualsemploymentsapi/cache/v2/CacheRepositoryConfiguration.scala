@@ -21,7 +21,7 @@ import uk.gov.hmrc.individualsemploymentsapi.cache.{CacheRepositoryConfiguration
 
 import javax.inject.Inject
 
-class CacheRepositoryConfiguration @Inject()(configuration: Configuration) extends BaseConig {
+class CacheRepositoryConfiguration @Inject() (configuration: Configuration) extends BaseConig {
   override val cacheEnabled: Boolean = configuration
     .getOptional[Boolean](
       "cacheV2.enabled"

@@ -31,7 +31,8 @@ object PayFrequency extends Enumeration {
     M1 -> CALENDAR_MONTHLY,
     M3 -> QUARTERLY,
     M6 -> BI_ANNUALLY,
-    MA -> ANNUALLY)
+    MA -> ANNUALLY
+  )
 
   def from(desValue: DesPayFrequency) = conversionMap.get(desValue)
 

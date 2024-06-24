@@ -24,4 +24,5 @@ case class Payment(
   paymentDate: LocalDate,
   employerPayeReference: Option[EmpRef] = None,
   monthPayNumber: Option[Int] = None,
-  weekPayNumber: Option[Int] = None)
+  weekPayNumber: Option[Int] = None
+)

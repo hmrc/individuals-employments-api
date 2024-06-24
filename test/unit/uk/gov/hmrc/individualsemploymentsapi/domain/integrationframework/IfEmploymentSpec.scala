@@ -40,7 +40,8 @@ class IfEmploymentSpec extends UnitSpec {
     endDate = Some("2002-05-12"),
     payFrequency = Some("W2"),
     payrollId = Some("12341234"),
-    address = Some(address))
+    address = Some(address)
+  )
 
   val payment = IfPayment(
     date = Some("2001-12-31"),

@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class AuditHelper @Inject()(auditConnector: AuditConnector)(implicit ec: ExecutionContext) {
+class AuditHelper @Inject() (auditConnector: AuditConnector)(implicit ec: ExecutionContext) {
 
   def auditApiResponse(
     correlationId: String,
@@ -34,7 +34,8 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)(implicit ec: Executi
     scopes: String,
     request: RequestHeader,
     selfLink: String,
-    employments: Option[Seq[Employment]])(implicit hc: HeaderCarrier) =
+    employments: Option[Seq[Employment]]
+  )(implicit hc: HeaderCarrier) =
     auditConnector.sendExplicitAudit(
       "ApiResponseEvent",
       ApiResponseEventModel(
@@ -57,7 +58,8 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)(implicit ec: Executi
     matchId: String,
     request: RequestHeader,
     requestUrl: String,
-    msg: String)(implicit hc: HeaderCarrier) =
+    msg: String
+  )(implicit hc: HeaderCarrier) =
     auditConnector.sendExplicitAudit(
       "ApiFailureEvent",
       ApiFailureResponseEventModel(
@@ -79,7 +81,8 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)(implicit ec: Executi
     matchId: String,
     request: RequestHeader,
     requestUrl: String,
-    ifEmployments: IfEmployments)(implicit hc: HeaderCarrier) =
+    ifEmployments: IfEmployments
+  )(implicit hc: HeaderCarrier) =
     auditConnector.sendExplicitAudit(
       "IntegrationFrameworkApiResponseEvent",
       IntegrationFrameworkApiResponseEventModel(
@@ -101,7 +104,8 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)(implicit ec: Executi
     matchId: String,
     request: RequestHeader,
     requestUrl: String,
-    msg: String)(implicit hc: HeaderCarrier) =
+    msg: String
+  )(implicit hc: HeaderCarrier) =
     auditConnector.sendExplicitAudit(
       "IntegrationFrameworkApiFailureEvent",
       ApiFailureResponseEventModel(

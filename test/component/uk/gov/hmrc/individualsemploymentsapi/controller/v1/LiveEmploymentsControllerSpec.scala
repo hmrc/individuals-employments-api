@@ -195,7 +195,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         nino,
         fromDate,
         toDate,
-        DesEmployments(Seq(DesEmployment(Seq.empty, Some("employer name")))))
+        DesEmployments(Seq(DesEmployment(Seq.empty, Some("employer name"))))
+      )
 
       When("the paye endpoint is invoked with a valid match id")
       val response = invokeEndpoint(s"$serviceUrl/paye?matchId=$matchId&fromDate=$fromDate&toDate=$toDate")
@@ -211,7 +212,8 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         "employments" -> Json.arr(
           Json.obj(
             "employer" -> Json.obj("name" -> "employer name")
-          ))
+          )
+        )
       )
     }
 

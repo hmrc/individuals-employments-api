@@ -30,12 +30,16 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       val response = invokeEndpoint(s"$serviceUrl/sandbox")
 
       Then("the response status should be 400 (bad request)")
-      assertResponseIs(response, BAD_REQUEST, """
+      assertResponseIs(
+        response,
+        BAD_REQUEST,
+        """
           {
              "code" : "INVALID_REQUEST",
              "message" : "matchId is required"
           }
-        """)
+        """
+      )
     }
 
     Scenario("malformed match id") {
@@ -106,12 +110,16 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
       val response = invokeEndpoint(s"$serviceUrl/sandbox/paye")
 
       Then("the response status should be 400 (bad request)")
-      assertResponseIs(response, BAD_REQUEST, """
+      assertResponseIs(
+        response,
+        BAD_REQUEST,
+        """
           {
              "code" : "INVALID_REQUEST",
              "message" : "matchId is required"
           }
-        """)
+        """
+      )
     }
 
     Scenario("malformed match id") {
@@ -196,7 +204,8 @@ class SandboxEmploymentsControllerSpec extends BaseSpec {
   private def assertResponseIs(
     httpResponse: HttpResponse[String],
     expectedResponseCode: Int,
-    expectedResponseBody: String) = {
+    expectedResponseBody: String
+  ) = {
     httpResponse.code shouldBe expectedResponseCode
     parse(httpResponse.body) shouldBe parse(expectedResponseBody)
   }

@@ -29,10 +29,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class DocumentationController @Inject()(cc: ControllerComponents, assets: Assets, config: Configuration)(
-  implicit materializer: Materializer,
-  executionContext: ExecutionContext)
-    extends BackendController(cc) {
+class DocumentationController @Inject() (cc: ControllerComponents, assets: Assets, config: Configuration)(implicit
+  materializer: Materializer,
+  executionContext: ExecutionContext
+) extends BackendController(cc) {
 
   private val v1WhitelistedApplicationIDs = config
     .getOptional[Seq[String]](
@@ -63,7 +63,8 @@ class DocumentationController @Inject()(cc: ControllerComponents, assets: Assets
         v2WhitelistedApplicationIDs,
         v2EndpointsEnabled,
         v2Status
-      )).withHeaders(
+      )
+    ).withHeaders(
       CONTENT_TYPE -> JSON
     )
   }
