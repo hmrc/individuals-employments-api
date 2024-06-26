@@ -319,9 +319,9 @@ class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSug
       verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(any())
     }
 
-    "fail with 400 if fromDate is before 2018" in new Setup {
+    "fail with 400 if fromDate is before 1800" in new Setup {
       val interval: Interval =
-        Interval(LocalDate.parse("2017-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
+        Interval(LocalDate.parse("1799-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
       val result: Future[Result] = employmentsController.paye(sampleMatchId.toString, interval, None)(
         FakeRequest().withHeaders(validCorrelationHeader)
       )

@@ -73,8 +73,9 @@ class EmploymentsController @Inject() (
       authenticate(scopeService.getEndPointScopes("paye"), matchId.toString) { authScopes =>
         withValidUuid(matchId, "matchId") { matchIdUuid =>
           val correlationId = validateCorrelationId(request)
-          if (interval.getStart isBefore LocalDate.of(2018, 1, 1).atStartOfDay()) {
-            Future.successful(BadRequest("Cannot query dates before 2018"))
+          val cutoff = 1800 // To be confirmed by the business - DLS-9957 failed release
+          if (interval.getStart isBefore LocalDate.of(cutoff, 1, 1).atStartOfDay()) {
+            Future.successful(BadRequest(s"Cannot query dates before $cutoff"))
           } else {
             employmentsService.paye(matchIdUuid, interval, payeReference, "paye", authScopes).map { employments =>
               val selfLink =
