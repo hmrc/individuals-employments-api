@@ -54,9 +54,10 @@ abstract class EmploymentsController(employmentsService: EmploymentsService, cc:
   }
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
+    val cutoff = 1800 // To be confirmed by the business - DLS-9957 failed release
     requiresPrivilegedAuthentication("read:individuals-employments-paye") {
-      if (interval.getStart isBefore LocalDate.parse("2018-01-01").atStartOfDay()) {
-        Future.successful(BadRequest("Cannot query dates before 2018"))
+      if (interval.getStart isBefore LocalDate.parse(s"$cutoff-01-01").atStartOfDay()) {
+        Future.successful(BadRequest(s"Cannot query dates before $cutoff"))
       } else {
         employmentsService.paye(matchId, interval).map { employments =>
           val selfLink =
