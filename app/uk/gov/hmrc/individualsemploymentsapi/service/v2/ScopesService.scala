@@ -67,7 +67,7 @@ class ScopesService @Inject() (configuration: Configuration) {
   }
 
   def getFilterToken(scopes: List[String], endpoint: String): Map[String, String] = {
-    val regex = "<([a-zA-Z]*)>".r("token")
+    val regex = "<(?<token>[a-zA-Z]*)>".r
     def getTokenFromText(filterText: String): Option[String] =
       regex.findFirstMatchIn(filterText).map(m => m.group("token"))
     def getFilterText(filterKey: String): Option[String] =
