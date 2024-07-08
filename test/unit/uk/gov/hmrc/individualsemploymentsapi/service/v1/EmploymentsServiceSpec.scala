@@ -37,6 +37,7 @@ import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.Intervals
 
 import java.util.UUID
+import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
@@ -63,6 +64,7 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
 
   implicit val hc: HeaderCarrier = new HeaderCarrier
 
+  @nowarn
   override def beforeEach(): Unit =
     Mockito.reset(individualsMatchingApiConnector, desConnector)
 
