@@ -18,8 +18,13 @@ package uk.gov.hmrc.individualsemploymentsapi
 
 import uk.gov.hmrc.individualsemploymentsapi.util.{IntervalQueryStringBinder, MatchUuidQueryStringBinder, StringQueryStringBinder}
 
+import scala.annotation.nowarn
+
 package object Binders {
+  @nowarn // suppressing warning on type annotation as adding in sed type annotation breaks tests
   implicit val matchUuidQueryStringBinder = new MatchUuidQueryStringBinder
+  @nowarn // added separate nowarn annotations due to not being able to use annotations on a package.
   implicit val intervalQueryStringBinder = new IntervalQueryStringBinder
+  @nowarn
   implicit val stringQueryStringBinder = new StringQueryStringBinder
 }
