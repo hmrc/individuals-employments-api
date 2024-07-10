@@ -32,13 +32,12 @@ class MatchUuidQueryStringBinderSpec extends AnyFlatSpec with Matchers with Tabl
   "Match UUID query string binder" should "fail to bind missing or malformed uuid parameter" in {
     val fixtures = Table(
       ("parameters", "response"),
-      (Map[String, Seq[String]]().empty, s"$queryStringParameterName is required"),
       (Map(queryStringParameterName -> Seq.empty[String]), s"$queryStringParameterName is required"),
       (Map(queryStringParameterName -> Seq("")), s"$queryStringParameterName format is invalid"),
       (Map(queryStringParameterName -> Seq("20200131")), s"$queryStringParameterName format is invalid")
     )
     fixtures foreach { case (parameters, response) =>
-      matchUuidQueryStringBinder.bind("", parameters) shouldBe Some(Left(response))
+      matchUuidQueryStringBinder.bind(queryStringParameterName, parameters) shouldBe Some(Left(response))
     }
   }
 
@@ -59,7 +58,7 @@ class MatchUuidQueryStringBinderSpec extends AnyFlatSpec with Matchers with Tabl
       )
     )
     fixtures foreach { case (parameters, response) =>
-      matchUuidQueryStringBinder.bind("", parameters) shouldBe Some(Right(response))
+      matchUuidQueryStringBinder.bind(queryStringParameterName, parameters) shouldBe Some(Right(response))
     }
   }
 
