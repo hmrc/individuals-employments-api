@@ -16,10 +16,7 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v1
 
-import java.time.LocalDate
-import java.time.LocalDate.parse
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
@@ -29,33 +26,31 @@ import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
 import uk.gov.hmrc.individualsemploymentsapi.domain
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode.{DesPayFrequency, M1}
-import uk.gov.hmrc.individualsemploymentsapi.domain._
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.{CacheService, LiveEmploymentsService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import utils.Intervals
 
+import java.time.LocalDate
+import java.time.LocalDate.parse
 import java.util.UUID
-import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.Future.successful
 
 class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar with BeforeAndAfterEach {
 
-  private val individualsMatchingApiConnector =
-    mock[IndividualsMatchingApiConnector]
-  private val desConnector = mock[DesConnector]
-
-  // can't mock function with by-value argument
-  private val stubCache = new CacheService(null, null)(null) {
-    override def get[T: Format](cacheId: String, functionToCache: => Future[T]): Future[T] =
-      functionToCache
+  trait Fixture {
+    val individualsMatchingApiConnector: IndividualsMatchingApiConnector = mock[IndividualsMatchingApiConnector]
+    val desConnector: DesConnector = mock[DesConnector]
+    // can't mock function with by-value argument
+    private val stubCache = new CacheService(null, null)(null) {
+      override def get[T: Format](cacheId: String, functionToCache: => Future[T]): Future[T] =
+        functionToCache
+    }
+    val liveEmploymentsService = new LiveEmploymentsService(individualsMatchingApiConnector, desConnector, 0, stubCache)
   }
-
-  private val liveEmploymentsService =
-    new LiveEmploymentsService(individualsMatchingApiConnector, desConnector, 0, stubCache)
 
   private val matchId = UUID.randomUUID()
   private val nino = Nino("AB123456C")
@@ -64,33 +59,28 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
 
   implicit val hc: HeaderCarrier = new HeaderCarrier
 
-  @nowarn // silenced warning (type object may indicate a programming error)
-  override def beforeEach(): Unit =
-    Mockito.reset(individualsMatchingApiConnector, desConnector)
-
   "Live Employments Service paye function based on match id" should {
 
-    "return empty list of employments when no employments exists for the given matchId" in {
-      mockIndividualsMatchingApiConnectorToReturn(successful(ninoMatch))
-      mockDesConnectorToReturn(successful(Seq.empty))
+    "return empty list of employments when no employments exists for the given matchId" in new Fixture {
+      when(individualsMatchingApiConnector.resolve(matchId)).thenReturn(successful(ninoMatch))
+      when(desConnector.fetchEmployments(nino, interval)).thenReturn(successful(Seq.empty))
       await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq.empty
     }
 
-    "return list of employments sorted by payment date when employments exists for the given matchId" in {
-      val employmentEndingJanuary =
-        aDesEmployment(leavingDate = Some(parse("2017-01-28")))
-      val employmentEndingMarch =
-        aDesEmployment(leavingDate = Some(parse("2017-03-28")))
-      val employmentWithLastPaymentInFebruary =
+    "return list of employments sorted by payment date when employments exists for the given matchId" in new Fixture {
+      private val employmentEndingJanuary = aDesEmployment(leavingDate = Some(parse("2017-01-28")))
+      private val employmentEndingMarch = aDesEmployment(leavingDate = Some(parse("2017-03-28")))
+      private val employmentWithLastPaymentInFebruary =
         aDesEmployment(
           leavingDate = None,
           payments = Seq(DesPayment(parse("2016-12-28"), 10), DesPayment(parse("2017-02-28"), 10))
         )
 
-      mockIndividualsMatchingApiConnectorToReturn(successful(ninoMatch))
-      mockDesConnectorToReturn(
-        successful(Seq(employmentEndingJanuary, employmentEndingMarch, employmentWithLastPaymentInFebruary))
-      )
+      when(individualsMatchingApiConnector.resolve(matchId)).thenReturn(successful(ninoMatch))
+      when(desConnector.fetchEmployments(nino, interval))
+        .thenReturn(
+          successful(Seq(employmentEndingJanuary, employmentEndingMarch, employmentWithLastPaymentInFebruary))
+        )
 
       await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq(
         Employment.from(employmentEndingMarch).get,
@@ -99,14 +89,13 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
       )
     }
 
-    "return the employments sorted by last payment date when an employment exists with no payments" in {
-      val anEmployment =
-        aDesEmployment(leavingDate = Some(LocalDate.parse("2017-01-01")))
-      val employmentWithNoPayments =
-        aDesEmployment(leavingDate = None, payments = Nil)
+    "return the employments sorted by last payment date when an employment exists with no payments" in new Fixture {
+      private val anEmployment = aDesEmployment(leavingDate = Some(LocalDate.parse("2017-01-01")))
+      private val employmentWithNoPayments = aDesEmployment(leavingDate = None, payments = Nil)
 
-      mockIndividualsMatchingApiConnectorToReturn(Future.successful(ninoMatch))
-      mockDesConnectorToReturn(Future.successful(Seq(anEmployment, employmentWithNoPayments)))
+      when(individualsMatchingApiConnector.resolve(matchId)).thenReturn(Future.successful(ninoMatch))
+      when(desConnector.fetchEmployments(nino, interval))
+        .thenReturn(Future.successful(Seq(anEmployment, employmentWithNoPayments)))
 
       await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq(
         Employment.from(employmentWithNoPayments).get,
@@ -114,10 +103,10 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
       )
     }
 
-    "retry once if the employments lookup returns a 503" in {
-      val someEmployment = aDesEmployment()
+    "retry once if the employments lookup returns a 503" in new Fixture {
+      private val someEmployment = aDesEmployment()
 
-      mockIndividualsMatchingApiConnectorToReturn(Future.successful(ninoMatch))
+      when(individualsMatchingApiConnector.resolve(matchId)).thenReturn(Future.successful(ninoMatch))
 
       when(desConnector.fetchEmployments(nino, interval))
         .thenReturn(Future.failed(UpstreamErrorResponse("""¯\_(ツ)_/¯""", 503, 503)))
@@ -127,14 +116,6 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
       verify(desConnector, times(2)).fetchEmployments(any(), any())(any(), any())
     }
   }
-
-  private def mockIndividualsMatchingApiConnectorToReturn(eventualNinoMatch: Future[NinoMatch]) =
-    when(individualsMatchingApiConnector.resolve(matchId))
-      .thenReturn(eventualNinoMatch)
-
-  private def mockDesConnectorToReturn(eventualDesEmployments: Future[Seq[DesEmployment]]) =
-    when(desConnector.fetchEmployments(nino, interval))
-      .thenReturn(eventualDesEmployments)
 
   private def aDesEmployment(
     employerName: Option[String] = Some("Acme Inc"),
