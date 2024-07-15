@@ -94,7 +94,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       response.code shouldBe BAD_REQUEST
       Json.parse(response.body) shouldBe Json.obj(
         "code"    -> "INVALID_REQUEST",
-        "message" -> "matchId is required"
+        "message" -> "Missing parameter: matchId"
       )
     }
 
@@ -183,7 +183,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
       response.code shouldBe BAD_REQUEST
       Json.parse(response.body) shouldBe Json.obj(
         "code"    -> "INVALID_REQUEST",
-        "message" -> "matchId is required"
+        "message" -> "Missing parameter: matchId"
       )
     }
 

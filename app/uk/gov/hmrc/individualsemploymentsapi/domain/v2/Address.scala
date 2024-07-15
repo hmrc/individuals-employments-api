@@ -18,6 +18,8 @@ package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfAddress
 
+import scala.language.implicitConversions
+
 case class Address(
   line1: Option[String],
   line2: Option[String],

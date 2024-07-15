@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.individualsemploymentsapi
 
-import uk.gov.hmrc.individualsemploymentsapi.util.{IntervalQueryStringBinder, MatchUuidQueryStringBinder, StringQueryStringBinder}
+import play.api.mvc.QueryStringBindable
+import uk.gov.hmrc.individualsemploymentsapi.util.{Interval, IntervalQueryStringBinder, MatchUuidQueryStringBinder}
+
+import java.util.UUID
 
 package object Binders {
-  implicit val matchUuidQueryStringBinder = new MatchUuidQueryStringBinder
-  implicit val intervalQueryStringBinder = new IntervalQueryStringBinder
-  implicit val stringQueryStringBinder = new StringQueryStringBinder
+  implicit val matchUuidQueryStringBinder: QueryStringBindable[UUID] = new MatchUuidQueryStringBinder
+  implicit val intervalQueryStringBinder: QueryStringBindable[Interval] = new IntervalQueryStringBinder
 }

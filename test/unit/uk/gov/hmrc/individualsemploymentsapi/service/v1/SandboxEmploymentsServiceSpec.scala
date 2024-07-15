@@ -26,7 +26,7 @@ import utils.Intervals
 class SandboxEmploymentsServiceSpec extends SpecBase with Intervals {
 
   val sandboxEmploymentsService = new SandboxEmploymentsService
-  implicit val hc = new HeaderCarrier
+  implicit val hc: HeaderCarrier = new HeaderCarrier
 
   "Sandbox employments service paye function" should {
 

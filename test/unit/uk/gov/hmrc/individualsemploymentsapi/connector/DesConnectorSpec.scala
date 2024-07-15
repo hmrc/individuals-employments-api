@@ -52,7 +52,7 @@ class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSuga
     .build()
 
   trait Setup {
-    implicit val hc = HeaderCarrier()
+    implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val underTest = fakeApplication.injector.instanceOf[DesConnector]
   }

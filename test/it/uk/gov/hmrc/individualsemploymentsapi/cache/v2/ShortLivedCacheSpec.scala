@@ -43,7 +43,7 @@ class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
     .build()
 
   val shortLivedCache = fakeApplication.injector.instanceOf[ShortLivedCache]
-  implicit val ec = fakeApplication.injector.instanceOf[ExecutionContext]
+  implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
 
   override def beforeEach(): Unit = {
 
