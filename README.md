@@ -15,7 +15,7 @@ Please ensure you reference the OGD Data Item matrix to ensure the right data it
 
 Unit, integration and component tests can be run with the following:
 
-    sbt test component:test
+    sbt test it:test component:test
 
 ### License
 
