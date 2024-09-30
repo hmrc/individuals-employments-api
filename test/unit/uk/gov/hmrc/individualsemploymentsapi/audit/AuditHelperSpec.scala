@@ -27,7 +27,8 @@ import uk.gov.hmrc.individualsemploymentsapi.audit.v2.models.{ApiFailureResponse
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import utils.{EmploymentsHelper, UnitSpec}
+import unit.uk.gov.hmrc.individualsemploymentsapi.util.UnitSpec
+import utils.EmploymentsHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

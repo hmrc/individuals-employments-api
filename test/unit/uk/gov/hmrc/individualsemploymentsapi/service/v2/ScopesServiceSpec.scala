@@ -19,7 +19,7 @@ package unit.uk.gov.hmrc.individualsemploymentsapi.service.v2
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.ScopesService
 import unit.uk.gov.hmrc.individualsemploymentsapi.service.ScopesConfig
-import utils.UnitSpec
+import unit.uk.gov.hmrc.individualsemploymentsapi.util.UnitSpec
 
 class ScopesServiceSpec extends UnitSpec with Matchers with ScopesConfig {
 
