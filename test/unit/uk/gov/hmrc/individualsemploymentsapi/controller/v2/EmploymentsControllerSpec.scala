@@ -38,8 +38,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.{NinoMatch, PayFrequencyCode
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, ScopesHelper, ScopesService}
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
-import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
-import utils.AuthHelper
+import unit.uk.gov.hmrc.individualsemploymentsapi.util.{AuthHelper, SpecBase}
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
