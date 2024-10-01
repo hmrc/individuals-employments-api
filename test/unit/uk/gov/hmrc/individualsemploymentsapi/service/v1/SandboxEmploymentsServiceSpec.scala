@@ -16,6 +16,7 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service
 
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.sandbox.v1.SandboxData.{Employments, sandboxMatchId}

@@ -27,6 +27,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, InternalServerException, NotFoundException}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
@@ -51,7 +52,6 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
   def externalServices: Seq[String] = Seq.empty
 
   override lazy val fakeApplication = new GuiceApplicationBuilder()
-    .bindings(bindModules: _*)
     .configure(
       "microservice.services.integration-framework.host"                -> "127.0.0.1",
       "microservice.services.integration-framework.port"                -> "11122",

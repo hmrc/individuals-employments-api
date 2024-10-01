@@ -24,6 +24,7 @@ import java.time.LocalDate
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.DesConnector
@@ -42,7 +43,6 @@ class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSuga
   val desEnvironment = "DES_ENVIRONMENT"
 
   override lazy val fakeApplication = new GuiceApplicationBuilder()
-    .bindings(bindModules: _*)
     .configure(
       "microservice.services.des.host"                -> "127.0.0.1",
       "microservice.services.des.port"                -> "11122",
