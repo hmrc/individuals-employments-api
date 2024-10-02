@@ -16,57 +16,7 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.util
 
-import org.apache.pekko.stream.Materializer
-import org.apache.pekko.util.ByteString
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.inject.guice.GuiceableModule
-import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.Result
 
-import java.nio.charset.Charset
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.{Duration, FiniteDuration, _}
-import scala.concurrent.{Await, Future}
-
-trait UnitSpec extends AnyWordSpec with Matchers {
-
-  implicit val defaultTimeout: FiniteDuration = 5.seconds
-
-  def await[A](future: Future[A])(implicit timeout: Duration): A =
-    Await.result(future, timeout)
-
-  def bindModules: Seq[GuiceableModule] = Seq()
-
-  def status(of: Result): Int = of.header.status
-
-  def status(of: Future[Result])(implicit timeout: Duration): Int =
-    status(Await.result(of, timeout))
-
-  def jsonBodyOf(result: Result)(implicit mat: Materializer): JsValue =
-    Json.parse(bodyOf(result))
-
-  def jsonBodyOf(resultF: Future[Result])(implicit mat: Materializer): Future[JsValue] =
-    resultF.map(jsonBodyOf)
-
-  def bodyOf(result: Result)(implicit mat: Materializer): String = {
-    val bodyBytes: ByteString = await(result.body.consumeData)
-    // We use the default charset to preserve the behaviour of a previous
-    // version of this code, which used new String(Array[Byte]).
-    // If the fact that the previous version used the default charset was an
-    // accident then it may be better to decode in UTF-8 or the charset
-    // specified by the result's headers.
-    bodyBytes.decodeString(Charset.defaultCharset().name)
-  }
-
-  def bodyOf(resultF: Future[Result])(implicit mat: Materializer): Future[String] =
-    resultF.map(bodyOf)
-
-  case class ExternalService(
-    serviceName: String,
-    runFrom: String = "SNAPSHOT_JAR",
-    classifier: Option[String] = None,
-    version: Option[String] = None
-  )
-
-}
+trait UnitSpec extends AnyWordSpec with Matchers

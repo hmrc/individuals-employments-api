@@ -16,52 +16,31 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.connector
 
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock._
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import org.scalatest.BeforeAndAfterEach
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.IndividualsMatchingApiConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
+import unit.uk.gov.hmrc.individualsemploymentsapi.util.{ConnectorSupport, UnitSpec, WireMockMethods}
 
 import java.util.UUID
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 
-class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEach {
-
-  val stubPort = sys.env.getOrElse("WIREMOCK", "11121").toInt
-  val stubHost = "localhost"
-  val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
-  implicit val ec: ExecutionContextExecutor = ExecutionContext.global
+class IndividualsMatchingApiConnectorSpec
+    extends UnitSpec with ConnectorSupport with WireMockMethods with BeforeAndAfterEach {
+  override def serviceId: String = "individuals-matching-api"
 
   trait Fixture {
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    val individualsMatchingApiConnector = new IndividualsMatchingApiConnector(
-      fakeApplication.injector.instanceOf[ServicesConfig],
-      fakeApplication.injector.instanceOf[HttpClient]
-    ) {
-      override val serviceUrl = "http://127.0.0.1:11121"
-    }
-  }
-
-  override def beforeEach(): Unit = {
-    wireMockServer.start()
-    configureFor(stubHost, stubPort)
+    protected val individualsMatchingApiConnector: IndividualsMatchingApiConnector =
+      app.injector.instanceOf[IndividualsMatchingApiConnector]
   }
 
   "Matching API connector resolve function should" should {
-
     val matchId = UUID.randomUUID()
 
     def stubWithResponseStatus(responseStatus: Int, body: String = ""): Unit =
-      stubFor(
-        get(urlPathMatching(s"/match-record/$matchId"))
-          .willReturn(aResponse().withStatus(responseStatus).withBody(body))
-      )
+      when(GET, s"/match-record/$matchId").thenReturn(responseStatus, body)
 
     "fail when upstream service fails" in new Fixture {
       stubWithResponseStatus(INTERNAL_SERVER_ERROR)
@@ -82,10 +61,5 @@ class IndividualsMatchingApiConnectorSpec extends SpecBase with BeforeAndAfterEa
       )
       await(individualsMatchingApiConnector.resolve(matchId)) shouldBe domain.NinoMatch(matchId, Nino("AB123456C"))
     }
-
   }
-
-  override def afterEach(): Unit =
-    wireMockServer.stop()
-
 }

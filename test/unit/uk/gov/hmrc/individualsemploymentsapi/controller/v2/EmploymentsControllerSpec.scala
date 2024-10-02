@@ -16,7 +16,6 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
-import java.time.{LocalDate, LocalTime}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo, refEq}
 import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito
@@ -39,12 +38,12 @@ import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundE
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, ScopesHelper, ScopesService}
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
-import utils.AuthHelper
 
+import java.time.{LocalDate, LocalTime}
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
-class EmploymentsControllerSpec extends SpecBase with AuthHelper with MockitoSugar {
+class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
   protected val ifEmploymentExample = IfEmployment(
     employer = Some(

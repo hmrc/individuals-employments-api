@@ -20,6 +20,7 @@ import org.mongodb.scala.model.Filters
 import org.scalatest.BeforeAndAfterEach
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsString, Json, OFormat}
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.individualsemploymentsapi.cache.v1.ShortLivedCache
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
@@ -39,7 +40,6 @@ class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
 
   override lazy val fakeApplication = new GuiceApplicationBuilder()
     .configure("mongodb.uri" -> mongoUri, "cache.ttlInSeconds" -> cacheTtl)
-    .bindings(bindModules: _*)
     .build()
 
   val shortLivedCache = fakeApplication.injector.instanceOf[ShortLivedCache]

@@ -21,7 +21,7 @@ import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MissingQueryParameterException
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{ScopesHelper, ScopesService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.service.ScopesConfig
-import utils.UnitSpec
+import unit.uk.gov.hmrc.individualsemploymentsapi.util.UnitSpec
 
 class ScopesHelperSpec extends UnitSpec with ScopesConfig with BeforeAndAfterEach with Matchers {
 

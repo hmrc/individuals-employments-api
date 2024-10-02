@@ -16,56 +16,28 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.connector
 
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock._
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
-
-import java.time.LocalDate
-import org.scalatest.BeforeAndAfterEach
-import org.scalatestplus.mockito.MockitoSugar
-import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, UpstreamErrorResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.DesConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
-import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
+import unit.uk.gov.hmrc.individualsemploymentsapi.util.{ConnectorSupport, UnitSpec, WireMockMethods}
 import utils.Intervals
 
+import java.time.LocalDate
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSugar with Intervals {
-  val stubPort = sys.env.getOrElse("WIREMOCK", "11122").toInt
-  val stubHost = "localhost"
-  val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
-  val desAuthorizationToken = "DES_TOKEN"
-  val desEnvironment = "DES_ENVIRONMENT"
-
-  override lazy val fakeApplication = new GuiceApplicationBuilder()
-    .bindings(bindModules: _*)
-    .configure(
-      "microservice.services.des.host"                -> "127.0.0.1",
-      "microservice.services.des.port"                -> "11122",
-      "microservice.services.des.authorization-token" -> desAuthorizationToken,
-      "microservice.services.des.environment"         -> desEnvironment
-    )
-    .build()
+class DesConnectorSpec extends UnitSpec with ConnectorSupport with WireMockMethods with Intervals {
+  override def serviceId: String = "des"
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    val underTest = fakeApplication.injector.instanceOf[DesConnector]
+    protected val underTest: DesConnector = app.injector.instanceOf[DesConnector]
   }
 
-  override def beforeEach(): Unit = {
-    wireMockServer.start()
-    configureFor(stubHost, stubPort)
-  }
-
-  override def afterEach(): Unit =
-    wireMockServer.stop()
-
-  val desAddress = DesAddress(
+  private val desAddress = DesAddress(
     line1 = Some("Acme House"),
     line2 = Some("23 Acme Street"),
     line3 = Some("Richmond"),
@@ -73,7 +45,8 @@ class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSuga
     line5 = Some("UK"),
     postalCode = Some("AI22 9LL")
   )
-  val desPayments = Seq(
+
+  private val desPayments = Seq(
     DesPayment(
       paymentDate = LocalDate.parse("2016-11-28"),
       totalPayInPeriod = 100,
@@ -87,7 +60,8 @@ class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSuga
       monthPayNumber = None
     )
   )
-  val desEmployment = DesEmployment(
+
+  private val desEmployment = DesEmployment(
     employerName = Some("Acme Inc"),
     employerAddress = Some(desAddress),
     employerDistrictNumber = Some("123"),
@@ -105,17 +79,7 @@ class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSuga
     val interval = toInterval(fromDate, toDate)
 
     "return the employments" in new Setup {
-      stubFor(
-        get(urlPathMatching(s"/individuals/nino/$nino/employments/income"))
-          .withQueryParam("from", equalTo(fromDate))
-          .withQueryParam("to", equalTo(toDate))
-          .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $desAuthorizationToken"))
-          .withHeader("Environment", equalTo(desEnvironment))
-          .willReturn(
-            aResponse()
-              .withStatus(200)
-              .withBody(
-                """
+      val responseBody = """
              {
                "employments": [
                  {
@@ -149,38 +113,32 @@ class DesConnectorSpec extends SpecBase with BeforeAndAfterEach with MockitoSuga
                ]
              }
           """
-              )
-          )
-      )
+      when(GET, s"/individuals/nino/$nino/employments/income", queryParams = Map("from" -> fromDate, "to" -> toDate))
+        .thenReturn(200, responseBody)
 
-      val result = await(underTest.fetchEmployments(nino, interval))
+      private val result = await(underTest.fetchEmployments(nino, interval))
 
       result shouldBe Seq(desEmployment)
     }
 
     "return an empty list when there is no employments" in new Setup {
-      stubFor(
-        get(urlPathMatching(s"/individuals/nino/$nino/employments/income"))
-          .withQueryParam("from", equalTo("2016-01-01"))
-          .withQueryParam("to", equalTo("2017-03-01"))
-          .willReturn(aResponse().withStatus(404))
-      )
+      when(
+        GET,
+        s"/individuals/nino/$nino/employments/income",
+        queryParams = Map("from" -> "2016-01-01", "to" -> "2017-03-01")
+      ).thenReturn(404)
 
-      val result = await(underTest.fetchEmployments(nino, interval))
+      private val result = await(underTest.fetchEmployments(nino, interval))
 
       result shouldBe Seq.empty
     }
 
     "fail when DES returns an error" in new Setup {
-      stubFor(
-        get(urlPathMatching(s"/individuals/nino/$nino/employments/income"))
-          .willReturn(aResponse().withStatus(500))
-      )
+      when(GET, s"/individuals/nino/$nino/employments/income").thenReturn(500)
 
       intercept[UpstreamErrorResponse] {
         await(underTest.fetchEmployments(nino, interval))
       }
     }
-
   }
 }
