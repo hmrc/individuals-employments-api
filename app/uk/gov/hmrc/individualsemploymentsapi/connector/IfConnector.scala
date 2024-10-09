@@ -16,24 +16,25 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.connector
 
-import java.time.LocalDate
 import play.api.Logger
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http.UpstreamErrorResponse.Upstream5xxResponse
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HeaderNames, HttpClient, InternalServerException, JsValidationException, NotFoundException, TooManyRequestException, UpstreamErrorResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, HeaderNames, InternalServerException, JsValidationException, NotFoundException, StringContextOps, TooManyRequestException, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfEmployment, IfEmployments}
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try}
 
-class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, val auditHelper: AuditHelper) {
+class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClientV2, val auditHelper: AuditHelper) {
 
   val logger: Logger = Logger(getClass)
 
@@ -80,11 +81,11 @@ class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, v
     ec: ExecutionContext
   ) =
     recover[IfEmployment](
-      http.GET[IfEmployments](url, Seq(), setHeaders(request)) map { response =>
-        auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, response)
-
-        response.employments
-      },
+      http.get(url"$url").transform(_.addHttpHeaders(setHeaders(request): _*)).execute[IfEmployments]
+        map { response =>
+          auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, response)
+          response.employments
+        },
       extractCorrelationId(request),
       matchId,
       request,

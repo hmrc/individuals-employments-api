@@ -20,6 +20,7 @@ import play.api.Logger
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments}
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
@@ -29,19 +30,13 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class DesConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient) {
+class DesConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClientV2) {
 
   val logger: Logger = Logger(getClass)
 
   private val serviceUrl = servicesConfig.baseUrl("des")
   private val desBearerToken = servicesConfig.getString("microservice.services.des.authorization-token")
   private val desEnvironment = servicesConfig.getString("microservice.services.des.environment")
-
-  private def headers = Seq(
-    HeaderNames.authorisation -> s"Bearer $desBearerToken",
-    "Environment"             -> desEnvironment,
-    "Source"                  -> "MDTP"
-  )
 
   def fetchEmployments(nino: Nino, interval: Interval)(implicit
     hc: HeaderCarrier,
@@ -52,11 +47,18 @@ class DesConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient) 
     val toDate = interval.getEnd.toLocalDate
     val employmentsUrl = s"$serviceUrl/individuals/nino/$nino/employments/income?from=$fromDate&to=$toDate"
 
-    http.GET[DesEmployments](employmentsUrl, Seq(), headers).map(_.employments).recoverWith {
-      case UpstreamErrorResponse(_, 404, _, _) => Future.successful(Seq.empty)
-      case UpstreamErrorResponse(msg, 429, _, _) =>
-        logger.warn(s"DES Rate limited: $msg")
-        Future.failed(new TooManyRequestException(msg))
-    }
+    http
+      .get(url"$employmentsUrl")
+      .setHeader(HeaderNames.authorisation -> s"Bearer $desBearerToken")
+      .setHeader("Environment" -> desEnvironment)
+      .setHeader("Source" -> "MDTP")
+      .execute[DesEmployments]
+      .map(_.employments)
+      .recoverWith {
+        case UpstreamErrorResponse(_, 404, _, _) => Future.successful(Seq.empty)
+        case UpstreamErrorResponse(msg, 429, _, _) =>
+          logger.warn(s"DES Rate limited: $msg")
+          Future.failed(new TooManyRequestException(msg))
+      }
   }
 }
