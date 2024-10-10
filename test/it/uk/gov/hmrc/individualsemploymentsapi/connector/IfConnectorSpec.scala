@@ -29,7 +29,8 @@ import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, InternalServerException, NotFoundException}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, InternalServerException, NotFoundException}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.connector.IfConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployments
@@ -70,7 +71,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val config = fakeApplication.injector.instanceOf[ServicesConfig]
-    val httpClient = fakeApplication.injector.instanceOf[HttpClient]
+    val httpClient = fakeApplication.injector.instanceOf[HttpClientV2]
     val auditHelper = mock[AuditHelper]
     val underTest = new IfConnector(config, httpClient, auditHelper)
 
