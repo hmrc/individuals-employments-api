@@ -37,6 +37,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.{NinoMatch, PayFrequencyCode
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, ScopesHelper, ScopesService}
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import java.time.{LocalDate, LocalTime}
@@ -99,6 +100,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val auditHelper: AuditHelper = mock[AuditHelper]
+    val config = fakeApplication.injector.instanceOf[ServicesConfig]
 
     val employmentsController = new EmploymentsController(
       mockEmploymentsService,
@@ -106,7 +108,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       scopesHelper,
       mockAuthConnector,
       auditHelper,
-      controllerComponent
+      controllerComponent,
+      config
     )
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -318,9 +321,9 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(any())
     }
 
-    "fail with 400 if fromDate is before 1800" in new Setup {
+    "fail with 400 if fromDate is before 2013" in new Setup {
       val interval: Interval =
-        Interval(LocalDate.parse("1799-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
+        Interval(LocalDate.parse("2012-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
       val result: Future[Result] = employmentsController.paye(sampleMatchId.toString, interval, None)(
         FakeRequest().withHeaders(validCorrelationHeader)
       )

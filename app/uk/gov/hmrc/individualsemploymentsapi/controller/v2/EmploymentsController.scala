@@ -26,6 +26,7 @@ import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.service.v2.{EmploymentsService, ScopesHelper, ScopesService}
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import uk.gov.hmrc.individualsemploymentsapi.util.RequestHeaderUtils.{maybeCorrelationId, validateCorrelationId}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.time.LocalDate
 import javax.inject.{Inject, Singleton}
@@ -38,7 +39,8 @@ class EmploymentsController @Inject() (
   scopesHelper: ScopesHelper,
   val authConnector: AuthConnector,
   implicit val auditHelper: AuditHelper,
-  cc: ControllerComponents
+  cc: ControllerComponents,
+  config: ServicesConfig
 )(implicit val ec: ExecutionContext)
     extends CommonController(cc) with PrivilegedAuthentication {
 
@@ -73,7 +75,8 @@ class EmploymentsController @Inject() (
       authenticate(scopeService.getEndPointScopes("paye"), matchId.toString) { authScopes =>
         withValidUuid(matchId, "matchId") { matchIdUuid =>
           val correlationId = validateCorrelationId(request)
-          val cutoff = 1800 // To be confirmed by the business - DLS-9957 failed release
+          val cutoff =
+            config.getInt("validation.cutoffYear")
           if (interval.getStart isBefore LocalDate.of(cutoff, 1, 1).atStartOfDay()) {
             Future.successful(BadRequest(s"Cannot query dates before $cutoff"))
           } else {
