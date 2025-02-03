@@ -35,7 +35,7 @@ import uk.gov.hmrc.individualsemploymentsapi.sandbox.v1.SandboxData.{Employments
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.{LiveEmploymentsService, SandboxEmploymentsService}
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
-
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import java.time.LocalDate
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
@@ -50,16 +50,23 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     val mockLiveEmploymentsService = mock[LiveEmploymentsService]
     val mockAuthConnector = mock[AuthConnector]
     val hmctsClientId = "hmctsClientId"
+    val config = fakeApplication.injector.instanceOf[ServicesConfig]
     implicit val ec: ExecutionContextExecutor = ExecutionContext.global
-
     val sandboxEmploymentsController = new SandboxEmploymentsController(
       mockSandboxEmploymentsService,
       mockAuthConnector,
       hmctsClientId,
-      controllerComponent
+      controllerComponent,
+      config
     )
     val liveEmploymentsController =
-      new LiveEmploymentsController(mockLiveEmploymentsService, mockAuthConnector, hmctsClientId, controllerComponent)
+      new LiveEmploymentsController(
+        mockLiveEmploymentsService,
+        mockAuthConnector,
+        hmctsClientId,
+        controllerComponent,
+        config
+      )
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -268,10 +275,10 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       )
     }
 
-    "fail with 400 if fromDate is before 1800" in new Setup {
+    "fail with 400 if fromDate is before 2013" in new Setup {
       val matchId: UUID = UUID.randomUUID()
       val interval: Interval =
-        Interval(LocalDate.parse("1799-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
+        Interval(LocalDate.parse("2012-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
       val res: Future[Result] = liveEmploymentsController.paye(matchId, interval)(FakeRequest())
       status(res) shouldBe BAD_REQUEST
     }

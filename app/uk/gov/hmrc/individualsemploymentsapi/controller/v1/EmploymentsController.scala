@@ -27,13 +27,18 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService}
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.time.LocalDate
 import java.util.UUID
 import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class EmploymentsController(employmentsService: EmploymentsService, cc: ControllerComponents)(implicit
+abstract class EmploymentsController(
+  employmentsService: EmploymentsService,
+  cc: ControllerComponents,
+  config: ServicesConfig
+)(implicit
   ec: ExecutionContext
 ) extends CommonController(cc) with PrivilegedAuthentication {
 
@@ -54,7 +59,10 @@ abstract class EmploymentsController(employmentsService: EmploymentsService, cc:
   }
 
   def paye(matchId: UUID, interval: Interval): Action[AnyContent] = Action.async { implicit request =>
-    val cutoff = 1800 // To be confirmed by the business - DLS-9957 failed release
+    val cutoff =
+      config.getInt(
+        "validation.cutoffYear"
+      )
     requiresPrivilegedAuthentication("read:individuals-employments-paye") {
       if (interval.getStart isBefore LocalDate.parse(s"$cutoff-01-01").atStartOfDay()) {
         Future.successful(BadRequest(s"Cannot query dates before $cutoff"))
@@ -89,9 +97,10 @@ class SandboxEmploymentsController @Inject() (
   sandboxEmploymentsService: SandboxEmploymentsService,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
-  cc: ControllerComponents
+  cc: ControllerComponents,
+  config: ServicesConfig
 )(implicit ec: ExecutionContext)
-    extends EmploymentsController(sandboxEmploymentsService, cc) {
+    extends EmploymentsController(sandboxEmploymentsService, cc, config) {
 
   override val environment: String = SANDBOX
 }
@@ -101,9 +110,10 @@ class LiveEmploymentsController @Inject() (
   liveEmploymentsService: LiveEmploymentsService,
   val authConnector: AuthConnector,
   @Named("hmctsClientId") val hmctsClientId: String,
-  cc: ControllerComponents
+  cc: ControllerComponents,
+  config: ServicesConfig
 )(implicit ec: ExecutionContext)
-    extends EmploymentsController(liveEmploymentsService, cc) {
+    extends EmploymentsController(liveEmploymentsService, cc, config) {
 
   override val environment: String = PRODUCTION
 }
