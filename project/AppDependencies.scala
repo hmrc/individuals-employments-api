@@ -12,7 +12,7 @@ object AppDependencies {
     hmrc      %% s"bootstrap-backend-$playVersion" % bootstrapVersion,
     hmrc      %% s"domain-$playVersion"            % "11.0.0",
     hmrc      %% s"play-hal-$playVersion"          % "4.0.0",
-    hmrc      %% s"crypto-json-$playVersion"       % "7.6.0",
+    hmrc      %% s"crypto-json-$playVersion"       % "8.2.0",
     hmrcMongo %% s"hmrc-mongo-$playVersion"        % mongoVersion
   )
 
