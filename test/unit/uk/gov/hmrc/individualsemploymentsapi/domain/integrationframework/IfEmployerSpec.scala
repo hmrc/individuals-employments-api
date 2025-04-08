@@ -22,7 +22,7 @@ import unit.uk.gov.hmrc.individualsemploymentsapi.util.UnitSpec
 
 class IfEmployerSpec extends UnitSpec {
 
-  val address = IfAddress(
+  val address: IfAddress = IfAddress(
     Some("line1"),
     Some("line2"),
     Some("line3"),
@@ -31,7 +31,7 @@ class IfEmployerSpec extends UnitSpec {
     Some("postcode")
   )
 
-  val employer = IfEmployer(
+  val employer: IfEmployer = IfEmployer(
     name = Some("Name"),
     address = Some(address)
   )

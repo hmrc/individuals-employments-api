@@ -34,13 +34,13 @@ import scala.concurrent.Future
 
 class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
-  val cacheId = UUID.randomUUID().toString
-  val cachedValue = TestClass("cached value")
-  val newValue = TestClass("new value")
+  val cacheId: String = UUID.randomUUID().toString
+  val cachedValue: TestClass = TestClass("cached value")
+  val newValue: TestClass = TestClass("new value")
 
   trait Setup {
-    val mockClient = mock[ShortLivedCache]
-    val mockCacheConfig = mock[CacheRepositoryConfiguration]
+    val mockClient: ShortLivedCache = mock[ShortLivedCache]
+    val mockCacheConfig: CacheRepositoryConfiguration = mock[CacheRepositoryConfiguration]
     val cacheService = new CacheService(mockClient, mockCacheConfig)
 
     implicit val hc: HeaderCarrier = HeaderCarrier()

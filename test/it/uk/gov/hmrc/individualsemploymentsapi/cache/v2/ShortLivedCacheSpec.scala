@@ -27,22 +27,23 @@ import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext
+import play.api.Application
 
 class ShortLivedCacheSpec extends SpecBase with BeforeAndAfterEach {
 
   val cacheTtl = 60
-  val id = UUID.randomUUID().toString
+  val id: String = UUID.randomUUID().toString
   val cachekey = "test-class-key-v2"
-  val testValue = TestClass("one", "two")
+  val testValue: TestClass = TestClass("one", "two")
 
   protected def databaseName: String = "test-" + this.getClass.getSimpleName
   protected def mongoUri: String = s"mongodb://localhost:27017/$databaseName"
 
-  override lazy val fakeApplication = new GuiceApplicationBuilder()
+  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
     .configure("mongodb.uri" -> mongoUri, "cache.ttlInSeconds" -> cacheTtl)
     .build()
 
-  val shortLivedCache = fakeApplication.injector.instanceOf[ShortLivedCache]
+  val shortLivedCache: ShortLivedCache = fakeApplication.injector.instanceOf[ShortLivedCache]
   implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
 
   override def beforeEach(): Unit = {

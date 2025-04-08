@@ -42,15 +42,15 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 
 class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
-  val controllerComponent =
+  val controllerComponent: ControllerComponents =
     fakeApplication.injector.instanceOf[ControllerComponents]
 
   trait Setup {
-    val mockSandboxEmploymentsService = mock[SandboxEmploymentsService]
-    val mockLiveEmploymentsService = mock[LiveEmploymentsService]
-    val mockAuthConnector = mock[AuthConnector]
+    val mockSandboxEmploymentsService: SandboxEmploymentsService = mock[SandboxEmploymentsService]
+    val mockLiveEmploymentsService: LiveEmploymentsService = mock[LiveEmploymentsService]
+    val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val hmctsClientId = "hmctsClientId"
-    val config = fakeApplication.injector.instanceOf[ServicesConfig]
+    val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
     implicit val ec: ExecutionContextExecutor = ExecutionContext.global
     val sandboxEmploymentsController = new SandboxEmploymentsController(
       mockSandboxEmploymentsService,

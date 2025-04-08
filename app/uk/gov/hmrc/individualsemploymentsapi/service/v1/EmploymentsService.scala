@@ -77,7 +77,7 @@ class LiveEmploymentsService @Inject() (
 )(implicit ec: ExecutionContext)
     extends EmploymentsService {
 
-  private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { e: DesEmployment =>
+  private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { (e: DesEmployment) =>
     e.employmentLeavingDate.getOrElse(interval.getEnd.toLocalDate)
   }
 

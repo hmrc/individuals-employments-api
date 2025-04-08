@@ -23,7 +23,7 @@ import play.api.{Application, Configuration}
 
 trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
 
-  lazy val additionalConfig = Configuration()
+  lazy val additionalConfig: Configuration = Configuration()
 
   def buildFakeApplication(extraConfig: Configuration): Application =
     new GuiceApplicationBuilder()

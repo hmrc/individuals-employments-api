@@ -38,13 +38,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
-  val cacheId = TestCacheId("foo")
-  val cachedValue = TestClass("cached value")
-  val newValue = TestClass("new value")
+  val cacheId: TestCacheId = TestCacheId("foo")
+  val cachedValue: TestClass = TestClass("cached value")
+  val newValue: TestClass = TestClass("new value")
 
   trait Setup {
-    val mockClient = mock[ShortLivedCache]
-    val mockCacheConfig = mock[CacheRepositoryConfiguration]
+    val mockClient: ShortLivedCache = mock[ShortLivedCache]
+    val mockCacheConfig: CacheRepositoryConfiguration = mock[CacheRepositoryConfiguration]
     implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
     implicit val hc: HeaderCarrier = HeaderCarrier()
     lazy val cacheService = new CacheService(mockClient, mockCacheConfig)

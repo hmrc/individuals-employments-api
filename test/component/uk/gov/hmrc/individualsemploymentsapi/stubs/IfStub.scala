@@ -24,7 +24,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmplo
 
 object IfStub extends MockHost(22004) {
 
-  val fieldsAndFilters = List[(String, Option[String])](
+  val fieldsAndFilters: List[(String, Option[String])] = List[(String, Option[String])](
     ("employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employment(startDate))", None),
     (
       "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,startDate),payments(date,paidTaxablePay))",
@@ -41,7 +41,7 @@ object IfStub extends MockHost(22004) {
     fromDate: String,
     toDate: String,
     ifEmployments: IfEmployments
-  ) =
+  ): Unit =
     fieldsAndFilters.foreach { fieldFilter =>
       mock.register(
         get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))
@@ -59,7 +59,7 @@ object IfStub extends MockHost(22004) {
       )
     }
 
-  def saCustomResponse(nino: String, status: Int, fromDate: String, toDate: String, response: JsValue) =
+  def saCustomResponse(nino: String, status: Int, fromDate: String, toDate: String, response: JsValue): Unit =
     fieldsAndFilters.foreach { fieldFilter =>
       mock.register(
         get(urlPathEqualTo(s"/individuals/employment/nino/$nino"))

@@ -31,6 +31,7 @@ import unit.uk.gov.hmrc.individualsemploymentsapi.util.UnitSpec
 import utils.EmploymentsHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import play.api.mvc.AnyContentAsEmpty
 
 class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper {
 
@@ -41,14 +42,14 @@ class AuditHelperSpec extends UnitSpec with MockitoSugar with EmploymentsHelper 
   val scopes = "test"
   val matchId = "80a6bb14-d888-436e-a541-4000674c60aa"
   val applicationId = "80a6bb14-d888-436e-a541-4000674c60bb"
-  val request = FakeRequest().withHeaders("X-Application-Id" -> applicationId)
-  val ifApiResponse = IfEmployments(List(createValidEmployment()))
-  val apiResponse = Seq(Employment.create(ifApiResponse.employments.head).get)
-  val ifUrl =
+  val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders("X-Application-Id" -> applicationId)
+  val ifApiResponse: IfEmployments = IfEmployments(List(createValidEmployment()))
+  val apiResponse: Seq[Employment] = Seq(Employment.create(ifApiResponse.employments.head).get)
+  val ifUrl: String =
     s"host/individuals/employments/paye/nino/$nino?startDate=2019-01-01&endDate=2020-01-01&fields=some(vals(val1),val2)"
   val endpoint = "/test"
 
-  val auditConnector = mock[AuditConnector]
+  val auditConnector: AuditConnector = mock[AuditConnector]
 
   val auditHelper = new AuditHelper(auditConnector)
 

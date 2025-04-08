@@ -22,6 +22,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployments
 import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
+import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
 object DesStub extends MockHost(22003) {
 
@@ -30,7 +31,7 @@ object DesStub extends MockHost(22003) {
     fromDate: String,
     toDate: String,
     desEmployments: DesEmployments
-  ) =
+  ): StubMapping =
     mock.register(
       get(urlPathEqualTo(s"/individuals/nino/$nino/employments/income"))
         .withQueryParam("from", equalTo(fromDate))

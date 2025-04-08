@@ -23,5 +23,5 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 case class MockHost(port: Int) {
   val server = new WireMockServer(WireMockConfiguration.wireMockConfig().port(port))
   val mock = new WireMock("localhost", port)
-  val url = s"http://localhost:$port"
+  val url: String = s"http://localhost:$port"
 }

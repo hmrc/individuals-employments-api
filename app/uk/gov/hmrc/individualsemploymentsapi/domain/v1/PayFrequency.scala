@@ -34,6 +34,6 @@ object PayFrequency extends Enumeration {
     MA -> ANNUALLY
   )
 
-  def from(desValue: DesPayFrequency) = conversionMap.get(desValue)
+  def from(desValue: DesPayFrequency): Option[Value] = conversionMap.get(desValue)
 
 }

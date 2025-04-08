@@ -30,6 +30,7 @@ import uk.gov.hmrc.play.http.logging.Mdc.preservingMdc
 import java.time.{LocalDateTime, ZoneOffset}
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
+import org.mongodb.scala.result.UpdateResult
 
 abstract class CacheRepository(
   val cacheConfig: CacheRepositoryConfiguration,
@@ -52,7 +53,7 @@ abstract class CacheRepository(
 
   implicit lazy val crypto: Encrypter with Decrypter = new ApplicationCrypto(configuration.underlying).JsonCrypto
 
-  def cache[T](id: String, value: T)(implicit formats: Format[T]) = {
+  def cache[T](id: String, value: T)(implicit formats: Format[T]): Future[UpdateResult] = {
 
     val jsonEncryptor = JsonEncryption.sensitiveEncrypter[T, SensitiveT[T]]
     val encryptedValue: JsValue = jsonEncryptor.writes(SensitiveT(value))

@@ -29,10 +29,10 @@ object RequestHeaderUtils {
 
   private val uriRegex = "(/[a-zA-Z0-9-_]*)/?.*$".r
 
-  def extractUriContext(requestHeader: RequestHeader) =
+  def extractUriContext(requestHeader: RequestHeader): String =
     (uriRegex.findFirstMatchIn(requestHeader.uri) map (_.group(1))).get
 
-  def validateCorrelationId(requestHeader: RequestHeader) =
+  def validateCorrelationId(requestHeader: RequestHeader): UUID =
     requestHeader.headers.get("CorrelationId") match {
       case Some(uuidString) =>
         Try(UUID.fromString(uuidString)) match {
@@ -52,7 +52,7 @@ object RequestHeaderUtils {
       case _ => None
     }
 
-  def getVersionedRequest(originalRequest: RequestHeader) = {
+  def getVersionedRequest(originalRequest: RequestHeader): RequestHeader = {
     val version = getVersion(originalRequest)
     originalRequest.withTarget(
       originalRequest.target
@@ -61,7 +61,7 @@ object RequestHeaderUtils {
     )
   }
 
-  def getVersion(originalRequest: RequestHeader) =
+  def getVersion(originalRequest: RequestHeader): String =
     originalRequest.headers.get(ACCEPT) flatMap { acceptHeaderValue =>
       acceptHeaderRegex.findFirstMatchIn(acceptHeaderValue) map (_.group(1))
     } getOrElse "1.0"
