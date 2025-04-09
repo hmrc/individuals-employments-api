@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json.Reads._
-import play.api.libs.json.{Format, JsPath}
+import play.api.libs.json.{Format, Json}
 
 case class IfEmployment(
   employer: Option[IfEmployer],
@@ -28,18 +26,5 @@ case class IfEmployment(
 )
 
 object IfEmployment {
-  implicit val employmentFormat: Format[IfEmployment] = Format(
-    (
-      (JsPath \ "employer").readNullable[IfEmployer] and
-        (JsPath \ "employment").readNullable[IfEmploymentDetail] and
-        (JsPath \ "payments").readNullable[Seq[IfPayment]] and
-        (JsPath \ "employerRef").readNullable[String]
-    )(IfEmployment.apply _),
-    (
-      (JsPath \ "employer").writeNullable[IfEmployer] and
-        (JsPath \ "employment").writeNullable[IfEmploymentDetail] and
-        (JsPath \ "payments").writeNullable[Seq[IfPayment]] and
-        (JsPath \ "employerRef").writeNullable[String]
-    )(unlift(IfEmployment.unapply))
-  )
+  implicit val employmentFormat: Format[IfEmployment] = Json.format
 }

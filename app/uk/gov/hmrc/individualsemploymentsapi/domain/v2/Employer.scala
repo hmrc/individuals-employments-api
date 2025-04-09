@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json.{Format, JsPath, Json, OFormat}
+import play.api.libs.json.{Format, Json, OFormat}
 import uk.gov.hmrc.domain.EmpRef
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployment
 
@@ -27,18 +26,7 @@ object Employer {
 
   implicit val addressJsonFormat: OFormat[Address] = Json.format[Address]
 
-  implicit val format: Format[Employer] = Format(
-    (
-      (JsPath \ "payeReference").readNullable[EmpRef] and
-        (JsPath \ "name").readNullable[String] and
-        (JsPath \ "address").readNullable[Address]
-    )(Employer.apply _),
-    (
-      (JsPath \ "payeReference").writeNullable[EmpRef] and
-        (JsPath \ "name").writeNullable[String] and
-        (JsPath \ "address").writeNullable[Address]
-    )(unlift(Employer.unapply))
-  )
+  implicit val format: Format[Employer] = Json.format
 
   def create(payeReference: Option[EmpRef], name: Option[String], address: Option[Address]): Option[Employer] =
     (payeReference, name, address) match {

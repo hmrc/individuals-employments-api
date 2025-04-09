@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.audit.v2.models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
 
 case class ApiResponseEventModel(
@@ -34,5 +34,5 @@ case class ApiResponseEventModel(
 )
 
 object ApiResponseEventModel {
-  implicit val formatApiResponseEventModel: Format[ApiResponseEventModel] = Json.format[ApiResponseEventModel]
+  implicit val writes: Writes[ApiResponseEventModel] = Json.writes
 }

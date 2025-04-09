@@ -18,7 +18,7 @@ package uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
-import play.api.libs.json.{Format, JsPath, Reads}
+import play.api.libs.json.{Format, JsPath, Json, Reads}
 
 import scala.util.matching.Regex
 
@@ -60,13 +60,6 @@ object IfPayment {
         (JsPath \ "week").readNullable[Int](min(1) keepAnd max(56)) and
         (JsPath \ "month").readNullable[Int](min(1) keepAnd max(12))
     )(IfPayment.apply _),
-    (
-      (JsPath \ "date").writeNullable[String] and
-        (JsPath \ "ytdTaxablePay").writeNullable[Double] and
-        (JsPath \ "paidTaxablePay").writeNullable[Double] and
-        (JsPath \ "paidNonTaxOrNICPayment").writeNullable[Double] and
-        (JsPath \ "week").writeNullable[Int] and
-        (JsPath \ "month").writeNullable[Int]
-    )(unlift(IfPayment.unapply))
+    Json.writes[IfPayment]
   )
 }

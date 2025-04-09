@@ -18,7 +18,7 @@ package uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads.{maxLength, minLength}
-import play.api.libs.json.{Format, JsPath}
+import play.api.libs.json.{Format, JsPath, Json}
 
 case class IfEmployer(name: Option[String], address: Option[IfAddress])
 
@@ -28,9 +28,6 @@ object IfEmployer {
       (JsPath \ "name").readNullable[String](minLength[String](0) keepAnd maxLength[String](100)) and
         (JsPath \ "address").readNullable[IfAddress]
     )(IfEmployer.apply _),
-    (
-      (JsPath \ "name").writeNullable[String] and
-        (JsPath \ "address").writeNullable[IfAddress]
-    )(unlift(IfEmployer.unapply))
+    Json.writes[IfEmployer]
   )
 }

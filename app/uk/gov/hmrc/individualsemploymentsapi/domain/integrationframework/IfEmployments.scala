@@ -16,14 +16,10 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework
 
-import play.api.libs.json.Reads._
 import play.api.libs.json._
 
 case class IfEmployments(employments: Seq[IfEmployment])
 
 object IfEmployments {
-  implicit val createEmploymentsFormat: Format[IfEmployments] = Format(
-    (JsPath \ "employments").read[Seq[IfEmployment]].map(x => IfEmployments(x)),
-    (JsPath \ "employments").write[Seq[IfEmployment]].contramap(x => x.employments)
-  )
+  implicit val format: Format[IfEmployments] = Json.format
 }

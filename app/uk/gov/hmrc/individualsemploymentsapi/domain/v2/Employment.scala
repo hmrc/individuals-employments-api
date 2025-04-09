@@ -49,7 +49,7 @@ object Employment {
         (JsPath \ "payFrequency").writeNullable[PayFrequency] and
         (JsPath \ "employer").writeNullable[Employer] and
         (JsPath \ "payment").writeNullable[Seq[Payment]]
-    )(unlift(Employment.unapply))
+    )(l => (l.startDate, l.endDate, l.payFrequency, l.employer, l.payments))
   )
 
   def create(
