@@ -114,7 +114,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    given(mockAuthConnector.authorise(eqTo(Enrolment("test-scope")), refEq(Retrievals.allEnrolments))(any(), any()))
+    `given`(mockAuthConnector.authorise(eqTo(Enrolment("test-scope")), refEq(Retrievals.allEnrolments))(any(), any()))
       .willReturn(Future.successful(Enrolments(Set(Enrolment("test-scope")))))
   }
 

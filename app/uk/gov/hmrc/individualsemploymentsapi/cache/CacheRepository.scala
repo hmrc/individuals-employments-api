@@ -46,7 +46,10 @@ abstract class CacheRepository(
         IndexModel(ascending("id"), IndexOptions().name("_id").unique(true).background(false).sparse(true)),
         IndexModel(
           ascending("modifiedDetails.lastUpdated"),
-          IndexOptions().name("lastUpdatedIndex").background(false).expireAfter(cacheConfig.cacheTtl, TimeUnit.SECONDS)
+          IndexOptions()
+            .name("lastUpdatedIndex")
+            .background(false)
+            .expireAfter(scala.Predef.long2Long(cacheConfig.cacheTtl), TimeUnit.SECONDS)
         )
       )
     ) {

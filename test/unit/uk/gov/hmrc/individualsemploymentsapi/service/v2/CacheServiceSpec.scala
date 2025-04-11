@@ -21,7 +21,7 @@ import com.google.common.io.BaseEncoding
 
 import java.time.{LocalDate, LocalTime}
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
@@ -49,14 +49,14 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
     implicit val hc: HeaderCarrier = HeaderCarrier()
     lazy val cacheService = new CacheService(mockClient, mockCacheConfig)
 
-    given(mockCacheConfig.cacheEnabled).willReturn(true)
+    `given`(mockCacheConfig.cacheEnabled).willReturn(true)
   }
 
   "cacheService.get" should {
 
     "return the cached value for a given id and key" in new Setup {
 
-      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId.id))(any()))
+      `given`(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId.id))(any()))
         .willReturn(Future.successful(Some(cachedValue)))
 
       await(cacheService.get[TestClass](cacheId, Future.successful(newValue))) shouldBe cachedValue
@@ -65,7 +65,7 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
     "cache the result of the fallback function when no cached value exists for a given id and key" in new Setup {
 
-      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId.id))(any()))
+      `given`(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId.id))(any()))
         .willReturn(Future.successful(None))
 
       await(cacheService.get[TestClass](cacheId, Future.successful(newValue))) shouldBe newValue
@@ -75,7 +75,7 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
     "ignore the cache when caching is not enabled" in new Setup {
 
-      given(mockCacheConfig.cacheEnabled).willReturn(false)
+      `given`(mockCacheConfig.cacheEnabled).willReturn(false)
 
       await(cacheService.get[TestClass](cacheId, Future.successful(newValue))) shouldBe newValue
       verifyNoMoreInteractions(mockClient)
