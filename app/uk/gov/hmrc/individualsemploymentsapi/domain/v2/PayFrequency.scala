@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
+import play.api.libs.json.{Format, Json}
+
 object PayFrequency extends Enumeration {
 
   type PayFrequency = Value
@@ -35,4 +37,5 @@ object PayFrequency extends Enumeration {
 
   def from(ifValue: String): Option[Value] = ifConversionMap.get(ifValue)
 
+  implicit val format: Format[PayFrequency] = Json.formatEnum(this)
 }

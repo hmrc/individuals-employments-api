@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.des
 
+import play.api.libs.json.{Format, Json}
+
 import java.time.LocalDate
 
 case class DesPayment(
@@ -24,3 +26,7 @@ case class DesPayment(
   weekPayNumber: Option[Int] = None,
   monthPayNumber: Option[Int] = None
 )
+
+object DesPayment {
+  implicit val desPaymentJsonFormat: Format[DesPayment] = Json.format[DesPayment]
+}

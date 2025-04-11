@@ -45,7 +45,7 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
   trait Setup {
     val mockClient: ShortLivedCache = mock[ShortLivedCache]
     val mockCacheConfig: CacheRepositoryConfiguration = mock[CacheRepositoryConfiguration]
-    implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
+    implicit val ec: ExecutionContext = fakeApplication().injector.instanceOf[ExecutionContext]
     implicit val hc: HeaderCarrier = HeaderCarrier()
     lazy val cacheService = new CacheService(mockClient, mockCacheConfig)
 

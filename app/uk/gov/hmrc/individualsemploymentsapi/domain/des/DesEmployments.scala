@@ -16,11 +16,14 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.des
 
+import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Payment
 
 case class DesEmployments(employments: Seq[DesEmployment])
 
 object DesEmployments {
+  implicit val desEmploymentsJsonFormat: Format[DesEmployments] = Json.format[DesEmployments]
+
   def toPayments(desEmployment: DesEmployment): Seq[Payment] =
     desEmployment.payments map { payment =>
       Payment(

@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.des
 
+import play.api.libs.json.{Format, Json, OFormat}
+
 case class DesAddress(
   line1: Option[String] = None,
   line2: Option[String] = None,
@@ -24,3 +26,7 @@ case class DesAddress(
   line5: Option[String] = None,
   postalCode: Option[String] = None
 )
+
+object DesAddress {
+  implicit val desAddressJsonFormat: Format[DesAddress] = Json.format[DesAddress]
+}

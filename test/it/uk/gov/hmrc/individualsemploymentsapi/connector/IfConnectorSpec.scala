@@ -53,7 +53,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
   def externalServices: Seq[String] = Seq.empty
 
-  override lazy val fakeApplication: Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure(
       "microservice.services.integration-framework.host"                -> "127.0.0.1",
       "microservice.services.integration-framework.port"                -> "11122",
@@ -62,7 +62,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
     )
     .build()
 
-  implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
+  implicit val ec: ExecutionContext = fakeApplication().injector.instanceOf[ExecutionContext]
 
   trait Setup {
 
@@ -71,8 +71,8 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
-    val httpClient: HttpClientV2 = fakeApplication.injector.instanceOf[HttpClientV2]
+    val config: ServicesConfig = fakeApplication().injector.instanceOf[ServicesConfig]
+    val httpClient: HttpClientV2 = fakeApplication().injector.instanceOf[HttpClientV2]
     val auditHelper: AuditHelper = mock[AuditHelper]
     val underTest = new IfConnector(config, httpClient, auditHelper)
 

@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.v1
 
+import play.api.libs.json.{Json, OFormat}
+
 import java.time.LocalDate
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.PayFrequency.PayFrequency
@@ -30,9 +32,9 @@ case class Employment(
 )
 
 object Employment {
+  implicit val employmentJsonFormat: OFormat[Employment] = Json.format[Employment]
 
   def from(desEmployment: DesEmployment): Option[Employment] = {
-
     val startDate = desEmployment.employmentStartDate
     val endDate = desEmployment.employmentLeavingDate
     val employer = Employer.create(
@@ -49,5 +51,4 @@ object Employment {
       case _                        => Some(Employment(startDate, endDate, employer, payFrequency, address, payrollId))
     }
   }
-
 }

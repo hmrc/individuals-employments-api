@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
-import play.api.Logger
+import play.api.Logging
 import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, TooManyRequestException}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses._
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.*
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates.toFormattedLocalDate
 import uk.gov.hmrc.individualsemploymentsapi.util.UuidValidator
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -34,10 +34,7 @@ import javax.inject.Inject
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class CommonController @Inject() (cc: ControllerComponents) extends BackendController(cc) {
-
-  val logger: Logger = Logger(getClass)
-
+abstract class CommonController @Inject() (cc: ControllerComponents) extends BackendController(cc) with Logging {
   private def getQueryParam[T](name: String)(implicit request: Request[T]) =
     request.queryString.get(name).flatMap(_.headOption)
 
@@ -87,11 +84,9 @@ abstract class CommonController @Inject() (cc: ControllerComponents) extends Bac
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInternalServer("Something went wrong.").toHttpResponse
   }
-
 }
 
 trait PrivilegedAuthentication extends AuthorisedFunctions {
-
   def authPredicate(scopes: Iterable[String]): Predicate =
     scopes.map(Enrolment(_): Predicate).reduce(_ or _)
 
@@ -109,9 +104,4 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
       f(scopes.enrolments.map(e => e.key))
     }
   }
-
-  def requiresPrivilegedAuthentication(scope: String)(
-    body: => Future[Result]
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
-    authorised(Enrolment(scope))(body)
 }

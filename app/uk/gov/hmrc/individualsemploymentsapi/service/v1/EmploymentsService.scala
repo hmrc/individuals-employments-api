@@ -25,7 +25,6 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, Individu
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
-import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 import java.util.UUID
 import javax.inject.{Inject, Named, Singleton}

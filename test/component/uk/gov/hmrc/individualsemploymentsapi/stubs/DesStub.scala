@@ -21,7 +21,6 @@ import component.uk.gov.hmrc.individualsemploymentsapi.controller.MockHost
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployments
-import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
 object DesStub extends MockHost(22003) {

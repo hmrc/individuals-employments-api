@@ -23,7 +23,6 @@ import uk.gov.hmrc.http._
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments}
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
-import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}

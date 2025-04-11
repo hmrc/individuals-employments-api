@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.cache
 
+import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, ReplaceOptions}
+import org.mongodb.scala.result.UpdateResult
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.crypto.json.JsonEncryption
@@ -30,7 +32,6 @@ import uk.gov.hmrc.play.http.logging.Mdc.preservingMdc
 import java.time.{LocalDateTime, ZoneOffset}
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
-import org.mongodb.scala.result.UpdateResult
 
 abstract class CacheRepository(
   val cacheConfig: CacheRepositoryConfiguration,

@@ -16,26 +16,20 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.controller.v1
 
-import play.api.Logger
-import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
-import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import play.api.Logging
+import play.api.mvc.{ControllerComponents, Request, Result}
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment}
 import uk.gov.hmrc.http.{HeaderCarrier, TooManyRequestException}
-import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
 import uk.gov.hmrc.individualsemploymentsapi.controller.v1.Environment.SANDBOX
-import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses._
-import uk.gov.hmrc.individualsemploymentsapi.util.Dates._
+import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.*
+import uk.gov.hmrc.individualsemploymentsapi.util.Dates.*
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class CommonController @Inject() (cc: ControllerComponents) extends BackendController(cc) {
-
-  val logger: Logger = Logger(getClass)
-
+abstract class CommonController @Inject() (cc: ControllerComponents) extends BackendController(cc) with Logging {
   private def getQueryParam[T](name: String)(implicit request: Request[T]) =
     request.queryString.get(name).flatMap(_.headOption)
 
@@ -53,31 +47,7 @@ abstract class CommonController @Inject() (cc: ControllerComponents) extends Bac
 }
 
 trait PrivilegedAuthentication extends AuthorisedFunctions {
-
   val environment: String
-
-  def authPredicate(scopes: Iterable[String]): Predicate =
-    scopes.map(Enrolment(_): Predicate).reduce(_ or _)
-
-  def authenticate(endpointScopes: Iterable[String], matchId: String)(f: Iterable[String] => Future[Result])(implicit
-    hc: HeaderCarrier,
-    request: RequestHeader,
-    auditHelper: AuditHelper,
-    ec: ExecutionContext
-  ): Future[Result] = {
-
-    if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
-
-    if (environment == Environment.SANDBOX)
-      f(endpointScopes.toList)
-    else {
-      authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) { case scopes =>
-        auditHelper.auditAuthScopes(matchId, scopes.enrolments.map(e => e.key).mkString(","), request)
-
-        f(scopes.enrolments.map(e => e.key))
-      }
-    }
-  }
 
   def requiresPrivilegedAuthentication(
     scope: String

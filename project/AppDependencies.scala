@@ -1,7 +1,6 @@
 import sbt.*
 
 object AppDependencies {
-
   val hmrc = "uk.gov.hmrc"
   val hmrcMongo = s"$hmrc.mongo"
   val mongoVersion = "2.6.0"
@@ -11,7 +10,7 @@ object AppDependencies {
   val compile: Seq[ModuleID] = Seq(
     hmrc      %% s"bootstrap-backend-$playVersion" % bootstrapVersion,
     hmrc      %% s"domain-$playVersion"            % "11.0.0",
-    hmrc      %% s"play-hal-$playVersion"          % "4.0.0",
+    hmrc      %% s"play-hal-$playVersion"          % "4.1.0",
     hmrc      %% s"crypto-json-$playVersion"       % "8.2.0",
     hmrcMongo %% s"hmrc-mongo-$playVersion"        % mongoVersion
   )

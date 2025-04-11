@@ -25,7 +25,6 @@ import java.time.LocalDate.parse
 import java.time.{LocalDate, LocalTime}
 
 class DatesSpec extends AnyFlatSpec with Matchers {
-
   "Dates utility" should "derive an interval between two dates" in {
     val (fromDate, toDate) = (parse("2020-01-01"), parse("2020-01-02"))
     Dates.toInterval(fromDate, toDate).toString shouldBe "2020-01-01T00:00:00.000Z/2020-01-02T00:00:00.001Z"
@@ -33,9 +32,10 @@ class DatesSpec extends AnyFlatSpec with Matchers {
 
   it should "fail to derive an interval with a from date which is before 31st March 2013" in {
     val (fromDate, toDate) = (parse("2013-03-30"), parse("2020-01-02"))
-    the[ValidationException] thrownBy {
-      Dates.toInterval(fromDate, toDate)
-    } should have message "fromDate earlier than 31st March 2013"
+
+    val exception = intercept[ValidationException](Dates.toInterval(fromDate, toDate))
+    exception shouldBe a[ValidationException]
+    exception.getMessage shouldBe "fromDate earlier than 31st March 2013"
 
     noException should be thrownBy Dates.toInterval(parse("2013-03-31"), toDate)
   }
