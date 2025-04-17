@@ -53,8 +53,7 @@ lazy val microservice =
         "target/component-test-reports/html-report")
     )
     .settings(
-      scalacOptions += "-Wconf:src=routes/.*:s",
-      scalacOptions += "-Wconf:msg=unused-imports&src=txt/.*:s"
+      scalacOptions += "-Wconf:src=routes/.*:s,src=txt/.*:s"
     )
     .settings(PlayKeys.playDefaultPort := 9651)
     .settings(majorVersion := 0)
