@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.des
 
+import play.api.libs.json.{Format, Json}
+
 import java.time.LocalDate
 import uk.gov.hmrc.domain.EmpRef
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
@@ -32,11 +34,14 @@ case class DesEmployment(
   employeeAddress: Option[DesAddress] = None,
   payrollId: Option[String] = None
 ) {
-
   val employerPayeReference: Option[EmpRef] =
     (employerDistrictNumber, employerSchemeReference) match {
       case (Some(districtNumber), Some(schemeReference)) => Some(EmpRef(districtNumber, schemeReference))
       case _                                             => None
     }
 
+}
+
+object DesEmployment {
+  implicit val desEmploymentJsonFormat: Format[DesEmployment] = Json.format[DesEmployment]
 }

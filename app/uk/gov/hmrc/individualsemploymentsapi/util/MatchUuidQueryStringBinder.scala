@@ -23,12 +23,12 @@ import scala.util.Try
 
 class MatchUuidQueryStringBinder extends QueryStringBindable[UUID] {
 
-  override def bind(key: String, params: Map[String, Seq[String]]) =
+  override def bind(key: String, params: Map[String, Seq[String]]): Some[Either[String, UUID]] =
     Some(for {
       value <- params.get(key).flatMap(_.headOption).toRight(s"$key is required")
       uuid  <- Try(UUID.fromString(value)).toEither.left.map(_ => s"$key format is invalid")
     } yield uuid)
 
-  override def unbind(key: String, uuid: UUID) = s"$key=${uuid.toString}"
+  override def unbind(key: String, uuid: UUID): String = s"$key=${uuid.toString}"
 
 }

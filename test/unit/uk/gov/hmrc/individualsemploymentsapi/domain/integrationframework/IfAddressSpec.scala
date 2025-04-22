@@ -21,7 +21,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfAddre
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.{StringsSpec, UnitSpec}
 
 class IfAddressSpec extends UnitSpec with StringsSpec {
-  val address = IfAddress(
+  val address: IfAddress = IfAddress(
     Some("line1"),
     Some("line2"),
     Some("line3"),

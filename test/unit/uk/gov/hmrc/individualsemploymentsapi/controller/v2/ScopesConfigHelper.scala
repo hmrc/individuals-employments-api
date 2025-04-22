@@ -20,7 +20,7 @@ import play.api.Configuration
 
 trait ScopesConfigHelper {
 
-  val mockScopesConfig = Configuration(
+  val mockScopesConfig: Configuration = Configuration(
     (s"api-config.scopes.test-scope.fields", List("A", "B", "C")),
     (
       s"api-config.endpoints.internal.paye.endpoint",

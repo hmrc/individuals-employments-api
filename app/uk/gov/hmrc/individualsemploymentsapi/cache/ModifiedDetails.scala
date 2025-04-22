@@ -16,22 +16,12 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.cache
 
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
-import play.api.libs.json.{Format, JsPath}
+import play.api.libs.json.{Format, Json}
 
 import java.time.LocalDateTime
 
 case class ModifiedDetails(createdAt: LocalDateTime, lastUpdated: LocalDateTime)
 
 object ModifiedDetails {
-  implicit val format: Format[ModifiedDetails] = Format(
-    (
-      (JsPath \ "createdAt").read[LocalDateTime] and
-        (JsPath \ "lastUpdated").read[LocalDateTime]
-    )(ModifiedDetails.apply _),
-    (
-      (JsPath \ "createdAt").write[LocalDateTime] and
-        (JsPath \ "lastUpdated").write[LocalDateTime]
-    )(unlift(ModifiedDetails.unapply))
-  )
+  implicit val format: Format[ModifiedDetails] = Json.format
 }

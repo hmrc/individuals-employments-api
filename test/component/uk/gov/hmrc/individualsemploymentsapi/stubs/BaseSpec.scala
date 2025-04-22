@@ -27,6 +27,8 @@ import play.mvc.Http.MimeTypes.JSON
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.duration.Duration
+import component.uk.gov.hmrc.individualsemploymentsapi.controller.MockHost
+import scala.concurrent.duration.FiniteDuration
 
 trait BaseSpec
     extends AnyFeatureSpec with BeforeAndAfterAll with BeforeAndAfterEach with Matchers with GuiceOneServerPerSuite
@@ -45,19 +47,19 @@ trait BaseSpec
     )
     .build()
 
-  val timeout = Duration(5, TimeUnit.SECONDS)
-  val serviceUrl = s"http://localhost:$port"
-  val mocks = Seq(AuthStub, IndividualsMatchingApiStub, DesStub, IfStub, Save4LaterStub)
+  val timeout: FiniteDuration = Duration(5, TimeUnit.SECONDS)
+  val serviceUrl: String = s"http://localhost:$port"
+  val mocks: Seq[MockHost] = Seq(AuthStub, IndividualsMatchingApiStub, DesStub, IfStub, Save4LaterStub)
   val authToken = "Bearer AUTH_TOKEN"
-  val acceptHeaderVP1 = ACCEPT -> "application/vnd.hmrc.P1.0+json"
-  val acceptHeaderVP2 = ACCEPT -> "application/vnd.hmrc.2.0+json"
+  val acceptHeaderVP1: (String, String) = ACCEPT -> "application/vnd.hmrc.P1.0+json"
+  val acceptHeaderVP2: (String, String) = ACCEPT -> "application/vnd.hmrc.2.0+json"
   val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
-  val validCorrelationHeader = ("CorrelationId", sampleCorrelationId)
+  val validCorrelationHeader: (String, String) = ("CorrelationId", sampleCorrelationId)
 
   protected def requestHeaders(
     acceptHeader: (String, String) = acceptHeaderVP1,
     correlationHeader: (String, String) = validCorrelationHeader
-  ) =
+  ): Map[String, String] =
     Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader, correlationHeader)
 
   override protected def beforeEach(): Unit =

@@ -75,7 +75,7 @@ case class CacheId(matchId: UUID, interval: Interval, fields: String, empRef: Op
     case None        => ""
   }
 
-  lazy val id: String =
+  val id: String =
     s"$matchId-${interval.getStart.format(Dates.jsonFormat)}-${interval.getEnd.format(Dates.jsonFormat)}-$fields$empRefKey"
 
 }

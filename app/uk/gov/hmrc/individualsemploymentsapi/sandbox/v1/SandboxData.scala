@@ -27,13 +27,13 @@ import java.util.UUID
 object SandboxData {
 
   val sandboxMatchIdString = "57072660-1df9-4aeb-b4ea-cd2d7f96e430"
-  val sandboxMatchId = UUID.fromString(sandboxMatchIdString)
+  val sandboxMatchId: UUID = UUID.fromString(sandboxMatchIdString)
 
   val sandboxNinoString = "NA000799C"
-  val sandboxNino = Nino(sandboxNinoString)
+  val sandboxNino: Nino = Nino(sandboxNinoString)
 
   object Employments {
-    val acme = DesEmployment(
+    val acme: DesEmployment = DesEmployment(
       Seq(
         DesPayment(LocalDate.of(2018, 1, 28), 0),
         DesPayment(LocalDate.of(2018, 2, 28), 0),
@@ -69,7 +69,7 @@ object SandboxData {
       ),
       Some("payroll-id")
     )
-    val disney = DesEmployment(
+    val disney: DesEmployment = DesEmployment(
       Seq(
         DesPayment(LocalDate.of(2019, 2, 19), 0),
         DesPayment(LocalDate.of(2019, 2, 28), 0)
@@ -106,15 +106,15 @@ object SandboxData {
 
   object Individuals {
 
-    val amanda = des.Individual(
+    val amanda: des.Individual = des.Individual(
       sandboxMatchId,
       sandboxNinoString,
       Seq(Employments.acme, Employments.disney)
     )
 
-    val individuals = Seq(amanda)
+    val individuals: Seq[des.Individual] = Seq(amanda)
 
-    def find(matchId: UUID) = individuals.find(_.matchId == matchId)
+    def find(matchId: UUID): Option[des.Individual] = individuals.find(_.matchId == matchId)
 
   }
 

@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.error
 
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.libs.json.Json.toJson
+import play.api.libs.json.{Json, Writes}
 import play.api.mvc.Result
 import play.api.mvc.Results.Status
-import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 
 object ErrorResponses {
 
@@ -40,4 +40,6 @@ object ErrorResponses {
   class MatchNotFoundException extends RuntimeException
   class MissingQueryParameterException(message: String) extends RuntimeException(message)
 
+  implicit val errorResponseWrites: Writes[ErrorResponse] = (e: ErrorResponse) =>
+    Json.obj("code" -> e.errorCode, "message" -> e.message)
 }

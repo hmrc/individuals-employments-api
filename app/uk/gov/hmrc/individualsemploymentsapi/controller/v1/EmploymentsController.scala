@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.controller.v1
 
-import play.api.hal.Hal._
+import play.api.hal.Hal.*
 import play.api.hal.HalLink
 import play.api.libs.json.Json
-import play.api.mvc.hal._
+import play.api.mvc.hal.*
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.individualsemploymentsapi.controller.v1.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService}
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
-import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.time.LocalDate

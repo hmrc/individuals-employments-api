@@ -17,7 +17,6 @@
 package component.uk.gov.hmrc.individualsemploymentsapi
 
 import component.uk.gov.hmrc.individualsemploymentsapi.stubs._
-import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION}
 import play.api.libs.json.Json.parse
 import play.api.test.FakeRequest
 import play.api.test.Helpers._

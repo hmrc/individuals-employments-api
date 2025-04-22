@@ -46,7 +46,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
-  protected val ifEmploymentExample = IfEmployment(
+  protected val ifEmploymentExample: IfEmployment = IfEmployment(
     employer = Some(
       IfEmployer(
         name = Some("Acme"),
@@ -85,22 +85,22 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
   )
 
   val sampleMatchIdString = "57072660-1df9-4aeb-b4ea-cd2d7f96e430"
-  val sampleMatchId = UUID.fromString(sampleMatchIdString)
+  val sampleMatchId: UUID = UUID.fromString(sampleMatchIdString)
 
   trait Setup extends ScopesConfigHelper {
 
     val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
-    val validCorrelationHeader = ("CorrelationId", sampleCorrelationId)
+    val validCorrelationHeader: (String, String) = ("CorrelationId", sampleCorrelationId)
 
-    val controllerComponent = fakeApplication.injector.instanceOf[ControllerComponents]
-    val mockEmploymentsService = mock[EmploymentsService]
+    val controllerComponent: ControllerComponents = fakeApplication().injector.instanceOf[ControllerComponents]
+    val mockEmploymentsService: EmploymentsService = mock[EmploymentsService]
 
-    implicit lazy val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
+    implicit lazy val ec: ExecutionContext = fakeApplication().injector.instanceOf[ExecutionContext]
     lazy val scopeService: ScopesService = new ScopesService(mockScopesConfig)
     lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val auditHelper: AuditHelper = mock[AuditHelper]
-    val config = fakeApplication.injector.instanceOf[ServicesConfig]
+    val config: ServicesConfig = fakeApplication().injector.instanceOf[ServicesConfig]
 
     val employmentsController = new EmploymentsController(
       mockEmploymentsService,
@@ -114,7 +114,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    given(mockAuthConnector.authorise(eqTo(Enrolment("test-scope")), refEq(Retrievals.allEnrolments))(any(), any()))
+    `given`(mockAuthConnector.authorise(eqTo(Enrolment("test-scope")), refEq(Retrievals.allEnrolments))(any(), any()))
       .willReturn(Future.successful(Enrolments(Set(Enrolment("test-scope")))))
   }
 

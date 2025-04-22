@@ -18,7 +18,7 @@ package uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads.{maxLength, minLength}
-import play.api.libs.json.{Format, JsPath}
+import play.api.libs.json.{Format, JsPath, Json}
 
 case class IfAddress(
   line1: Option[String] = None,
@@ -39,13 +39,6 @@ object IfAddress {
         (JsPath \ "line5").readNullable[String](minLength[String](0) keepAnd maxLength[String](100)) and
         (JsPath \ "postcode").readNullable[String](minLength[String](0) keepAnd maxLength[String](10))
     )(IfAddress.apply _),
-    (
-      (JsPath \ "line1").writeNullable[String] and
-        (JsPath \ "line2").writeNullable[String] and
-        (JsPath \ "line3").writeNullable[String] and
-        (JsPath \ "line4").writeNullable[String] and
-        (JsPath \ "line5").writeNullable[String] and
-        (JsPath \ "postcode").writeNullable[String]
-    )(unlift(IfAddress.unapply))
+    Json.writes[IfAddress]
   )
 }

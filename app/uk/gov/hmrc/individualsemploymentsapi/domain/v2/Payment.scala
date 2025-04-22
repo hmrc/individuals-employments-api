@@ -16,11 +16,12 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
-import java.time.LocalDate
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Format, JsPath}
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfPayment
+
+import java.time.LocalDate
 
 case class Payment(paymentDate: Option[LocalDate], taxablePayment: Option[Double]) {}
 
@@ -34,7 +35,7 @@ object Payment {
     (
       (JsPath \ "date").writeNullable[LocalDate] and
         (JsPath \ "paidTaxablePay").writeNullable[Double]
-    )(unlift(Payment.unapply))
+    )(l => (l.paymentDate, l.taxablePayment))
   )
 
   def create(ifPayment: IfPayment): Option[Payment] = {

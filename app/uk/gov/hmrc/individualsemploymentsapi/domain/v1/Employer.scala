@@ -16,11 +16,14 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.v1
 
+import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.domain.EmpRef
 
 case class Employer(payeReference: Option[EmpRef], name: Option[String], address: Option[Address])
 
 object Employer {
+  implicit val employerJsonFormat: Format[Employer] = Json.format[Employer]
+
   def create(payeReference: Option[EmpRef], name: Option[String], address: Option[Address]): Option[Employer] =
     (payeReference, name, address) match {
       case (None, None, None) => None

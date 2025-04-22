@@ -17,7 +17,7 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v1
 
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.BDDMockito.given
+import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito.{verify, verifyNoMoreInteractions}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.mockito.MockitoSugar
@@ -34,25 +34,25 @@ import scala.concurrent.Future
 
 class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
-  val cacheId = UUID.randomUUID().toString
-  val cachedValue = TestClass("cached value")
-  val newValue = TestClass("new value")
+  val cacheId: String = UUID.randomUUID().toString
+  val cachedValue: TestClass = TestClass("cached value")
+  val newValue: TestClass = TestClass("new value")
 
   trait Setup {
-    val mockClient = mock[ShortLivedCache]
-    val mockCacheConfig = mock[CacheRepositoryConfiguration]
+    val mockClient: ShortLivedCache = mock[ShortLivedCache]
+    val mockCacheConfig: CacheRepositoryConfiguration = mock[CacheRepositoryConfiguration]
     val cacheService = new CacheService(mockClient, mockCacheConfig)
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    given(mockCacheConfig.cacheEnabled).willReturn(true)
+    `given`(mockCacheConfig.cacheEnabled).willReturn(true)
   }
 
   "cacheService.get" should {
 
     "return the cached value for a given id and key" in new Setup {
 
-      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId))(any()))
+      `given`(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId))(any()))
         .willReturn(Future.successful(Some(cachedValue)))
       await(cacheService.get[TestClass](cacheId, Future.successful(newValue))) shouldBe cachedValue
 
@@ -60,7 +60,7 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
     "cache the result of the fallback function when no cached value exists for a given id and key" in new Setup {
 
-      given(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId))(any()))
+      `given`(mockClient.fetchAndGetEntry[TestClass](eqTo(cacheId))(any()))
         .willReturn(Future.successful(None))
 
       await(cacheService.get[TestClass](cacheId, Future.successful(newValue))) shouldBe newValue
@@ -70,7 +70,7 @@ class CacheServiceSpec extends SpecBase with MockitoSugar with ScalaFutures {
 
     "ignore the cache when caching is not enabled" in new Setup {
 
-      given(mockCacheConfig.cacheEnabled).willReturn(false)
+      `given`(mockCacheConfig.cacheEnabled).willReturn(false)
       await(cacheService.get[TestClass](cacheId, Future.successful(newValue))) shouldBe newValue
       verifyNoMoreInteractions(mockClient)
 

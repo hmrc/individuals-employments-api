@@ -16,7 +16,11 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain
 
+import play.api.libs.json.{Format, Json}
+
 object PayFrequencyCode extends Enumeration {
   type DesPayFrequency = Value
   val W1, W2, W4, IO, IR, M1, M3, M6, MA = Value
+
+  implicit val format: Format[DesPayFrequency] = Json.formatEnum(this)
 }

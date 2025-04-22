@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.cache
 
+import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, ReplaceOptions}
+import org.mongodb.scala.result.UpdateResult
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.crypto.json.JsonEncryption
@@ -45,14 +47,17 @@ abstract class CacheRepository(
         IndexModel(ascending("id"), IndexOptions().name("_id").unique(true).background(false).sparse(true)),
         IndexModel(
           ascending("modifiedDetails.lastUpdated"),
-          IndexOptions().name("lastUpdatedIndex").background(false).expireAfter(cacheConfig.cacheTtl, TimeUnit.SECONDS)
+          IndexOptions()
+            .name("lastUpdatedIndex")
+            .background(false)
+            .expireAfter(scala.Predef.long2Long(cacheConfig.cacheTtl), TimeUnit.SECONDS)
         )
       )
     ) {
 
   implicit lazy val crypto: Encrypter with Decrypter = new ApplicationCrypto(configuration.underlying).JsonCrypto
 
-  def cache[T](id: String, value: T)(implicit formats: Format[T]) = {
+  def cache[T](id: String, value: T)(implicit formats: Format[T]): Future[UpdateResult] = {
 
     val jsonEncryptor = JsonEncryption.sensitiveEncrypter[T, SensitiveT[T]]
     val encryptedValue: JsValue = jsonEncryptor.writes(SensitiveT(value))

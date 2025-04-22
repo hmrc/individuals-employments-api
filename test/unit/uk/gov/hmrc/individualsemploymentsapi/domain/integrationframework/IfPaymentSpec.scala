@@ -23,7 +23,7 @@ import unit.uk.gov.hmrc.individualsemploymentsapi.util.UnitSpec
 
 class IfPaymentSpec extends UnitSpec {
 
-  val payment = IfPayment(
+  val payment: IfPayment = IfPayment(
     date = Some("2001-12-31"),
     ytdTaxablePay = Some(162081.23),
     paidTaxablePay = Some(112.75),

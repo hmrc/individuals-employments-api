@@ -42,7 +42,7 @@ class EmploymentsService @Inject() (
 
   private val endpoints = List("paye")
 
-  private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { e: Employment =>
+  private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { (e: Employment) =>
     e.endDate.getOrElse(interval.getEnd.toLocalDate)
   }
 

@@ -20,7 +20,7 @@ import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework._
 
 trait EmploymentsHelper {
 
-  val address = IfAddress(
+  val address: IfAddress = IfAddress(
     Some("line1"),
     Some("line2"),
     Some("line3"),
@@ -29,12 +29,12 @@ trait EmploymentsHelper {
     Some("postcode")
   )
 
-  val employer = IfEmployer(
+  val employer: IfEmployer = IfEmployer(
     name = Some("Name"),
     address = Some(address)
   )
 
-  val employmentDetail = IfEmploymentDetail(
+  val employmentDetail: IfEmploymentDetail = IfEmploymentDetail(
     startDate = Some("2001-12-31"),
     endDate = Some("2002-05-12"),
     payFrequency = Some("W2"),
@@ -42,7 +42,7 @@ trait EmploymentsHelper {
     address = Some(address)
   )
 
-  val payment = IfPayment(
+  val payment: IfPayment = IfPayment(
     date = Some("2001-12-31"),
     ytdTaxablePay = Some(162081.23),
     paidTaxablePay = Some(112.75),
@@ -51,14 +51,14 @@ trait EmploymentsHelper {
     month = Some(12)
   )
 
-  val employment = IfEmployment(
+  val employment: IfEmployment = IfEmployment(
     employer = Some(employer),
     employment = Some(employmentDetail),
     payments = Some(Seq(payment)),
     employerRef = Some("247/A1987CB")
   )
 
-  def createValidEmployment() =
+  def createValidEmployment(): IfEmployment =
     IfEmployment(
       employer = Some(employer),
       employment = Some(employmentDetail),

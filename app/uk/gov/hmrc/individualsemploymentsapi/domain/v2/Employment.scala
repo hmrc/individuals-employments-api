@@ -16,41 +16,22 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.domain.v2
 
-import java.time.LocalDate
-import play.api.libs.functional.syntax._
-import play.api.libs.json.{Format, JsPath}
+import play.api.libs.json.{Format, JsPath, Json}
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.IfEmployment
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.PayFrequency.PayFrequency
-import uk.gov.hmrc.individualsemploymentsapi.util.JsonFormatters.EnumJson
+
+import java.time.LocalDate
 
 case class Employment(
   startDate: Option[LocalDate],
   endDate: Option[LocalDate],
   payFrequency: Option[PayFrequency],
   employer: Option[Employer],
-  payments: Option[Seq[Payment]]
+  payment: Option[Seq[Payment]]
 )
 
 object Employment {
-
-  implicit val payFrequencyFormat: Format[PayFrequency] = EnumJson.enumFormat(PayFrequency)
-
-  implicit val format: Format[Employment] = Format(
-    (
-      (JsPath \ "startDate").readNullable[LocalDate] and
-        (JsPath \ "endDate").readNullable[LocalDate] and
-        (JsPath \ "payFrequency").readNullable[PayFrequency] and
-        (JsPath \ "employer").readNullable[Employer] and
-        (JsPath \ "payment").readNullable[Seq[Payment]]
-    )(Employment.apply _),
-    (
-      (JsPath \ "startDate").writeNullable[LocalDate] and
-        (JsPath \ "endDate").writeNullable[LocalDate] and
-        (JsPath \ "payFrequency").writeNullable[PayFrequency] and
-        (JsPath \ "employer").writeNullable[Employer] and
-        (JsPath \ "payment").writeNullable[Seq[Payment]]
-    )(unlift(Employment.unapply))
-  )
+  implicit val format: Format[Employment] = Json.format
 
   def create(
     startDate: Option[LocalDate],
