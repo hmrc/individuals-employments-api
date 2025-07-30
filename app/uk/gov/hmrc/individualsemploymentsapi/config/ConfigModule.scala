@@ -18,17 +18,19 @@ package uk.gov.hmrc.individualsemploymentsapi.config
 
 import com.google.inject.AbstractModule
 import com.google.inject.name.Names
-import play.api.{Configuration, Environment}
+import com.typesafe.config.Config
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 
-class ConfigModule(environment: Environment, configuration: Configuration) extends AbstractModule {
+class ConfigModule(config: Config) extends AbstractModule {
   override def configure(): Unit = {
-    val delay = configuration.getOptional[Int]("retryDelay").getOrElse(1000)
-    val hmctsClientId = configuration
-      .getOptional[String]("clientIds.hmcts")
+    val delay = Option.when(config.hasPath("retryDelay"))(config.getInt("retryDelay")).getOrElse(1000)
+    val hmctsClientId = Option
+      .when(
+        config
+          .hasPath("clientIds.hmcts")
+      )(config.getString("clientIds.hmcts"))
       .getOrElse(throw new RuntimeException("Missing required configuration 'clientIds.hmcts'"))
-
     bindConstant().annotatedWith(Names.named("retryDelay")).to(delay)
     bindConstant().annotatedWith(Names.named("hmctsClientId")).to(hmctsClientId)
 

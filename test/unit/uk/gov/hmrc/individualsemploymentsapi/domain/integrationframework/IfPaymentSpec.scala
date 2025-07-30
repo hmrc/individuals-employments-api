@@ -96,12 +96,12 @@ class IfPaymentSpec extends UnitSpec {
     "validate successfully" when {
 
       "value is larger than min value" in {
-        val result = JsNumber(IfPayment.minValue + 1.0).validate[Double](paymentAmountValidator)
+        val result = JsNumber(IfPayment.minValue + 1.0).validate[Double](using paymentAmountValidator)
         result.isSuccess shouldBe true
       }
 
       "value is smaller than max value" in {
-        val result = JsNumber(IfPayment.maxValue - 1.0).validate[Double](paymentAmountValidator)
+        val result = JsNumber(IfPayment.maxValue - 1.0).validate[Double](using paymentAmountValidator)
         result.isSuccess shouldBe true
       }
     }
@@ -109,17 +109,17 @@ class IfPaymentSpec extends UnitSpec {
     "fail validation" when {
 
       "not a multiple of 0.01" in {
-        val result = JsNumber(123.4312123123123).validate[Double](paymentAmountValidator)
+        val result = JsNumber(123.4312123123123).validate[Double](using paymentAmountValidator)
         result.isError shouldBe true
       }
 
       "value is smaller than min value" in {
-        val result = JsNumber(IfPayment.minValue - 1.0).validate[Double](paymentAmountValidator)
+        val result = JsNumber(IfPayment.minValue - 1.0).validate[Double](using paymentAmountValidator)
         result.isError shouldBe true
       }
 
       "value is larger than max value" in {
-        val result = JsNumber(IfPayment.maxValue + 1.0).validate[Double](paymentAmountValidator)
+        val result = JsNumber(IfPayment.maxValue + 1.0).validate[Double](using paymentAmountValidator)
         result.isError shouldBe true
       }
     }

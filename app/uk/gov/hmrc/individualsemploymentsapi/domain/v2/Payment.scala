@@ -31,7 +31,7 @@ object Payment {
     (
       (JsPath \ "date").readNullable[LocalDate] and
         (JsPath \ "paidTaxablePay").readNullable[Double]
-    )(Payment.apply _),
+    )(Payment.apply),
     (
       (JsPath \ "date").writeNullable[LocalDate] and
         (JsPath \ "paidTaxablePay").writeNullable[Double]

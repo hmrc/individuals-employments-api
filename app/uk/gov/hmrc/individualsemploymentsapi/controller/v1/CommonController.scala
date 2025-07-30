@@ -39,10 +39,10 @@ abstract class CommonController @Inject() (cc: ControllerComponents) extends Bac
   }
 
   private[controller] def recovery: PartialFunction[Throwable, Result] = {
-    case _: MatchNotFoundException    => ErrorNotFound.toHttpResponse
-    case e: AuthorisationException    => ErrorUnauthorized(e.getMessage).toHttpResponse
-    case tmr: TooManyRequestException => ErrorTooManyRequests.toHttpResponse
-    case e: IllegalArgumentException  => ErrorInvalidRequest(e.getMessage).toHttpResponse
+    case _: MatchNotFoundException   => ErrorNotFound.toHttpResponse
+    case e: AuthorisationException   => ErrorUnauthorized(e.getMessage).toHttpResponse
+    case _: TooManyRequestException  => ErrorTooManyRequests.toHttpResponse
+    case e: IllegalArgumentException => ErrorInvalidRequest(e.getMessage).toHttpResponse
   }
 }
 

@@ -25,9 +25,9 @@ case class IfEmployer(name: Option[String], address: Option[IfAddress])
 object IfEmployer {
   implicit val employerFormat: Format[IfEmployer] = Format(
     (
-      (JsPath \ "name").readNullable[String](minLength[String](0) keepAnd maxLength[String](100)) and
+      (JsPath \ "name").readNullable[String](using minLength[String](0) keepAnd maxLength[String](100)) and
         (JsPath \ "address").readNullable[IfAddress]
-    )(IfEmployer.apply _),
+    )(IfEmployer.apply),
     Json.writes[IfEmployer]
   )
 }

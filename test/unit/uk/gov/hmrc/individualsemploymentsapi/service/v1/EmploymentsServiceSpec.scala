@@ -46,7 +46,7 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
     val individualsMatchingApiConnector: IndividualsMatchingApiConnector = mock[IndividualsMatchingApiConnector]
     val desConnector: DesConnector = mock[DesConnector]
     // can't mock function with by-value argument
-    private val stubCache = new CacheService(null, null)(null) {
+    private val stubCache = new CacheService(null, null)(using null) {
       override def get[T: Format](cacheId: String, functionToCache: => Future[T]): Future[T] =
         functionToCache
     }
@@ -114,7 +114,7 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
         .thenReturn(Future.successful(Seq(someEmployment)))
 
       await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq(Employment.from(someEmployment).get)
-      verify(desConnector, times(2)).fetchEmployments(any(), any())(any(), any())
+      verify(desConnector, times(2)).fetchEmployments(any(), any())(using any(), any())
     }
   }
 

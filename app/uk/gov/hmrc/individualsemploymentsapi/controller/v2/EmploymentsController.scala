@@ -77,7 +77,7 @@ class EmploymentsController @Inject() (
           val correlationId = validateCorrelationId(request)
           val cutoff =
             config.getInt("validation.cutoffYear")
-          if (interval.getStart isBefore LocalDate.of(cutoff, 1, 1).atStartOfDay()) {
+          if (interval.getStart `isBefore` LocalDate.of(cutoff, 1, 1).atStartOfDay()) {
             Future.successful(BadRequest(s"Cannot query dates before $cutoff"))
           } else {
             employmentsService.paye(matchIdUuid, interval, payeReference, "paye", authScopes).map { employments =>

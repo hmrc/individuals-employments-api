@@ -42,14 +42,14 @@ object IfEmploymentDetail {
 
   implicit val employmentDetailFormat: Format[IfEmploymentDetail] = Format(
     (
-      (JsPath \ "startDate").readNullable[String](pattern(datePattern, "Date format is incorrect")) and
-        (JsPath \ "endDate").readNullable[String](pattern(datePattern, "Date format is incorrect")) and
-        (JsPath \ "payFrequency").readNullable[String](
+      (JsPath \ "startDate").readNullable[String](using pattern(datePattern, "Date format is incorrect")) and
+        (JsPath \ "endDate").readNullable[String](using pattern(datePattern, "Date format is incorrect")) and
+        (JsPath \ "payFrequency").readNullable[String](using
           pattern(payFrequencyPattern, "Pay frequency must be one of: W1, W2, W4, M1, M3, M6, MA, IO, IR")
         ) and
-        (JsPath \ "payrollId").readNullable[String](minLength[String](0) keepAnd maxLength[String](100)) and
+        (JsPath \ "payrollId").readNullable[String](using minLength[String](0) keepAnd maxLength[String](100)) and
         (JsPath \ "address").readNullable[IfAddress]
-    )(IfEmploymentDetail.apply _),
+    )(IfEmploymentDetail.apply),
     Json.writes[IfEmploymentDetail]
   )
 }
