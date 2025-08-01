@@ -32,13 +32,13 @@ case class IfAddress(
 object IfAddress {
   implicit val addressFormat: Format[IfAddress] = Format(
     (
-      (JsPath \ "line1").readNullable[String](minLength[String](0) keepAnd maxLength[String](100)) and
-        (JsPath \ "line2").readNullable[String](minLength[String](0) keepAnd maxLength[String](100)) and
-        (JsPath \ "line3").readNullable[String](minLength[String](0) keepAnd maxLength[String](100)) and
-        (JsPath \ "line4").readNullable[String](minLength[String](0) keepAnd maxLength[String](100)) and
-        (JsPath \ "line5").readNullable[String](minLength[String](0) keepAnd maxLength[String](100)) and
-        (JsPath \ "postcode").readNullable[String](minLength[String](0) keepAnd maxLength[String](10))
-    )(IfAddress.apply _),
+      (JsPath \ "line1").readNullable[String](using minLength[String](0) keepAnd maxLength[String](100)) and
+        (JsPath \ "line2").readNullable[String](using minLength[String](0) keepAnd maxLength[String](100)) and
+        (JsPath \ "line3").readNullable[String](using minLength[String](0) keepAnd maxLength[String](100)) and
+        (JsPath \ "line4").readNullable[String](using minLength[String](0) keepAnd maxLength[String](100)) and
+        (JsPath \ "line5").readNullable[String](using minLength[String](0) keepAnd maxLength[String](100)) and
+        (JsPath \ "postcode").readNullable[String](using minLength[String](0) keepAnd maxLength[String](10))
+    )(IfAddress.apply),
     Json.writes[IfAddress]
   )
 }

@@ -63,7 +63,7 @@ abstract class EmploymentsController(
         "validation.cutoffYear"
       )
     requiresPrivilegedAuthentication("read:individuals-employments-paye") {
-      if (interval.getStart isBefore LocalDate.parse(s"$cutoff-01-01").atStartOfDay()) {
+      if (interval.getStart `isBefore` LocalDate.parse(s"$cutoff-01-01").atStartOfDay()) {
         Future.successful(BadRequest(s"Cannot query dates before $cutoff"))
       } else {
         employmentsService.paye(matchId, interval).map { employments =>

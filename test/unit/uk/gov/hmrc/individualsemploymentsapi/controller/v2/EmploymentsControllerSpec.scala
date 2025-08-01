@@ -114,7 +114,9 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    `given`(mockAuthConnector.authorise(eqTo(Enrolment("test-scope")), refEq(Retrievals.allEnrolments))(any(), any()))
+    `given`(
+      mockAuthConnector.authorise(eqTo(Enrolment("test-scope")), refEq(Retrievals.allEnrolments))(using any(), any())
+    )
       .willReturn(Future.successful(Enrolments(Set(Enrolment("test-scope")))))
   }
 
@@ -125,7 +127,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
       Mockito.reset(employmentsController.auditHelper)
 
-      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
+      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
@@ -137,14 +139,16 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         "message" -> "The resource can not be found"
       )
 
-      verify(employmentsController.auditHelper, times(1)).auditApiFailure(any(), any(), any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1)).auditApiFailure(any(), any(), any(), any(), any())(using
+        any()
+      )
     }
 
     "Return an invalid request when missing a CorrelationId" in new Setup {
 
       Mockito.reset(employmentsController.auditHelper)
 
-      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
+      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
@@ -157,7 +161,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       )
 
       verify(employmentsController.auditHelper, times(1))
-        .auditApiFailure(any(), any(), any(), any(), any())(any())
+        .auditApiFailure(any(), any(), any(), any(), any())(using any())
 
     }
 
@@ -165,7 +169,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
       Mockito.reset(employmentsController.auditHelper)
 
-      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
+      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
@@ -178,7 +182,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       )
 
       verify(employmentsController.auditHelper, times(1))
-        .auditApiFailure(any(), any(), any(), any(), any())(any())
+        .auditApiFailure(any(), any(), any(), any(), any())(using any())
 
     }
 
@@ -186,7 +190,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
       Mockito.reset(employmentsController.auditHelper)
 
-      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(any[HeaderCarrier]))
+      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier]))
         .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
 
       val eventualResult =
@@ -206,16 +210,16 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       )
 
       verify(employmentsController.auditHelper, times(1))
-        .auditApiResponse(any(), any(), any(), any(), any(), any())(any())
+        .auditApiResponse(any(), any(), any(), any(), any(), any())(using any())
 
-      verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(using any())
     }
 
     "fail with status 401 when the bearer token does not have enrolment test-scope" in new Setup {
 
       Mockito.reset(employmentsController.auditHelper)
 
-      when(mockAuthConnector.authorise(any(), any())(any(), any()))
+      when(mockAuthConnector.authorise(any(), any())(using any(), any()))
         .thenReturn(Future.failed(InsufficientEnrolments()))
 
       val result = employmentsController.root(randomMatchId.toString)(FakeRequest().withHeaders(validCorrelationHeader))
@@ -224,14 +228,14 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       verifyNoInteractions(mockEmploymentsService)
 
       verify(employmentsController.auditHelper, times(1))
-        .auditApiFailure(any(), any(), any(), any(), any())(any())
+        .auditApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "fail with status 500 when an unknown exception is thrown" in new Setup {
 
       Mockito.reset(employmentsController.auditHelper)
 
-      when(mockAuthConnector.authorise(any(), any())(any(), any()))
+      when(mockAuthConnector.authorise(any(), any())(using any(), any()))
         .thenReturn(Future.failed(new Exception("Test Exception")))
 
       val result = employmentsController.root(randomMatchId.toString)(FakeRequest().withHeaders(validCorrelationHeader))
@@ -240,7 +244,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       verifyNoInteractions(mockEmploymentsService)
 
       verify(employmentsController.auditHelper, times(1))
-        .auditApiFailure(any(), any(), any(), any(), any())(any())
+        .auditApiFailure(any(), any(), any(), any(), any())(using any())
     }
   }
 
@@ -256,7 +260,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
       val invalidMatchId = UUID.randomUUID()
 
-      when(mockEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval), any(), any(), any())(any(), any()))
+      when(mockEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval), any(), any(), any())(using any(), any()))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
@@ -271,7 +275,9 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         "message" -> "The resource can not be found"
       )
 
-      verify(employmentsController.auditHelper, times(1)).auditApiFailure(any(), any(), any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1)).auditApiFailure(any(), any(), any(), any(), any())(using
+        any()
+      )
     }
 
     "return 200 OK" in new Setup {
@@ -280,7 +286,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
       val matchId = UUID.randomUUID()
 
-      when(mockEmploymentsService.paye(eqTo(matchId), eqTo(interval), any(), any(), any())(any(), any()))
+      when(mockEmploymentsService.paye(eqTo(matchId), eqTo(interval), any(), any(), any())(using any(), any()))
         .thenReturn(Future.successful(Seq(Employment.create(ifEmploymentExample).get)))
 
       val res =
@@ -316,9 +322,9 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       )
 
       verify(employmentsController.auditHelper, times(1))
-        .auditApiResponse(any(), any(), any(), any(), any(), any())(any())
+        .auditApiResponse(any(), any(), any(), any(), any(), any())(using any())
 
-      verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(using any())
     }
 
     "fail with 400 if fromDate is before 2013" in new Setup {
@@ -334,7 +340,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
       Mockito.reset(employmentsController.auditHelper)
 
-      when(mockAuthConnector.authorise(any(), any())(any(), any())).thenReturn(Future.failed(InsufficientEnrolments()))
+      when(mockAuthConnector.authorise(any(), any())(using any(), any()))
+        .thenReturn(Future.failed(InsufficientEnrolments()))
 
       val result =
         employmentsController.paye(sampleMatchId.toString, interval, None)(
@@ -344,7 +351,9 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       status(result) shouldBe UNAUTHORIZED
       verifyNoInteractions(mockEmploymentsService)
 
-      verify(employmentsController.auditHelper, times(1)).auditApiFailure(any(), any(), any(), any(), any())(any())
+      verify(employmentsController.auditHelper, times(1)).auditApiFailure(any(), any(), any(), any(), any())(using
+        any()
+      )
     }
 
   }

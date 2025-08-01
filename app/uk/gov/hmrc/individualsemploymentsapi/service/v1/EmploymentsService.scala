@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait EmploymentsService {
 
-  implicit val localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ isBefore _)
+  implicit val localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ `isBefore` _)
 
   def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch]
 

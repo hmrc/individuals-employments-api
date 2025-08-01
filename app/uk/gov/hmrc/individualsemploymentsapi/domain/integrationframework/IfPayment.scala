@@ -53,13 +53,13 @@ object IfPayment {
 
   implicit val ifPaymentFormat: Format[IfPayment] = Format(
     (
-      (JsPath \ "date").readNullable[String](pattern(datePattern, "Date format is incorrect")) and
-        (JsPath \ "ytdTaxablePay").readNullable[Double](paymentAmountValidator) and
-        (JsPath \ "paidTaxablePay").readNullable[Double](paymentAmountValidator) and
-        (JsPath \ "paidNonTaxOrNICPayment").readNullable[Double](paymentAmountValidator) and
-        (JsPath \ "week").readNullable[Int](min(1) keepAnd max(56)) and
-        (JsPath \ "month").readNullable[Int](min(1) keepAnd max(12))
-    )(IfPayment.apply _),
+      (JsPath \ "date").readNullable[String](using pattern(datePattern, "Date format is incorrect")) and
+        (JsPath \ "ytdTaxablePay").readNullable[Double](using paymentAmountValidator) and
+        (JsPath \ "paidTaxablePay").readNullable[Double](using paymentAmountValidator) and
+        (JsPath \ "paidNonTaxOrNICPayment").readNullable[Double](using paymentAmountValidator) and
+        (JsPath \ "week").readNullable[Int](using min(1) keepAnd max(56)) and
+        (JsPath \ "month").readNullable[Int](using min(1) keepAnd max(12))
+    )(IfPayment.apply),
     Json.writes[IfPayment]
   )
 }

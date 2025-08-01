@@ -107,7 +107,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
       intercept[InternalServerException] {
         await(
-          underTest.fetchEmployments(nino, interval, None, matchId)(
+          underTest.fetchEmployments(nino, interval, None, matchId)(using
             hc,
             FakeRequest().withHeaders(sampleCorrelationIdHeader),
             ec
@@ -115,7 +115,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
       }
 
-      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "Fail when IF returns a bad request" in new Setup {
@@ -129,7 +129,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
       intercept[InternalServerException] {
         await(
-          underTest.fetchEmployments(nino, interval, None, matchId)(
+          underTest.fetchEmployments(nino, interval, None, matchId)(using
             hc,
             FakeRequest().withHeaders(sampleCorrelationIdHeader),
             ec
@@ -137,7 +137,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
       }
 
-      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "return an empty dataset for NO_DATA_FOUND" in new Setup {
@@ -151,12 +151,16 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
       val result = await(
         underTest
-          .fetchEmployments(nino, interval, None, matchId)(hc, FakeRequest().withHeaders(sampleCorrelationIdHeader), ec)
+          .fetchEmployments(nino, interval, None, matchId)(using
+            hc,
+            FakeRequest().withHeaders(sampleCorrelationIdHeader),
+            ec
+          )
       )
 
       result shouldBe List()
 
-      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "Fail when IF returns a NOT_FOUND" in new Setup {
@@ -170,7 +174,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
 
       intercept[NotFoundException] {
         await(
-          underTest.fetchEmployments(nino, interval, None, matchId)(
+          underTest.fetchEmployments(nino, interval, None, matchId)(using
             hc,
             FakeRequest().withHeaders(sampleCorrelationIdHeader),
             ec
@@ -178,7 +182,7 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
       }
 
-      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+      verify(underTest.auditHelper, times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "for no employment data" should {
@@ -201,14 +205,14 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
 
         val result = await(
-          underTest.fetchEmployments(nino, interval, None, matchId)(
+          underTest.fetchEmployments(nino, interval, None, matchId)(using
             hc,
             FakeRequest().withHeaders(sampleCorrelationIdHeader),
             ec
           )
         )
 
-        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(using any())
 
         result shouldBe noEmploymentData.employments
       }
@@ -234,14 +238,14 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
 
         val result = await(
-          underTest.fetchEmployments(nino, interval, None, matchId)(
+          underTest.fetchEmployments(nino, interval, None, matchId)(using
             hc,
             FakeRequest().withHeaders(sampleCorrelationIdHeader),
             ec
           )
         )
 
-        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(using any())
 
         result shouldBe singleEmploymentData.employments
       }
@@ -267,14 +271,14 @@ class IfConnectorSpec extends SpecBase with BeforeAndAfterEach with Intervals wi
         )
 
         val result = await(
-          underTest.fetchEmployments(nino, interval, None, matchId)(
+          underTest.fetchEmployments(nino, interval, None, matchId)(using
             hc,
             FakeRequest().withHeaders(sampleCorrelationIdHeader),
             ec
           )
         )
 
-        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        verify(underTest.auditHelper, times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(using any())
 
         result shouldBe multiEmploymentData.employments
       }

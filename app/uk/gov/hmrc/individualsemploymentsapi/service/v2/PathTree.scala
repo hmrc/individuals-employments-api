@@ -20,7 +20,7 @@ class PathTree(node: B) {
 
   def listChildren: Iterable[String] = node.listChildren
 
-  def children: Iterable[Node] = node.children
+  private def children: Iterable[Node] = node.children
 
   def hasChild(key: String): Boolean = node.hasChild(key)
 
@@ -114,7 +114,7 @@ case class B(value: String, children: Iterable[Node]) extends Node {
             }
           ) ++ b.children.filter(n1 => !a.hasChild(n1.get))
         )
-      case (a: L, b: B) => b
+      case (_: L, b: B) => b
       case _            => a1
     }
 }

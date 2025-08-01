@@ -38,7 +38,7 @@ class EmploymentsService @Inject() (
   cacheService: CacheService
 )(implicit val ec: ExecutionContext) {
 
-  private implicit val localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ isBefore _)
+  private implicit val localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ `isBefore` _)
 
   private val endpoints = List("paye")
 

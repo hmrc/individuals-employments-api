@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.cache
 
-import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, ReplaceOptions}
 import org.mongodb.scala.result.UpdateResult
@@ -27,7 +26,7 @@ import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, Sensitive}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import uk.gov.hmrc.play.http.logging.Mdc.preservingMdc
+import uk.gov.hmrc.mdc.Mdc.preservingMdc
 
 import java.time.{LocalDateTime, ZoneOffset}
 import java.util.concurrent.TimeUnit
@@ -55,7 +54,7 @@ abstract class CacheRepository(
       )
     ) {
 
-  implicit lazy val crypto: Encrypter with Decrypter = new ApplicationCrypto(configuration.underlying).JsonCrypto
+  implicit lazy val crypto: Encrypter & Decrypter = new ApplicationCrypto(configuration.underlying).JsonCrypto
 
   def cache[T](id: String, value: T)(implicit formats: Format[T]): Future[UpdateResult] = {
 
