@@ -22,7 +22,7 @@ import org.mongodb.scala.result.UpdateResult
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.crypto.json.JsonEncryption
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, Sensitive}
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive, SymmetricCryptoFactory}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -54,7 +54,8 @@ abstract class CacheRepository(
       )
     ) {
 
-  implicit lazy val crypto: Encrypter & Decrypter = new ApplicationCrypto(configuration.underlying).JsonCrypto
+  implicit lazy val crypto: Encrypter & Decrypter =
+    SymmetricCryptoFactory.aesCryptoFromConfig("mongodb.encryption", configuration.underlying)
 
   def cache[T](id: String, value: T)(implicit formats: Format[T]): Future[UpdateResult] = {
 

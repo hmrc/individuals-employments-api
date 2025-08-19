@@ -86,10 +86,10 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
   protected val IfNoEmploymentEx = IfEmployment(
     employer = None,
-    employment =Some(
+    employment = Some(
       IfEmploymentDetail(
-        startDate =None,
-        endDate = Some(LocalDate.of(2099,12,31).toString),
+        startDate = None,
+        endDate = Some(LocalDate.of(2099, 12, 31).toString),
         payFrequency = None,
         payrollId = None,
         address = None
