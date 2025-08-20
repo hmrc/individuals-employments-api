@@ -38,7 +38,7 @@ object Employer {
     val name = ifEmployment.employer.flatMap(e => e.name)
     val address = ifEmployment.employer.flatMap(e => e.address)
     val empRef = ifEmployment.employerRef.map { x =>
-      val splits = x.split('/')
+      val splits = x.split("/", -1)
       EmpRef(splits(0), splits(1))
     }
 

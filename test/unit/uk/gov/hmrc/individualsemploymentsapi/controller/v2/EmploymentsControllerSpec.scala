@@ -84,6 +84,20 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     employerRef = Some("247/A1987CB")
   )
 
+  protected val IfNoEmploymentEx = IfEmployment(
+    employer = None,
+    employment = Some(
+      IfEmploymentDetail(
+        startDate = None,
+        endDate = Some(LocalDate.of(2099, 12, 31).toString),
+        payFrequency = None,
+        payrollId = None,
+        address = None
+      )
+    ),
+    payments = None,
+    employerRef = Some("/")
+  )
   val sampleMatchIdString = "57072660-1df9-4aeb-b4ea-cd2d7f96e430"
   val sampleMatchId: UUID = UUID.fromString(sampleMatchIdString)
 
@@ -316,6 +330,42 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
                 "line5"    -> "Acme State",
                 "postcode" -> "AI22 9LL"
               )
+            )
+          )
+        )
+      )
+
+      verify(employmentsController.auditHelper, times(1))
+        .auditApiResponse(any(), any(), any(), any(), any(), any())(using any())
+
+      verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(using any())
+    }
+
+    "return 200 OK for no employments" in new Setup {
+
+      Mockito.reset(employmentsController.auditHelper)
+
+      val matchId = UUID.randomUUID()
+
+      when(mockEmploymentsService.paye(eqTo(matchId), eqTo(interval), any(), any(), any())(using any(), any()))
+        .thenReturn(Future.successful(Seq(Employment.create(IfNoEmploymentEx).get)))
+
+      val res =
+        employmentsController.paye(matchId.toString, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
+
+      status(res) shouldBe OK
+
+      contentAsJson(res) shouldBe Json.obj(
+        "_links" -> Json.obj(
+          "self" -> Json.obj(
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2018-03-02"
+          )
+        ),
+        "employments" -> Json.arr(
+          Json.obj(
+            "endDate" -> "2099-12-31",
+            "employer" -> Json.obj(
+              "payeReference" -> "/"
             )
           )
         )
