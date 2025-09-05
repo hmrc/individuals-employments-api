@@ -42,7 +42,7 @@ class IfQueriesSpec extends BaseSpec {
 
     Scenario("For read:individuals-employments-laa-c4") {
       val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-laa-c4"), List("paye"))
-      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employment(endDate,startDate))"
+      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employerRef,employment(endDate,startDate))"
     }
 
     Scenario("For read:individuals-employments-hmcts-c2") {
