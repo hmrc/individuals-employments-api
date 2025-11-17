@@ -23,12 +23,12 @@ import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive, SymmetricCryptoFactory}
+import uk.gov.hmrc.mdc.Mdc.preservingMdc
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import uk.gov.hmrc.mdc.Mdc.preservingMdc
 
-import java.time.{LocalDateTime, ZoneOffset}
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -66,8 +66,8 @@ abstract class CacheRepository(
       id,
       new Data(encryptedValue),
       new ModifiedDetails(
-        LocalDateTime.now(ZoneOffset.UTC),
-        LocalDateTime.now(ZoneOffset.UTC)
+        Instant.now,
+        Instant.now
       )
     )
 

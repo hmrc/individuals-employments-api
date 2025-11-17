@@ -16,12 +16,14 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.cache
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, Json, OFormat}
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
-import java.time.LocalDateTime
+import java.time.Instant
 
-case class ModifiedDetails(createdAt: LocalDateTime, lastUpdated: LocalDateTime)
+case class ModifiedDetails(createdAt: Instant, lastUpdated: Instant)
 
 object ModifiedDetails {
-  implicit val format: Format[ModifiedDetails] = Json.format
+  given Format[Instant] = MongoJavatimeFormats.instantFormat
+  implicit val format: OFormat[ModifiedDetails] = Json.format
 }
