@@ -20,6 +20,7 @@ import com.google.inject.AbstractModule
 import com.google.inject.name.Names
 import com.typesafe.config.Config
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.individualsemploymentsapi.ttl.UpdateCacheTTLService
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 
 class ConfigModule(config: Config) extends AbstractModule {
@@ -35,5 +36,6 @@ class ConfigModule(config: Config) extends AbstractModule {
     bindConstant().annotatedWith(Names.named("hmctsClientId")).to(hmctsClientId)
 
     bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
+    bind(classOf[UpdateCacheTTLService]).asEagerSingleton()
   }
 }
