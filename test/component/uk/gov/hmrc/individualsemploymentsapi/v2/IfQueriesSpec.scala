@@ -89,7 +89,7 @@ class IfQueriesSpec extends BaseSpec {
     }
     Scenario("For read:individuals-employments-scts") {
       val queryString = helper.getQueryStringFor(Seq("read:individuals-employments-scts"), List("paye"))
-      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),payments(date,paidTaxablePay))"
+      queryString shouldBe "employments(employer(address(line1,line2,line3,line4,line5,postcode),name),employment(endDate),payments(date,paidTaxablePay))"
     }
   }
 }
