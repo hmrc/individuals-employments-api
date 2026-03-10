@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.cache
 
+import org.mongodb.scala.model.Filters.{equal, gt, gte, lte}
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, ReplaceOptions}
 import org.mongodb.scala.result.UpdateResult
@@ -23,12 +24,13 @@ import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.crypto.json.JsonEncryption
 import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive, SymmetricCryptoFactory}
+import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import uk.gov.hmrc.mdc.Mdc.preservingMdc
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
-import java.time.Instant
+import java.time.{Instant, LocalDateTime}
 import java.util.concurrent.TimeUnit
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -57,13 +59,14 @@ abstract class CacheRepository(
   implicit lazy val crypto: Encrypter & Decrypter =
     SymmetricCryptoFactory.aesCryptoFromConfig("mongodb.encryption", configuration.underlying)
 
-  def cache[T](id: String, value: T)(implicit formats: Format[T]): Future[UpdateResult] = {
+  def cache[T](id: String, interval: Interval, value: T)(implicit formats: Format[T]): Future[UpdateResult] = {
 
     val jsonEncryptor = JsonEncryption.sensitiveEncrypter[T, SensitiveT[T]]
     val encryptedValue: JsValue = jsonEncryptor.writes(SensitiveT(value))
 
     val entry = new Entry(
       id,
+      interval,
       new Data(encryptedValue),
       new ModifiedDetails(
         Instant.now,
@@ -82,12 +85,17 @@ abstract class CacheRepository(
     }
   }
 
-  def fetchAndGetEntry[T](id: String)(implicit formats: Format[T]): Future[Option[T]] = {
+  def fetchAndGetEntry[T](id: String, fromDate: LocalDateTime, toDate: LocalDateTime)(implicit
+    formats: Format[T]
+  ): Future[Option[T]] = {
     val decryptor = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
+
+    val filters =
+      Filters.and(equal("id", toBson(id)), gte("interval.fromDate", fromDate), lte("interval.toDate", toDate))
 
     preservingMdc {
       collection
-        .find(Filters.equal("id", toBson(id)))
+        .find(filters)
         .headOption()
         .map {
           case Some(entry) => decryptor.reads(entry.data.value).asOpt map (_.decryptedValue)

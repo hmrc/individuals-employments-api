@@ -18,6 +18,7 @@ package uk.gov.hmrc.individualsemploymentsapi.service.v1
 
 import play.api.libs.json.Format
 import uk.gov.hmrc.individualsemploymentsapi.cache.v1.{CacheRepositoryConfiguration, ShortLivedCache}
+import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -28,14 +29,14 @@ class CacheService @Inject() (cachingClient: ShortLivedCache, conf: CacheReposit
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
-  def get[T: Format](cacheId: String, fallbackFunction: => Future[T]): Future[T] =
+  def get[T: Format](cacheId: String, interval: Interval, fallbackFunction: => Future[T]): Future[T] =
     if (cacheEnabled)
-      cachingClient.fetchAndGetEntry[T](cacheId) flatMap {
+      cachingClient.fetchAndGetEntry[T](cacheId, interval.fromDate, interval.toDate) flatMap {
         case Some(value) =>
           Future.successful(value)
         case None =>
           fallbackFunction map { result =>
-            cachingClient.cache(cacheId, result)
+            cachingClient.cache(cacheId, interval, result)
             result
           }
       }

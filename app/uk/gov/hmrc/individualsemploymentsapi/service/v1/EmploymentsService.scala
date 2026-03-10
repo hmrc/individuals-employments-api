@@ -88,6 +88,7 @@ class LiveEmploymentsService @Inject() (
       cacheService
         .get(
           s"$matchId-${interval.getStart}-${interval.getEnd}",
+          interval,
           withRetry {
             desConnector.fetchEmployments(ninoMatch.nino, interval)
           }

@@ -32,14 +32,15 @@ class CacheService @Inject() (cachingClient: ShortLivedCache, conf: CacheReposit
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
-  def get[T: Format](cacheId: CacheIdBase, fallbackFunction: => Future[T]): Future[T] =
+  def get[T: Format](cacheId: CacheId, fallbackFunction: => Future[T]): Future[T] =
     if (cacheEnabled)
-      cachingClient.fetchAndGetEntry[T](cacheId.id) flatMap {
+      cachingClient.fetchAndGetEntry[T](cacheId.id, cacheId.interval.fromDate, cacheId.interval.toDate) flatMap {
         case Some(value) =>
           Future.successful(value)
         case None =>
           fallbackFunction map { result =>
-            cachingClient.cache(cacheId.id, result)
+            System.out.println("result: " + result)
+            cachingClient.cache(cacheId.id, cacheId.interval, result)
             result
           }
       }

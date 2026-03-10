@@ -17,9 +17,11 @@
 package uk.gov.hmrc.individualsemploymentsapi.cache
 
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 
-case class Entry(id: String, data: Data, modifiedDetails: ModifiedDetails)
+case class Entry(id: String, interval: Interval, data: Data, modifiedDetails: ModifiedDetails)
 
 object Entry {
   implicit val format: Format[Entry] = Json.format
+  implicit val formatInterval: Format[Interval] = Json.format
 }
