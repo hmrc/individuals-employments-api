@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.service.v1
 
+import play.api.mvc.RequestHeader
+
 import java.time.{LocalDate, LocalTime}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
@@ -35,9 +37,12 @@ trait EmploymentsService {
 
   implicit val localDateOrdering: Ordering[LocalDate] = Ordering.fromLessThan(_ `isBefore` _)
 
-  def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch]
+  def resolve(matchId: UUID)(implicit hc: HeaderCarrier, request: RequestHeader): Future[NinoMatch]
 
-  def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]]
+  def paye(matchId: UUID, interval: Interval)(implicit
+    hc: HeaderCarrier,
+    request: RequestHeader
+  ): Future[Seq[Employment]]
 }
 
 @Singleton
@@ -46,11 +51,14 @@ class SandboxEmploymentsService extends EmploymentsService {
   import uk.gov.hmrc.individualsemploymentsapi.sandbox.v1.SandboxData.Individuals.find
   import uk.gov.hmrc.individualsemploymentsapi.sandbox.v1.SandboxData._
 
-  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
+  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier, request: RequestHeader): Future[NinoMatch] =
     if (matchId.equals(sandboxMatchId)) successful(domain.NinoMatch(sandboxMatchId, sandboxNino))
     else failed(new MatchNotFoundException)
 
-  override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =
+  override def paye(matchId: UUID, interval: Interval)(implicit
+    hc: HeaderCarrier,
+    request: RequestHeader
+  ): Future[Seq[Employment]] =
     paye(find(matchId), interval)
 
   private def paye(maybeIndividual: Option[Individual], interval: Interval): Future[Seq[Employment]] =
@@ -80,10 +88,13 @@ class LiveEmploymentsService @Inject() (
     e.employmentLeavingDate.getOrElse(interval.getEnd.toLocalDate)
   }
 
-  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
+  override def resolve(matchId: UUID)(implicit hc: HeaderCarrier, request: RequestHeader): Future[NinoMatch] =
     individualsMatchingApiConnector.resolve(matchId)
 
-  override def paye(matchId: UUID, interval: Interval)(implicit hc: HeaderCarrier): Future[Seq[Employment]] =
+  override def paye(matchId: UUID, interval: Interval)(implicit
+    hc: HeaderCarrier,
+    request: RequestHeader
+  ): Future[Seq[Employment]] =
     resolve(matchId).flatMap { ninoMatch =>
       cacheService
         .get(

@@ -21,16 +21,13 @@ import play.api.hal.HalLink
 import play.api.libs.json.Json
 import play.api.mvc.hal.*
 import play.api.mvc.{Action, AnyContent, ControllerComponents, Request}
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.individualsemploymentsapi.controller.v1.Environment.{PRODUCTION, SANDBOX}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
-import uk.gov.hmrc.individualsemploymentsapi.service.v1.{EmploymentsService, LiveEmploymentsService, SandboxEmploymentsService}
+import uk.gov.hmrc.individualsemploymentsapi.service.v1.EmploymentsService
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.time.LocalDate
 import java.util.UUID
-import javax.inject.{Inject, Named, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 abstract class EmploymentsController(
@@ -89,30 +86,4 @@ abstract class EmploymentsController(
         employments.map(_.copy(payrollId = None, employeeAddress = None))
     }
 
-}
-
-@Singleton
-class SandboxEmploymentsController @Inject() (
-  sandboxEmploymentsService: SandboxEmploymentsService,
-  val authConnector: AuthConnector,
-  @Named("hmctsClientId") val hmctsClientId: String,
-  cc: ControllerComponents,
-  config: ServicesConfig
-)(implicit ec: ExecutionContext)
-    extends EmploymentsController(sandboxEmploymentsService, cc, config) {
-
-  override val environment: String = SANDBOX
-}
-
-@Singleton
-class LiveEmploymentsController @Inject() (
-  liveEmploymentsService: LiveEmploymentsService,
-  val authConnector: AuthConnector,
-  @Named("hmctsClientId") val hmctsClientId: String,
-  cc: ControllerComponents,
-  config: ServicesConfig
-)(implicit ec: ExecutionContext)
-    extends EmploymentsController(liveEmploymentsService, cc, config) {
-
-  override val environment: String = PRODUCTION
 }

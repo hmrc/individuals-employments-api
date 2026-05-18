@@ -46,7 +46,7 @@ class EmploymentsService @Inject() (
     e.endDate.getOrElse(interval.getEnd.toLocalDate)
   }
 
-  def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
+  def resolve(matchId: UUID)(implicit hc: HeaderCarrier, request: RequestHeader): Future[NinoMatch] =
     individualsMatchingApiConnector.resolve(matchId)
 
   def paye(

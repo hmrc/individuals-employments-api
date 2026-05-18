@@ -17,9 +17,10 @@
 package uk.gov.hmrc.individualsemploymentsapi.connector
 
 import play.api.Logger
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments}
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
@@ -37,8 +38,22 @@ class DesConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClientV2
   private val desBearerToken = servicesConfig.getString("microservice.services.des.authorization-token")
   private val desEnvironment = servicesConfig.getString("microservice.services.des.environment")
 
+  val extractCorrelationId: RequestHeader => Seq[(String, String)] =
+    req =>
+      req.headers
+        .get("X-Correlation-ID")
+        .map(id => Seq("X-Correlation-ID" -> id))
+        .getOrElse(Seq.empty)
+
+  private def setHeaders() = Seq(
+    HeaderNames.authorisation -> s"Bearer $desBearerToken",
+    "Environment"             -> desEnvironment,
+    "Source"                  -> "MDTP"
+  )
+
   def fetchEmployments(nino: Nino, interval: Interval)(implicit
     hc: HeaderCarrier,
+    request: RequestHeader,
     ec: ExecutionContext
   ): Future[Seq[DesEmployment]] = {
 
@@ -48,9 +63,7 @@ class DesConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClientV2
 
     http
       .get(url"$employmentsUrl")
-      .setHeader(HeaderNames.authorisation -> s"Bearer $desBearerToken")
-      .setHeader("Environment" -> desEnvironment)
-      .setHeader("Source" -> "MDTP")
+      .transform(_.addHttpHeaders((setHeaders() ++ extractCorrelationId(request))*))
       .execute[DesEmployments]
       .map(_.employments)
       .recoverWith {

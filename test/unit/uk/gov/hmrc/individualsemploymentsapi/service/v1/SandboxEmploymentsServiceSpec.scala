@@ -16,6 +16,8 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.service
 
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
@@ -28,6 +30,7 @@ class SandboxEmploymentsServiceSpec extends SpecBase with Intervals {
 
   val sandboxEmploymentsService = new SandboxEmploymentsService
   implicit val hc: HeaderCarrier = new HeaderCarrier
+  implicit val rd: RequestHeader = FakeRequest()
 
   "Sandbox employments service paye function" should {
 
