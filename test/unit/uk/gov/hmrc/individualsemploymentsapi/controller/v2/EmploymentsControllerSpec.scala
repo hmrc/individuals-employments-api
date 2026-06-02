@@ -16,15 +16,15 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
-import org.mockito.ArgumentMatchers.{any, eq => eqTo, refEq}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo, refEq}
 import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
-import play.api.mvc.{ControllerComponents, Result}
-import play.api.test.Helpers._
-import play.api.test._
+import play.api.mvc.{ControllerComponents, RequestHeader, Result}
+import play.api.test.Helpers.*
+import play.api.test.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
@@ -141,7 +141,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
       Mockito.reset(employmentsController.auditHelper)
 
-      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier]))
+      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
@@ -162,7 +162,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
       Mockito.reset(employmentsController.auditHelper)
 
-      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier]))
+      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
@@ -183,7 +183,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
       Mockito.reset(employmentsController.auditHelper)
 
-      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier]))
+      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
@@ -204,7 +204,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
       Mockito.reset(employmentsController.auditHelper)
 
-      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier]))
+      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
 
       val eventualResult =

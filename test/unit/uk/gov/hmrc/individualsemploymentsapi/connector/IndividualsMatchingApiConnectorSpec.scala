@@ -17,7 +17,10 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.connector
 
 import org.scalatest.BeforeAndAfterEach
-import play.api.test.Helpers._
+import org.scalatest.matchers.must.Matchers.mustBe
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
+import play.api.test.Helpers.*
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.IndividualsMatchingApiConnector
@@ -32,6 +35,7 @@ class IndividualsMatchingApiConnectorSpec
 
   trait Fixture {
     implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val rh: RequestHeader = FakeRequest()
     protected val individualsMatchingApiConnector: IndividualsMatchingApiConnector =
       app.injector.instanceOf[IndividualsMatchingApiConnector]
   }
@@ -60,6 +64,22 @@ class IndividualsMatchingApiConnectorSpec
         """
       )
       await(individualsMatchingApiConnector.resolve(matchId)) shouldBe domain.NinoMatch(matchId, Nino("AB123456C"))
+    }
+    "setHeaders return header when CorrelationId is present" in new Fixture {
+
+      val request = FakeRequest().withHeaders("CorrelationId" -> "188e9400-b636-4a3b-80ba-230a8c72b92a")
+
+      val result: Seq[(String, String)] = individualsMatchingApiConnector.setHeaders(request)
+
+      result mustBe Seq("CorrelationId" -> "188e9400-b636-4a3b-80ba-230a8c72b92a")
+    }
+
+    "setHeaders return empty Seq when CorrelationId is missing" in new Fixture {
+      val request = FakeRequest()
+
+      val result: Seq[(String, String)] = individualsMatchingApiConnector.setHeaders(request)
+
+      result mustBe Seq.empty
     }
   }
 }

@@ -17,10 +17,12 @@
 package unit.uk.gov.hmrc.individualsemploymentsapi.service.v1
 
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito._
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Format
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
@@ -59,6 +61,7 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
   private val interval = toInterval("2016-01-01", "2017-03-01")
 
   implicit val hc: HeaderCarrier = new HeaderCarrier
+  implicit val rd: RequestHeader = FakeRequest()
 
   "Live Employments Service paye function based on match id" should {
 
@@ -114,7 +117,7 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
         .thenReturn(Future.successful(Seq(someEmployment)))
 
       await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq(Employment.from(someEmployment).get)
-      verify(desConnector, times(2)).fetchEmployments(any(), any())(using any(), any())
+      verify(desConnector, times(2)).fetchEmployments(any(), any())(using any(), any(), any())
     }
   }
 

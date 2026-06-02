@@ -16,18 +16,19 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.controller.v1
 
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.Mockito.{verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.Json
-import play.api.mvc.{ControllerComponents, Result}
-import play.api.test.Helpers._
-import play.api.test._
+import play.api.mvc.{ControllerComponents, RequestHeader, Result}
+import play.api.test.Helpers.*
+import play.api.test.*
 import uk.gov.hmrc.auth.core.retrieve.EmptyRetrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.individualsemploymentsapi.controller.v1.{LiveEmploymentsController, SandboxEmploymentsController}
+import uk.gov.hmrc.individualsemploymentsapi.controller.v1.live.LiveEmploymentsController
+import uk.gov.hmrc.individualsemploymentsapi.controller.v1.sandbox.SandboxEmploymentsController
 import uk.gov.hmrc.individualsemploymentsapi.domain
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
@@ -36,6 +37,7 @@ import uk.gov.hmrc.individualsemploymentsapi.service.v1.{LiveEmploymentsService,
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
 import java.time.LocalDate
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
@@ -69,6 +71,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       )
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val rd: RequestHeader = FakeRequest()
 
     when(mockAuthConnector.authorise(any(), eqTo(EmptyRetrieval))(using any(), any()))
       .thenReturn(Future.successful(()))
@@ -78,7 +81,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     val randomMatchId = UUID.randomUUID()
 
     "return a 404 (not found) when a match id does not match live data" in new Setup {
-      when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier]))
+      when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
@@ -92,7 +95,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "return a 200 (ok) when a match id matches live data" in new Setup {
-      when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier]))
+      when(mockLiveEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.successful(domain.NinoMatch(randomMatchId, Nino("AB123456C"))))
       val eventualResult =
         liveEmploymentsController.root(randomMatchId)(FakeRequest())
@@ -124,7 +127,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "not require bearer token authentication for sandbox" in new Setup {
-      when(mockSandboxEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier]))
+      when(mockSandboxEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier], any[RequestHeader]))
         .thenReturn(Future.successful(domain.NinoMatch(randomMatchId, Nino("AB123456C"))))
 
       val result =
@@ -143,7 +146,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     "return 404 (not found) for an invalid matchId" in new Setup {
       val invalidMatchId = UUID.randomUUID()
-      when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval))(using any()))
+      when(mockLiveEmploymentsService.paye(eqTo(invalidMatchId), eqTo(interval))(using any(), any()))
         .thenReturn(Future.failed(new MatchNotFoundException))
 
       val eventualResult =
@@ -158,7 +161,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     "return 200 OK with payroll ID and employee address when the X-Client-Id header is set to the HMCTS client ID" in new Setup {
       val matchId = UUID.randomUUID()
 
-      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(using any()))
+      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(using any(), any()))
         .thenReturn(Future.successful(Seq(Employment.from(Employments.acme).get)))
 
       val res =
@@ -203,7 +206,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     "return 200 OK without payroll ID and employee address when the X-Client-Id header is not set to the HMCTS client ID" in new Setup {
       val matchId = UUID.randomUUID()
 
-      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(using any()))
+      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(using any(), any()))
         .thenReturn(Future.successful(Seq(Employment.from(Employments.acme).get)))
 
       val res =
@@ -241,7 +244,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     "return 200 OK without payroll ID and employee address when the X-Client-Id header is not set" in new Setup {
       val matchId = UUID.randomUUID()
 
-      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(using any()))
+      when(mockLiveEmploymentsService.paye(eqTo(matchId), eqTo(interval))(using any(), any()))
         .thenReturn(Future.successful(Seq(Employment.from(Employments.acme).get)))
 
       val res = liveEmploymentsController.paye(matchId, interval)(FakeRequest())
@@ -298,7 +301,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     }
 
     "not require bearer token authentication" in new Setup {
-      when(mockSandboxEmploymentsService.paye(eqTo(sandboxMatchId), eqTo(interval))(using any()))
+      when(mockSandboxEmploymentsService.paye(eqTo(sandboxMatchId), eqTo(interval))(using any(), any()))
         .thenReturn(
           Future.successful(Seq(Employment.from(Employments.acme), Employment.from(Employments.disney)).flatten)
         )

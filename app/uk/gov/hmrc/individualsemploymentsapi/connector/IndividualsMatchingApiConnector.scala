@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.connector
 
-import uk.gov.hmrc.http.HttpReads.Implicits._
+import play.api.mvc.RequestHeader
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
@@ -34,9 +35,17 @@ class IndividualsMatchingApiConnector @Inject() (serviceConfig: ServicesConfig, 
 
   private[connector] val serviceUrl = serviceConfig.baseUrl("individuals-matching-api")
 
-  def resolve(matchId: UUID)(implicit hc: HeaderCarrier): Future[NinoMatch] =
+  val setHeaders: RequestHeader => Seq[(String, String)] =
+    req =>
+      req.headers
+        .get("CorrelationId")
+        .map(id => Seq("CorrelationId" -> id))
+        .getOrElse(Seq.empty)
+
+  def resolve(matchId: UUID)(implicit hc: HeaderCarrier, request: RequestHeader): Future[NinoMatch] =
     http
       .get(url"$serviceUrl/match-record/$matchId")
+      .transform(_.addHttpHeaders(setHeaders(request)*))
       .execute[NinoMatch]
       .recover { case UpstreamErrorResponse(_, 404, _, _) =>
         throw new MatchNotFoundException

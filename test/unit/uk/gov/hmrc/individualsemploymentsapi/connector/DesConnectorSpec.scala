@@ -16,6 +16,9 @@
 
 package unit.uk.gov.hmrc.individualsemploymentsapi.connector
 
+import org.scalatest.matchers.must.Matchers.mustBe
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
@@ -33,6 +36,7 @@ class DesConnectorSpec extends UnitSpec with ConnectorSupport with WireMockMetho
 
   trait Setup {
     implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val rd: RequestHeader = FakeRequest()
 
     protected val underTest: DesConnector = app.injector.instanceOf[DesConnector]
   }
@@ -139,6 +143,23 @@ class DesConnectorSpec extends UnitSpec with ConnectorSupport with WireMockMetho
       intercept[UpstreamErrorResponse] {
         await(underTest.fetchEmployments(nino, interval))
       }
+    }
+
+    "extractCorrelationId return header when CorrelationId is present" in new Setup {
+
+      val request = FakeRequest().withHeaders("X-Correlation-ID" -> "188e9400-b636-4a3b-80ba-230a8c72b92a")
+
+      val result: Seq[(String, String)] = underTest.extractCorrelationId(request)
+
+      result mustBe Seq("X-Correlation-ID" -> "188e9400-b636-4a3b-80ba-230a8c72b92a")
+    }
+
+    "extractCorrelationId return empty Seq when CorrelationId is missing" in new Setup {
+      val request = FakeRequest()
+
+      val result: Seq[(String, String)] = underTest.extractCorrelationId(request)
+
+      result mustBe Seq.empty
     }
   }
 }
