@@ -23,6 +23,7 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, TooManyRequestException}
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
+import uk.gov.hmrc.individualsemploymentsapi.config.AppConfig
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.*
 import uk.gov.hmrc.individualsemploymentsapi.util.Dates.toFormattedLocalDate
 import uk.gov.hmrc.individualsemploymentsapi.util.UuidValidator
@@ -94,14 +95,18 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
     hc: HeaderCarrier,
     request: RequestHeader,
     auditHelper: AuditHelper,
-    ec: ExecutionContext
+    ec: ExecutionContext,
+    appConfig: AppConfig
   ): Future[Result] = {
 
     if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
-
-    authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) { scopes =>
-      auditHelper.auditAuthScopes(matchId, scopes.enrolments.map(e => e.key).mkString(","), request)
-      f(scopes.enrolments.map(e => e.key))
+    if (appConfig.localEnv) {
+      f(endpointScopes.toList)
+    } else {
+      authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) { scopes =>
+        auditHelper.auditAuthScopes(matchId, scopes.enrolments.map(e => e.key).mkString(","), request)
+        f(scopes.enrolments.map(e => e.key))
+      }
     }
   }
 }

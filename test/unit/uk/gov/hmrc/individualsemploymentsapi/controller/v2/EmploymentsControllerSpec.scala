@@ -30,6 +30,7 @@ import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments, Insufficient
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.individualsemploymentsapi.audit.v2.AuditHelper
+import uk.gov.hmrc.individualsemploymentsapi.config.AppConfig
 import uk.gov.hmrc.individualsemploymentsapi.controller.v2.EmploymentsController
 import uk.gov.hmrc.individualsemploymentsapi.domain.integrationframework.{IfAddress, IfEmployer, IfEmployment, IfEmploymentDetail}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v2.Employment
@@ -110,6 +111,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     val mockEmploymentsService: EmploymentsService = mock[EmploymentsService]
 
     implicit lazy val ec: ExecutionContext = fakeApplication().injector.instanceOf[ExecutionContext]
+    lazy val appConfig: AppConfig = fakeApplication().injector.instanceOf[AppConfig]
     lazy val scopeService: ScopesService = new ScopesService(mockScopesConfig)
     lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
@@ -124,7 +126,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       auditHelper,
       controllerComponent,
       config
-    )
+    )(using ec, appConfig)
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
