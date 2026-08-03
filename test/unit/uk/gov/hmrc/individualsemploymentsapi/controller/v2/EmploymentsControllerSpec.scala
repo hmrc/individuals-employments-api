@@ -21,6 +21,7 @@ import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify, verifyNoInteractions, when}
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.{Environment, Mode}
 import play.api.libs.json.Json
 import play.api.mvc.{ControllerComponents, RequestHeader, Result}
 import play.api.test.Helpers.*
@@ -106,10 +107,8 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
     val validCorrelationHeader: (String, String) = ("CorrelationId", sampleCorrelationId)
-
     val controllerComponent: ControllerComponents = fakeApplication().injector.instanceOf[ControllerComponents]
     val mockEmploymentsService: EmploymentsService = mock[EmploymentsService]
-
     implicit lazy val ec: ExecutionContext = fakeApplication().injector.instanceOf[ExecutionContext]
     lazy val appConfig: AppConfig = fakeApplication().injector.instanceOf[AppConfig]
     lazy val scopeService: ScopesService = new ScopesService(mockScopesConfig)
@@ -117,6 +116,16 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
     val auditHelper: AuditHelper = mock[AuditHelper]
     val config: ServicesConfig = fakeApplication().injector.instanceOf[ServicesConfig]
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+
+    `given`(
+      mockAuthConnector.authorise(eqTo(Enrolment("test-scope")), refEq(Retrievals.allEnrolments))(using any(), any())
+    )
+      .willReturn(Future.successful(Enrolments(Set(Enrolment("test-scope")))))
+  }
+
+  trait NonLocalSetup extends Setup {
+   implicit val env: Environment = Environment.simple(mode = Mode.Prod)
 
     val employmentsController = new EmploymentsController(
       mockEmploymentsService,
@@ -126,20 +135,27 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       auditHelper,
       controllerComponent,
       config
-    )(using ec, appConfig)
+    )(using ec, appConfig, env)
+  }
 
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+  trait LocalSetup extends Setup {
+    implicit val envDev: Environment = Environment.simple(mode = Mode.Dev)
 
-    `given`(
-      mockAuthConnector.authorise(eqTo(Enrolment("test-scope")), refEq(Retrievals.allEnrolments))(using any(), any())
-    )
-      .willReturn(Future.successful(Enrolments(Set(Enrolment("test-scope")))))
+    val employmentsController = new EmploymentsController(
+      mockEmploymentsService,
+      scopeService,
+      scopesHelper,
+      mockAuthConnector,
+      auditHelper,
+      controllerComponent,
+      config
+    )(using ec, appConfig, envDev)
   }
 
   "Root" should {
     val randomMatchId = UUID.randomUUID()
 
-    "return a 404 (not found) when a match id does not match live data" in new Setup {
+    "return a 404 (not found) when a match id does not match live data" in new NonLocalSetup {
 
       Mockito.reset(employmentsController.auditHelper)
 
@@ -160,7 +176,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       )
     }
 
-    "Return an invalid request when missing a CorrelationId" in new Setup {
+    "Return an invalid request when missing a CorrelationId" in new NonLocalSetup {
 
       Mockito.reset(employmentsController.auditHelper)
 
@@ -181,7 +197,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     }
 
-    "Return an invalid request with an invalid CorrelationId" in new Setup {
+    "Return an invalid request with an invalid CorrelationId" in new NonLocalSetup {
 
       Mockito.reset(employmentsController.auditHelper)
 
@@ -202,7 +218,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
 
     }
 
-    "return a 200 (ok) when a match id matches live data" in new Setup {
+    "return a 200 (ok) when a match id matches live data" in new NonLocalSetup {
 
       Mockito.reset(employmentsController.auditHelper)
 
@@ -231,7 +247,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(using any())
     }
 
-    "fail with status 401 when the bearer token does not have enrolment test-scope" in new Setup {
+    "fail with status 401 when the bearer token does not have enrolment test-scope" in new NonLocalSetup {
 
       Mockito.reset(employmentsController.auditHelper)
 
@@ -247,7 +263,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
         .auditApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
-    "fail with status 500 when an unknown exception is thrown" in new Setup {
+    "fail with status 500 when an unknown exception is thrown" in new NonLocalSetup {
 
       Mockito.reset(employmentsController.auditHelper)
 
@@ -262,6 +278,36 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       verify(employmentsController.auditHelper, times(1))
         .auditApiFailure(any(), any(), any(), any(), any())(using any())
     }
+
+    "for local return a 200 (ok) when a match id matches live data" in new LocalSetup {
+
+      Mockito.reset(employmentsController.auditHelper)
+
+      when(mockEmploymentsService.resolve(eqTo(randomMatchId))(using any[HeaderCarrier], any[RequestHeader]))
+        .thenReturn(Future.successful(NinoMatch(randomMatchId, Nino("AB123456C"))))
+
+      val eventualResult =
+        employmentsController.root(randomMatchId.toString)(FakeRequest().withHeaders(validCorrelationHeader))
+
+      status(eventualResult) shouldBe OK
+      contentAsJson(eventualResult) shouldBe Json.obj(
+        "_links" -> Json.obj(
+          "paye" -> Json.obj(
+            "href"  -> s"/individuals/employments/paye?matchId=$randomMatchId{&startDate,endDate}",
+            "title" -> "Get an individual's PAYE employment data"
+          ),
+          "self" -> Json.obj(
+            "href" -> s"/individuals/employments/?matchId=$randomMatchId"
+          )
+        )
+      )
+
+      verify(employmentsController.auditHelper, times(1))
+        .auditApiResponse(any(), any(), any(), any(), any(), any())(using any())
+
+      verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(using any())
+    }
+
   }
 
   "Employments controller paye function" should {
@@ -270,7 +316,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
     val toDate = LocalDate.parse("2018-05-31").atTime(LocalTime.MIN)
     val interval = Interval(fromDate, toDate)
 
-    "return 404 (not found) for an invalid matchId" in new Setup {
+    "return 404 (not found) for an invalid matchId" in new NonLocalSetup {
 
       Mockito.reset(employmentsController.auditHelper)
 
@@ -296,7 +342,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       )
     }
 
-    "return 200 OK" in new Setup {
+    "return 200 OK" in new NonLocalSetup {
 
       Mockito.reset(employmentsController.auditHelper)
 
@@ -343,7 +389,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(using any())
     }
 
-    "return 200 OK for no employments" in new Setup {
+    "return 200 OK for no employments" in new NonLocalSetup {
 
       Mockito.reset(employmentsController.auditHelper)
 
@@ -379,7 +425,90 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(using any())
     }
 
-    "fail with 400 if fromDate is before 2013" in new Setup {
+    "for local return 200 OK" in new LocalSetup {
+
+      Mockito.reset(employmentsController.auditHelper)
+
+      val matchId = UUID.randomUUID()
+
+      when(mockEmploymentsService.paye(eqTo(matchId), eqTo(interval), any(), any(), any())(using any(), any()))
+        .thenReturn(Future.successful(Seq(Employment.create(ifEmploymentExample).get)))
+
+      val res =
+        employmentsController.paye(matchId.toString, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
+
+      status(res) shouldBe OK
+
+      contentAsJson(res) shouldBe Json.obj(
+        "_links" -> Json.obj(
+          "self" -> Json.obj(
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2018-03-02"
+          )
+        ),
+        "employments" -> Json.arr(
+          Json.obj(
+            "startDate"    -> "2019-01-01",
+            "endDate"      -> "2019-06-30",
+            "payFrequency" -> "FOUR_WEEKLY",
+            "employer" -> Json.obj(
+              "payeReference" -> "247/A1987CB",
+              "name"          -> "Acme",
+              "address" -> Json.obj(
+                "line1"    -> "Acme Inc Building",
+                "line2"    -> "Acme Inc Campus",
+                "line3"    -> "Acme Street",
+                "line4"    -> "AcmeVille",
+                "line5"    -> "Acme State",
+                "postcode" -> "AI22 9LL"
+              )
+            )
+          )
+        )
+      )
+
+      verify(employmentsController.auditHelper, times(1))
+        .auditApiResponse(any(), any(), any(), any(), any(), any())(using any())
+
+      verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(using any())
+    }
+
+    "for local return 200 OK for no employments" in new LocalSetup {
+
+      Mockito.reset(employmentsController.auditHelper)
+
+      val matchId = UUID.randomUUID()
+
+      when(mockEmploymentsService.paye(eqTo(matchId), eqTo(interval), any(), any(), any())(using any(), any()))
+        .thenReturn(Future.successful(Seq(Employment.create(IfNoEmploymentEx).get)))
+
+      val res =
+        employmentsController.paye(matchId.toString, interval, None)(FakeRequest().withHeaders(validCorrelationHeader))
+
+      status(res) shouldBe OK
+
+      contentAsJson(res) shouldBe Json.obj(
+        "_links" -> Json.obj(
+          "self" -> Json.obj(
+            "href" -> s"/individuals/employments/paye?matchId=$matchId&fromDate=2018-03-02"
+          )
+        ),
+        "employments" -> Json.arr(
+          Json.obj(
+            "endDate" -> "2099-12-31",
+            "employer" -> Json.obj(
+              "payeReference" -> "/"
+            )
+          )
+        )
+      )
+
+      verify(employmentsController.auditHelper, times(1))
+        .auditApiResponse(any(), any(), any(), any(), any(), any())(using any())
+
+      verify(employmentsController.auditHelper, times(1)).auditAuthScopes(any(), any(), any())(using any())
+    }
+
+    "fail with 400 if fromDate is before 2013" in new NonLocalSetup {
       val interval: Interval =
         Interval(LocalDate.parse("2012-12-31").atStartOfDay(), LocalDate.parse("2018-01-31").atStartOfDay())
       val result: Future[Result] = employmentsController.paye(sampleMatchId.toString, interval, None)(
@@ -388,7 +517,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
       status(result) shouldBe BAD_REQUEST
     }
 
-    "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new Setup {
+    "fail with status 401 when the bearer token does not have enrolment read:individuals-employments-paye" in new NonLocalSetup {
 
       Mockito.reset(employmentsController.auditHelper)
 

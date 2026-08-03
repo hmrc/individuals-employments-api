@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.individualsemploymentsapi.controller.v2
 
+import play.api.Environment
 import play.api.hal.Hal.*
 import play.api.hal.HalLink
 import play.api.libs.json.Json
@@ -42,7 +43,7 @@ class EmploymentsController @Inject() (
   implicit val auditHelper: AuditHelper,
   cc: ControllerComponents,
   config: ServicesConfig
-)(implicit val ec: ExecutionContext, appConfig: AppConfig)
+)(implicit val ec: ExecutionContext, appConfig: AppConfig, environment: Environment)
     extends CommonController(cc) with PrivilegedAuthentication {
 
   def root(matchId: String): Action[AnyContent] = Action.async { implicit request =>
