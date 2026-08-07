@@ -3,7 +3,7 @@ import sbt.*
 object AppDependencies {
   val hmrc = "uk.gov.hmrc"
   val hmrcMongo = s"$hmrc.mongo"
-  val mongoVersion = "2.12.0"
+  val mongoVersion = "2.13.0"
   val bootstrapVersion = "10.7.0"
   val playVersion = "play-30"
 

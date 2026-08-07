@@ -20,3 +20,7 @@ Run all the tests with coverage report:
 ### License
 
 This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
+
+### Running locally for performance tests
+
+     sbt run -Dconfig.resource=application.local.conf

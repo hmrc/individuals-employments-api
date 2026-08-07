@@ -17,7 +17,6 @@
 package uk.gov.hmrc.individualsemploymentsapi.service.v1
 
 import play.api.mvc.RequestHeader
-
 import java.time.{LocalDate, LocalTime}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
