@@ -47,8 +47,9 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
     "read:individuals-employments-lsani-c1",
     "read:individuals-employments-lsani-c3",
     "read:individuals-employments-nictsejo-c4",
-    "read:individuals-employments-scts"
-  )
+    "read:individuals-employments-scts",
+    "read:individuals-employments-dfe"
+  ).sorted
 
   val validData: IfEmployments = IfEmployments(
     Seq(
