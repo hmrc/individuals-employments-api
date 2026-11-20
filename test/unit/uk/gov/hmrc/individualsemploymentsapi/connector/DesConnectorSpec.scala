@@ -24,7 +24,7 @@ import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
 import uk.gov.hmrc.individualsemploymentsapi.connector.DesConnector
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.ip.{IpAddress, IpEmployment, IpPayment}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.{ConnectorSupport, UnitSpec, WireMockMethods}
 import utils.Intervals
 
@@ -41,7 +41,7 @@ class DesConnectorSpec extends UnitSpec with ConnectorSupport with WireMockMetho
     protected val underTest: DesConnector = app.injector.instanceOf[DesConnector]
   }
 
-  private val desAddress = DesAddress(
+  private val desAddress = IpAddress(
     line1 = Some("Acme House"),
     line2 = Some("23 Acme Street"),
     line3 = Some("Richmond"),
@@ -51,13 +51,13 @@ class DesConnectorSpec extends UnitSpec with ConnectorSupport with WireMockMetho
   )
 
   private val desPayments = Seq(
-    DesPayment(
+    IpPayment(
       paymentDate = LocalDate.parse("2016-11-28"),
       totalPayInPeriod = 100,
       weekPayNumber = None,
       monthPayNumber = Some(8)
     ),
-    DesPayment(
+    IpPayment(
       paymentDate = LocalDate.parse("2016-12-06"),
       totalPayInPeriod = 50,
       weekPayNumber = Some(49),
@@ -65,7 +65,7 @@ class DesConnectorSpec extends UnitSpec with ConnectorSupport with WireMockMetho
     )
   )
 
-  private val desEmployment = DesEmployment(
+  private val desEmployment = IpEmployment(
     employerName = Some("Acme Inc"),
     employerAddress = Some(desAddress),
     employerDistrictNumber = Some("123"),
@@ -161,5 +161,16 @@ class DesConnectorSpec extends UnitSpec with ConnectorSupport with WireMockMetho
 
       result mustBe Seq.empty
     }
+
+    "DesConnector should assign correct HTTP headers to downstream call" in new Setup {
+      val headers = underTest.setHeaders()
+
+      (headers should contain).allOf(
+        "Authorization" -> "Bearer DES_BEARER_TOKEN",
+        "Environment"   -> "isit",
+        "Source"        -> "MDTP"
+      )
+    }
+
   }
 }

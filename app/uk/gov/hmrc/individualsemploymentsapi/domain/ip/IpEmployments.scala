@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain.des
+package uk.gov.hmrc.individualsemploymentsapi.domain.ip
 
 import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Payment
 
-case class DesEmployments(employments: Seq[DesEmployment])
+case class IpEmployments(employments: Seq[IpEmployment])
 
-object DesEmployments {
-  implicit val desEmploymentsJsonFormat: Format[DesEmployments] = Json.format[DesEmployments]
+object IpEmployments {
+  implicit val ipEmploymentsJsonFormat: Format[IpEmployments] = Json.format[IpEmployments]
 
-  def toPayments(desEmployment: DesEmployment): Seq[Payment] =
-    desEmployment.payments map { payment =>
+  def toPayments(ipEmployment: IpEmployment): Seq[Payment] =
+    ipEmployment.payments map { payment =>
       Payment(
         payment.totalPayInPeriod,
         payment.paymentDate,
-        desEmployment.employerPayeReference,
+        ipEmployment.employerPayeReference,
         payment.monthPayNumber,
         payment.weekPayNumber
       )

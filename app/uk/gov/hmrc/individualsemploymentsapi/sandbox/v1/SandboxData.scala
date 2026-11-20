@@ -17,8 +17,8 @@
 package uk.gov.hmrc.individualsemploymentsapi.sandbox.v1
 
 import uk.gov.hmrc.domain.Nino
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
-import uk.gov.hmrc.individualsemploymentsapi.domain.{PayFrequencyCode, des}
+import uk.gov.hmrc.individualsemploymentsapi.domain.ip.{IpAddress, IpEmployment, IpPayment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.{PayFrequencyCode, ip}
 
 import java.time.LocalDate
 import java.time.LocalDate.parse
@@ -33,17 +33,17 @@ object SandboxData {
   val sandboxNino: Nino = Nino(sandboxNinoString)
 
   object Employments {
-    val acme: DesEmployment = DesEmployment(
+    val acme: IpEmployment = IpEmployment(
       Seq(
-        DesPayment(LocalDate.of(2018, 1, 28), 0),
-        DesPayment(LocalDate.of(2018, 2, 28), 0),
-        DesPayment(LocalDate.of(2018, 3, 28), 0),
-        DesPayment(LocalDate.of(2018, 4, 28), 0),
-        DesPayment(LocalDate.of(2018, 5, 28), 0)
+        IpPayment(LocalDate.of(2018, 1, 28), 0),
+        IpPayment(LocalDate.of(2018, 2, 28), 0),
+        IpPayment(LocalDate.of(2018, 3, 28), 0),
+        IpPayment(LocalDate.of(2018, 4, 28), 0),
+        IpPayment(LocalDate.of(2018, 5, 28), 0)
       ),
       Some("Acme"),
       Some(
-        DesAddress(
+        IpAddress(
           line1 = Some("Acme Inc Building"),
           line2 = Some("Acme Inc Campus"),
           line3 = Some("Acme Street"),
@@ -58,7 +58,7 @@ object SandboxData {
       Some(LocalDate.of(2018, 6, 30)),
       Some(PayFrequencyCode.W4),
       Some(
-        DesAddress(
+        IpAddress(
           line1 = Some("Employee's House"),
           line2 = Some("Employee Street"),
           line3 = Some("Employee Town"),
@@ -69,14 +69,14 @@ object SandboxData {
       ),
       Some("payroll-id")
     )
-    val disney: DesEmployment = DesEmployment(
+    val disney: IpEmployment = IpEmployment(
       Seq(
-        DesPayment(LocalDate.of(2019, 2, 19), 0),
-        DesPayment(LocalDate.of(2019, 2, 28), 0)
+        IpPayment(LocalDate.of(2019, 2, 19), 0),
+        IpPayment(LocalDate.of(2019, 2, 28), 0)
       ),
       Some("Disney"),
       Some(
-        DesAddress(
+        IpAddress(
           line1 = Some("Friars House"),
           line2 = Some("Campus Way"),
           line3 = Some("New Street"),
@@ -91,7 +91,7 @@ object SandboxData {
       Some(parse("2019-03-01")),
       Some(PayFrequencyCode.W2),
       Some(
-        DesAddress(
+        IpAddress(
           line1 = None,
           line2 = None,
           line3 = None,
@@ -106,15 +106,15 @@ object SandboxData {
 
   object Individuals {
 
-    val amanda: des.Individual = des.Individual(
+    val amanda: ip.Individual = ip.Individual(
       sandboxMatchId,
       sandboxNinoString,
       Seq(Employments.acme, Employments.disney)
     )
 
-    val individuals: Seq[des.Individual] = Seq(amanda)
+    val individuals: Seq[ip.Individual] = Seq(amanda)
 
-    def find(matchId: UUID): Option[des.Individual] = individuals.find(_.matchId == matchId)
+    def find(matchId: UUID): Option[ip.Individual] = individuals.find(_.matchId == matchId)
 
   }
 
