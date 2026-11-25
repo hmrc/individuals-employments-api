@@ -23,6 +23,8 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class AppConfig @Inject() (config: Configuration) {
 
+  lazy val useHipApi: Boolean = config.get[Boolean]("feature-flags.hip.api-6077")
+
   lazy val localEnv: Boolean =
     config.getOptional[Boolean]("localEnv").getOrElse(false)
 }

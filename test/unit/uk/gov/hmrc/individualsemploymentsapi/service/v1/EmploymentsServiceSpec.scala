@@ -26,10 +26,10 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
-import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
+import uk.gov.hmrc.individualsemploymentsapi.connector.{IndividualsMatchingApiConnector, IntegrationPlatformRouter}
 import uk.gov.hmrc.individualsemploymentsapi.domain
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode.{DesPayFrequency, M1}
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment, DesPayment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.ip.{IpAddress, IpEmployment, IpPayment}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.service.v1.{CacheService, LiveEmploymentsService}
 import unit.uk.gov.hmrc.individualsemploymentsapi.util.SpecBase
@@ -46,13 +46,13 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
 
   trait Fixture {
     val individualsMatchingApiConnector: IndividualsMatchingApiConnector = mock[IndividualsMatchingApiConnector]
-    val desConnector: DesConnector = mock[DesConnector]
+    val ipConnector: IntegrationPlatformRouter = mock[IntegrationPlatformRouter]
     // can't mock function with by-value argument
     private val stubCache = new CacheService(null, null)(using null) {
       override def get[T: Format](cacheId: String, functionToCache: => Future[T]): Future[T] =
         functionToCache
     }
-    val liveEmploymentsService = new LiveEmploymentsService(individualsMatchingApiConnector, desConnector, 0, stubCache)
+    val liveEmploymentsService = new LiveEmploymentsService(individualsMatchingApiConnector, ipConnector, 0, stubCache)
   }
 
   private val matchId = UUID.randomUUID()
@@ -67,7 +67,7 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
 
     "return empty list of employments when no employments exists for the given matchId" in new Fixture {
       when(individualsMatchingApiConnector.resolve(matchId)).thenReturn(successful(ninoMatch))
-      when(desConnector.fetchEmployments(nino, interval)).thenReturn(successful(Seq.empty))
+      when(ipConnector.fetchEmployments(nino, interval)).thenReturn(successful(Seq.empty))
       await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq.empty
     }
 
@@ -77,11 +77,11 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
       private val employmentWithLastPaymentInFebruary =
         aDesEmployment(
           leavingDate = None,
-          payments = Seq(DesPayment(parse("2016-12-28"), 10), DesPayment(parse("2017-02-28"), 10))
+          payments = Seq(IpPayment(parse("2016-12-28"), 10), IpPayment(parse("2017-02-28"), 10))
         )
 
       when(individualsMatchingApiConnector.resolve(matchId)).thenReturn(successful(ninoMatch))
-      when(desConnector.fetchEmployments(nino, interval))
+      when(ipConnector.fetchEmployments(nino, interval))
         .thenReturn(
           successful(Seq(employmentEndingJanuary, employmentEndingMarch, employmentWithLastPaymentInFebruary))
         )
@@ -98,7 +98,7 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
       private val employmentWithNoPayments = aDesEmployment(leavingDate = None, payments = Nil)
 
       when(individualsMatchingApiConnector.resolve(matchId)).thenReturn(Future.successful(ninoMatch))
-      when(desConnector.fetchEmployments(nino, interval))
+      when(ipConnector.fetchEmployments(nino, interval))
         .thenReturn(Future.successful(Seq(anEmployment, employmentWithNoPayments)))
 
       await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq(
@@ -112,19 +112,19 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
 
       when(individualsMatchingApiConnector.resolve(matchId)).thenReturn(Future.successful(ninoMatch))
 
-      when(desConnector.fetchEmployments(nino, interval))
+      when(ipConnector.fetchEmployments(nino, interval))
         .thenReturn(Future.failed(UpstreamErrorResponse("""¯\_(ツ)_/¯""", 503, 503)))
         .thenReturn(Future.successful(Seq(someEmployment)))
 
       await(liveEmploymentsService.paye(matchId, interval)) shouldBe Seq(Employment.from(someEmployment).get)
-      verify(desConnector, times(2)).fetchEmployments(any(), any())(using any(), any(), any())
+      verify(ipConnector, times(2)).fetchEmployments(any(), any())(using any(), any(), any())
     }
   }
 
   private def aDesEmployment(
     employerName: Option[String] = Some("Acme Inc"),
-    employerAddress: Option[DesAddress] = Some(
-      DesAddress(
+    employerAddress: Option[IpAddress] = Some(
+      IpAddress(
         line1 = Some("Acme House"),
         line2 = Some("23 Acme Street"),
         line3 = Some("Richmond"),
@@ -138,9 +138,9 @@ class EmploymentsServiceSpec extends SpecBase with Intervals with MockitoSugar w
     startDate: Option[LocalDate] = Some(parse("2016-01-01")),
     leavingDate: Option[LocalDate] = Some(parse("2020-02-29")),
     frequency: Option[DesPayFrequency] = Some(M1),
-    payments: Seq[DesPayment] = Seq.empty
+    payments: Seq[IpPayment] = Seq.empty
   ) =
-    DesEmployment(
+    IpEmployment(
       payments,
       employerName,
       employerAddress,

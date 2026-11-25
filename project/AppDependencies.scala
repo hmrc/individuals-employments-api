@@ -18,6 +18,7 @@ object AppDependencies {
   def test(scope: String = "test, it"): Seq[ModuleID] = Seq(
     hmrc                %% s"bootstrap-test-$playVersion" % bootstrapVersion % scope,
     "org.scalatestplus" %% "scalacheck-1-17"              % "3.2.18.0"       % scope,
-    "com.codacy"        %% "scalaj-http"                  % "2.5.0"          % scope
+    "com.codacy"        %% "scalaj-http"                  % "2.5.0"          % scope,
+    "com.ironcorelabs"  %% "cats-scalatest"               % "4.0.2"          % scope
   )
 }

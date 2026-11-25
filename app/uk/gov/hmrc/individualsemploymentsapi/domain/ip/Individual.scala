@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain.des
+package uk.gov.hmrc.individualsemploymentsapi.domain.ip
 
 import java.util.UUID
 
-case class Individual(matchId: UUID, nino: String, employments: Seq[DesEmployment])
+case class Individual(matchId: UUID, nino: String, employments: Seq[IpEmployment])

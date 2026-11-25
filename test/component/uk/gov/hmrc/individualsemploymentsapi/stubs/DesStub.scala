@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock._
 import component.uk.gov.hmrc.individualsemploymentsapi.controller.MockHost
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployments
+import uk.gov.hmrc.individualsemploymentsapi.domain.ip.IpEmployments
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 
 object DesStub extends MockHost(22003) {
@@ -29,13 +29,13 @@ object DesStub extends MockHost(22003) {
     nino: String,
     fromDate: String,
     toDate: String,
-    desEmployments: DesEmployments
+    ipEmployments: IpEmployments
   ): StubMapping =
     mock.register(
       get(urlPathEqualTo(s"/individuals/nino/$nino/employments/income"))
         .withQueryParam("from", equalTo(fromDate))
         .withQueryParam("to", equalTo(toDate))
-        .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(desEmployments).toString()))
+        .willReturn(aResponse().withStatus(OK).withBody(Json.toJson(ipEmployments).toString()))
     )
 
   def enforceRateLimit(nino: String, fromDate: String, toDate: String): Unit =

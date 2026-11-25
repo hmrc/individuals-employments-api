@@ -21,16 +21,16 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.domain.EmpRef
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesAddress, DesEmployment}
+import uk.gov.hmrc.individualsemploymentsapi.domain.ip.{IpAddress, IpEmployment}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.{Address, Employer, Employment, PayFrequency}
 
 class EmploymentSpec extends AnyFlatSpec with Matchers {
 
   "Employment" should "derive itself from an instance of des employment" in {
-    val desEmployment = DesEmployment(
+    val desEmployment = IpEmployment(
       Seq.empty,
       Some("Acme Inc"),
-      Some(DesAddress(Some("line 1"), postalCode = Some("AB1 2CD"))),
+      Some(IpAddress(Some("line 1"), postalCode = Some("AB1 2CD"))),
       Some("123"),
       Some("AB12345"),
       Some(LocalDate.of(2016, 1, 1)),
@@ -66,7 +66,7 @@ class EmploymentSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "handle the edge case where des employment is empty" in {
-    val desEmployment = DesEmployment(Seq.empty, None, None, None, None, None, None, None)
+    val desEmployment = IpEmployment(Seq.empty, None, None, None, None, None, None, None)
     Employment.from(desEmployment) shouldBe None
   }
 

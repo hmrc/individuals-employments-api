@@ -19,7 +19,7 @@ package uk.gov.hmrc.individualsemploymentsapi.domain.v1
 import play.api.libs.json.{Json, OFormat}
 
 import java.time.LocalDate
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.DesEmployment
+import uk.gov.hmrc.individualsemploymentsapi.domain.ip.IpEmployment
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.PayFrequency.PayFrequency
 
 case class Employment(
@@ -34,17 +34,17 @@ case class Employment(
 object Employment {
   implicit val employmentJsonFormat: OFormat[Employment] = Json.format[Employment]
 
-  def from(desEmployment: DesEmployment): Option[Employment] = {
-    val startDate = desEmployment.employmentStartDate
-    val endDate = desEmployment.employmentLeavingDate
+  def from(ipEmployment: IpEmployment): Option[Employment] = {
+    val startDate = ipEmployment.employmentStartDate
+    val endDate = ipEmployment.employmentLeavingDate
     val employer = Employer.create(
-      desEmployment.employerPayeReference,
-      desEmployment.employerName,
-      desEmployment.employerAddress.map(Address.from)
+      ipEmployment.employerPayeReference,
+      ipEmployment.employerName,
+      ipEmployment.employerAddress.map(Address.from)
     )
-    val payFrequency = desEmployment.employmentPayFrequency.flatMap(PayFrequency.from)
-    val address = desEmployment.employeeAddress.map(Address.from)
-    val payrollId = desEmployment.payrollId
+    val payFrequency = ipEmployment.employmentPayFrequency.flatMap(PayFrequency.from)
+    val address = ipEmployment.employeeAddress.map(Address.from)
+    val payrollId = ipEmployment.payrollId
 
     (startDate, endDate, employer, payFrequency) match {
       case (None, None, None, None) => None

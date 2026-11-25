@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain.des
+package uk.gov.hmrc.individualsemploymentsapi.domain.ip
 
 import play.api.libs.json.{Format, Json, OFormat}
 
-case class DesAddress(
+case class IpAddress(
   line1: Option[String] = None,
   line2: Option[String] = None,
   line3: Option[String] = None,
@@ -27,6 +27,6 @@ case class DesAddress(
   postalCode: Option[String] = None
 )
 
-object DesAddress {
-  implicit val desAddressJsonFormat: Format[DesAddress] = Json.format[DesAddress]
+object IpAddress {
+  implicit val ipAddressJsonFormat: Format[IpAddress] = Json.format[IpAddress]
 }

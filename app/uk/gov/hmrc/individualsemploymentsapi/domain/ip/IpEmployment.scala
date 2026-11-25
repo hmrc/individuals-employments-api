@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain.des
+package uk.gov.hmrc.individualsemploymentsapi.domain.ip
 
 import play.api.libs.json.{Format, Json}
 
@@ -22,16 +22,16 @@ import java.time.LocalDate
 import uk.gov.hmrc.domain.EmpRef
 import uk.gov.hmrc.individualsemploymentsapi.domain.PayFrequencyCode
 
-case class DesEmployment(
-  payments: Seq[DesPayment],
+case class IpEmployment(
+  payments: Seq[IpPayment],
   employerName: Option[String] = None,
-  employerAddress: Option[DesAddress] = None,
+  employerAddress: Option[IpAddress] = None,
   employerDistrictNumber: Option[String] = None,
   employerSchemeReference: Option[String] = None,
   employmentStartDate: Option[LocalDate] = None,
   employmentLeavingDate: Option[LocalDate] = None,
   employmentPayFrequency: Option[PayFrequencyCode.Value] = None,
-  employeeAddress: Option[DesAddress] = None,
+  employeeAddress: Option[IpAddress] = None,
   payrollId: Option[String] = None
 ) {
   val employerPayeReference: Option[EmpRef] =
@@ -42,6 +42,6 @@ case class DesEmployment(
 
 }
 
-object DesEmployment {
-  implicit val desEmploymentJsonFormat: Format[DesEmployment] = Json.format[DesEmployment]
+object IpEmployment {
+  implicit val ipEmploymentJsonFormat: Format[IpEmployment] = Json.format[IpEmployment]
 }

@@ -20,7 +20,7 @@ import component.uk.gov.hmrc.individualsemploymentsapi.stubs.{AuthStub, BaseSpec
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import scalaj.http.Http
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, DesEmployments}
+import uk.gov.hmrc.individualsemploymentsapi.domain.ip.{IpEmployment, IpEmployments}
 
 import java.util.UUID
 
@@ -195,7 +195,7 @@ class LiveEmploymentsControllerSpec extends BaseSpec {
         nino,
         fromDate,
         toDate,
-        DesEmployments(Seq(DesEmployment(Seq.empty, Some("employer name"))))
+        IpEmployments(Seq(IpEmployment(Seq.empty, Some("employer name"))))
       )
 
       When("the paye endpoint is invoked with a valid match id")

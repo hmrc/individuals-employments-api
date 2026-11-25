@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.individualsemploymentsapi.domain.des
+package uk.gov.hmrc.individualsemploymentsapi.domain.ip
 
 import play.api.libs.json.{Format, Json}
 
 import java.time.LocalDate
 
-case class DesPayment(
+case class IpPayment(
   paymentDate: LocalDate,
   totalPayInPeriod: Double,
   weekPayNumber: Option[Int] = None,
   monthPayNumber: Option[Int] = None
 )
 
-object DesPayment {
-  implicit val desPaymentJsonFormat: Format[DesPayment] = Json.format[DesPayment]
+object IpPayment {
+  implicit val ipPaymentJsonFormat: Format[IpPayment] = Json.format[IpPayment]
 }

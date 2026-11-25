@@ -17,12 +17,13 @@
 package uk.gov.hmrc.individualsemploymentsapi.service.v1
 
 import play.api.mvc.RequestHeader
+
 import java.time.{LocalDate, LocalTime}
 import uk.gov.hmrc.http.{HeaderCarrier, UpstreamErrorResponse}
-import uk.gov.hmrc.individualsemploymentsapi.connector.{DesConnector, IndividualsMatchingApiConnector}
+import uk.gov.hmrc.individualsemploymentsapi.connector.{IndividualsMatchingApiConnector, IntegrationPlatformRouter}
 import uk.gov.hmrc.individualsemploymentsapi.domain
 import uk.gov.hmrc.individualsemploymentsapi.domain.NinoMatch
-import uk.gov.hmrc.individualsemploymentsapi.domain.des.{DesEmployment, Individual}
+import uk.gov.hmrc.individualsemploymentsapi.domain.ip.{Individual, IpEmployment}
 import uk.gov.hmrc.individualsemploymentsapi.domain.v1.Employment
 import uk.gov.hmrc.individualsemploymentsapi.error.ErrorResponses.MatchNotFoundException
 import uk.gov.hmrc.individualsemploymentsapi.util.Interval
@@ -77,13 +78,13 @@ class SandboxEmploymentsService extends EmploymentsService {
 @Singleton
 class LiveEmploymentsService @Inject() (
   individualsMatchingApiConnector: IndividualsMatchingApiConnector,
-  desConnector: DesConnector,
+  integrationPlatformRouter: IntegrationPlatformRouter,
   @Named("retryDelay") retryDelay: Int,
   cacheService: CacheService
 )(implicit ec: ExecutionContext)
     extends EmploymentsService {
 
-  private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { (e: DesEmployment) =>
+  private def sortByLeavingDateOrLastPaymentDate(interval: Interval) = { (e: IpEmployment) =>
     e.employmentLeavingDate.getOrElse(interval.getEnd.toLocalDate)
   }
 
@@ -99,7 +100,7 @@ class LiveEmploymentsService @Inject() (
         .get(
           s"$matchId-${interval.getStart}-${interval.getEnd}",
           withRetry {
-            desConnector.fetchEmployments(ninoMatch.nino, interval)
+            integrationPlatformRouter.fetchEmployments(ninoMatch.nino, interval)
           }
         )
         .map { employments =>

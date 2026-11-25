@@ -125,7 +125,7 @@ class EmploymentsControllerSpec extends SpecBase with MockitoSugar {
   }
 
   trait NonLocalSetup extends Setup {
-   implicit val env: Environment = Environment.simple(mode = Mode.Prod)
+    implicit val env: Environment = Environment.simple(mode = Mode.Prod)
 
     val employmentsController = new EmploymentsController(
       mockEmploymentsService,
